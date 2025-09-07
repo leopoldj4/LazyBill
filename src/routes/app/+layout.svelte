@@ -16,6 +16,8 @@
 				<Sidebar.Trigger class="-ml-1" />
 			</div>
 		</header>
-		{@render children?.()}
+		<div class="flex flex-col gap-6 p-8">
+			{@render children?.()}
+		</div>
 	</Sidebar.Inset>
 </Sidebar.Provider>

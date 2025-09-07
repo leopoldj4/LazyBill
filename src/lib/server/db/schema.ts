@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { pgTable, text, timestamp, boolean, uuid, date } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -55,3 +56,44 @@ export const verification = pgTable('verification', {
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 });
+
+export const customer = pgTable("customer", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull(),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at'),
+	street: text('street').notNull().default(""),
+	city: text('city').notNull().default(""),
+	state: text('state').notNull().default(""),
+	zip: text('zip').notNull().default(""),
+	country: text('country').notNull().default(""),
+	phone: text('phone').notNull().default(""),
+	email: text('email').notNull().default(""),
+	customerNumber: text('customer_number').notNull().default(""),
+	notes: text('notes').notNull().default(""),
+});
+
+export const task = pgTable("task", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull(),
+	notes: text('notes'),
+	done: boolean('done').notNull().default(false),
+	dueDate: date('due_date'),
+	star: boolean('star').notNull().default(false),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at'),
+});
+
+export const taskRelations = relations(task, ({ one }) => ({
+    customer: one(customer, {
+        fields: [task.customerId],
+        references: [customer.id],
+    }),
+}));
+
+export const customerRelations = relations(customer, ({ many }) => ({
+    tasks: many(task),
+}));
