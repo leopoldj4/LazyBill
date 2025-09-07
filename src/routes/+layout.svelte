@@ -7,7 +7,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Junjo</title>
+	<title>Kirei</title>
 	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
