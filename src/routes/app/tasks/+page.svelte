@@ -12,6 +12,7 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import Task from './Task.svelte';
 	import { enhance } from '$app/forms';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	let { data }: PageProps = $props();
 
@@ -35,8 +36,8 @@
 
 <SiteHeader>What are you working on today?</SiteHeader>
 
-<form class="flex flex-row gap-4" method="post" action="?/createTask" use:enhance>
-	<Select.Root type="single" bind:value={selectedCustomer} name="customerId">
+<form class="flex flex-row gap-4" method="post" action="?/createTask" use:enhance={() => {return invalidateAll()}}>
+	<Select.Root type="single" bind:value={selectedCustomer} name="customerId" required>
 		<Select.Trigger class="w-[180px]">
 			{selectedCustomer
 				? data.customers.find((customer) => customer.id === selectedCustomer)!.name

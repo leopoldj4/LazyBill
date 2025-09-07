@@ -7,11 +7,29 @@ export async function handle({ event, resolve }) {
   const session = await auth.api.getSession({
     headers: event.request.headers,
   });
-
+  
   if (session) {
     event.locals.session = session.session;
     event.locals.user = session.user;
+
+    if (!event.url.pathname.startsWith('/app')) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: '/app',
+        },
+      });
+    }
   }
 
+  if (!session && event.url.pathname.startsWith('/app')) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: '/',
+      },
+    });
+  }
+  
   return svelteKitHandler({ event, resolve, auth, building });
 }
