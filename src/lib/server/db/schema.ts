@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, boolean, uuid, date } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, uuid, date, integer } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -61,8 +61,6 @@ export const customer = pgTable("customer", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at'),
 	street: text('street').notNull().default(""),
 	city: text('city').notNull().default(""),
 	state: text('state').notNull().default(""),
@@ -72,6 +70,24 @@ export const customer = pgTable("customer", {
 	email: text('email').notNull().default(""),
 	customerNumber: text('customer_number').notNull().default(""),
 	notes: text('notes').notNull().default(""),
+});
+
+export const invoice = pgTable("invoice", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
+	invoiceNumber: text('invoice_number').notNull(),
+	invoiceDate: date('invoice_date').notNull(),
+	invoiceDueDate: date('invoice_due_date').notNull(),
+	notes: text('notes').notNull().default(""),
+});
+
+export const invoiceArticle = pgTable("invoice_article", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	invoiceId: uuid('invoice_id').references(() => invoice.id, { onDelete: 'cascade' }),
+	article: text('article').notNull(),
+	quantity: integer('quantity').notNull(),
+	price: integer('price').notNull(),
 });
 
 export const task = pgTable("task", {
@@ -88,12 +104,27 @@ export const task = pgTable("task", {
 });
 
 export const taskRelations = relations(task, ({ one }) => ({
-    customer: one(customer, {
-        fields: [task.customerId],
-        references: [customer.id],
-    }),
+	customer: one(customer, {
+		fields: [task.customerId],
+		references: [customer.id],
+	}),
 }));
 
 export const customerRelations = relations(customer, ({ many }) => ({
-    tasks: many(task),
+	tasks: many(task),
+}));
+
+export const invoiceRelations = relations(invoice, ({ many, one }) => ({
+	customer: one(customer, {
+		fields: [invoice.customerId],
+		references: [customer.id],
+	}),
+	articles: many(invoiceArticle),
+}));
+
+export const invoiceArticleRelations = relations(invoiceArticle, ({ one }) => ({
+	invoice: one(invoice, {
+		fields: [invoiceArticle.invoiceId],
+		references: [invoice.id],
+	}),
 }));

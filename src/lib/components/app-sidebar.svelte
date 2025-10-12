@@ -15,6 +15,7 @@
 
 <Sidebar.Root {collapsible} {...restProps}>
 	<Sidebar.Header>
+		<h1 class="text-2xl font-bold p-3 text-center">Kirei</h1>
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<NavThings />

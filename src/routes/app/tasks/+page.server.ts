@@ -3,7 +3,7 @@ import { customer, task } from "$lib/server/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function load({ locals }) {
-    const userId = locals.user.id;
+    const userId = locals.user!.id;
 
     const customers = await db.query.customer.findMany({
         where: eq(customer.userId, userId),

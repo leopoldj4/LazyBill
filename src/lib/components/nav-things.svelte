@@ -30,7 +30,6 @@
 </script>
 
 <Sidebar.Group>
-	<Sidebar.GroupLabel>Things</Sidebar.GroupLabel>
 	<Sidebar.Menu>
 		{#each items as item (item.title)}
 			<Sidebar.MenuItem>
