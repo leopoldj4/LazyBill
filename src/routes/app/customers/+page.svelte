@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 
 	const { data } = $props();
@@ -13,11 +14,44 @@
 			Add Customer
 		</a>
 	</div>
-	<ul>
-		{#each data.customers as customer}
-			<li>
-				<a href={`/app/customers/${customer.id}`}>{customer.name}</a>
-			</li>
-		{/each}
-	</ul>
+	
+	<div class="mt-6">
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Name</TableHead>
+					<TableHead>Email</TableHead>
+					<TableHead>Phone</TableHead>
+					<TableHead>Address</TableHead>
+					<TableHead>Customer Number</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{#each data.customers as customer}
+					<TableRow>
+						<TableCell>
+							<a href={`/app/customers/${customer.id}`} class="font-medium text-blue-600 hover:text-blue-800 hover:underline">
+								{customer.name}
+							</a>
+						</TableCell>
+						<TableCell>{customer.email || '-'}</TableCell>
+						<TableCell>{customer.phone || '-'}</TableCell>
+						<TableCell>
+							{#if customer.street || customer.city || customer.state || customer.zip}
+								<div class="text-sm">
+									{#if customer.street}{customer.street}<br/>{/if}
+									{#if customer.city || customer.state || customer.zip}
+										{customer.city}{#if customer.city && customer.state}, {/if}{customer.state} {customer.zip}
+									{/if}
+								</div>
+							{:else}
+								-
+							{/if}
+						</TableCell>
+						<TableCell>{customer.customerNumber || '-'}</TableCell>
+					</TableRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</div>
 </div>
