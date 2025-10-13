@@ -6,6 +6,8 @@
 	import { authClient } from '$lib/auth-client';
 	import logo from '$lib/assets/logo.svg';
 	import type { SidebarUser } from './sidebar-user';
+	import BuildingIcon from '@lucide/svelte/icons/building';
+	import UserIcon from '@lucide/svelte/icons/user';
 
 	let {
 		ref = $bindable(null),
@@ -24,6 +26,24 @@
 		<NavThings />
 	</Sidebar.Content>
 	<Sidebar.Footer>
+		<Sidebar.MenuItem>
+			<Sidebar.MenuButton>
+				{#snippet child({ props })}
+					<a href="/app/company" {...props}><BuildingIcon />My Company</a>
+				{/snippet}
+			</Sidebar.MenuButton>
+		</Sidebar.MenuItem>
+		<Sidebar.MenuItem>
+			<Sidebar.MenuButton>
+				{#snippet child({ props })}
+					<a href="/app/account" {...props}>
+						<UserIcon />
+						Account Settings
+					</a>
+				{/snippet}
+			</Sidebar.MenuButton>
+		</Sidebar.MenuItem>
+		<Sidebar.Separator />
 		<NavUser {user} />
 	</Sidebar.Footer>
 	<Sidebar.Rail />
