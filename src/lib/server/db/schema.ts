@@ -107,6 +107,26 @@ export const task = pgTable("task", {
 	updatedAt: timestamp('updated_at'),
 });
 
+export const company = pgTable("company", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	name: text('name').notNull(),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	phone: text('phone').notNull(),
+	country: text('country').notNull(),
+	state: text('state').notNull(),
+	city: text('city').notNull(),
+	street: text('street').notNull(),
+	streetExtra: text('street_extra').notNull(),
+	zip: text('zip').notNull(),
+});
+
+export const userRelations = relations(user, ({ many, one }) => ({
+	tasks: many(task),
+	invoices: many(invoice),
+	customers: many(customer),
+	companies: one(company),
+}));
+
 export const taskRelations = relations(task, ({ one }) => ({
 	customer: one(customer, {
 		fields: [task.customerId],
