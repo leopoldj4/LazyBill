@@ -8,15 +8,19 @@ import { eq, and } from "drizzle-orm";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
+  representative: z.string(),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
   phone: z.string().optional(),
-  customerNumber: z.string().optional(),
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
-  country: z.string().optional(),
-  notes: z.string().optional(),
+  
+  // Invoice address fields
+  invoiceName: z.string(),
+  invoiceCountry: z.string(),
+  invoiceState: z.string(),
+  invoiceCity: z.string(),
+  invoiceStreet: z.string(),
+  invoicePhone: z.string(),
+  invoiceStreetExtra: z.string(),
+  invoiceZip: z.string(),
 });
 
 export const load = async ({ params, locals }) => {

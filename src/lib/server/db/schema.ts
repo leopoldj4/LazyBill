@@ -60,16 +60,20 @@ export const verification = pgTable('verification', {
 export const customer = pgTable("customer", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	street: text('street').notNull().default(""),
-	city: text('city').notNull().default(""),
-	state: text('state').notNull().default(""),
-	zip: text('zip').notNull().default(""),
-	country: text('country').notNull().default(""),
-	phone: text('phone').notNull().default(""),
+	representative: text('representative').notNull().default(""),
 	email: text('email').notNull().default(""),
-	customerNumber: text('customer_number').notNull().default(""),
-	notes: text('notes').notNull().default(""),
+	phone: text('phone').notNull().default(""),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	
+	// Invoice address fields
+	invoiceName: text('invoice_name').notNull().default(""),
+	invoiceCountry: text('invoice_country').notNull().default(""),
+	invoiceState: text('invoice_state').notNull().default(""),
+	invoiceCity: text('invoice_city').notNull().default(""),
+	invoiceStreet: text('invoice_street').notNull().default(""),
+	invoicePhone: text('invoice_phone').notNull().default(""),
+	invoiceStreetExtra: text('invoice_street_extra').notNull().default(""),
+	invoiceZip: text('invoice_zip').notNull().default(""),
 });
 
 export const invoice = pgTable("invoice", {

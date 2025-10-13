@@ -60,6 +60,11 @@
 							<div>
 								<span class="font-medium">Name:</span> {data.customer.name}
 							</div>
+							{#if data.customer.representative}
+								<div>
+									<span class="font-medium">Representative:</span> {data.customer.representative}
+								</div>
+							{/if}
 							{#if data.customer.email}
 								<div>
 									<span class="font-medium">Email:</span> 
@@ -76,50 +81,49 @@
 									</a>
 								</div>
 							{/if}
-							{#if data.customer.customerNumber}
-								<div>
-									<span class="font-medium">Customer Number:</span> {data.customer.customerNumber}
-								</div>
-							{/if}
 						</div>
 					</div>
 				</div>
 
-				<!-- Address Information -->
+				<!-- Invoice Address Information -->
 				<div class="space-y-4">
 					<div>
-						<h3 class="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Address</h3>
+						<h3 class="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Invoice Address</h3>
 						<div class="mt-2">
-							{#if data.customer.street || data.customer.city || data.customer.state || data.customer.zip || data.customer.country}
+							{#if data.customer.invoiceName || data.customer.invoiceStreet || data.customer.invoiceCity || data.customer.invoiceState || data.customer.invoiceZip || data.customer.invoiceCountry}
 								<div class="space-y-1">
-									{#if data.customer.street}
-										<div>{data.customer.street}</div>
+									{#if data.customer.invoiceName}
+										<div class="font-medium">{data.customer.invoiceName}</div>
 									{/if}
-									{#if data.customer.city || data.customer.state || data.customer.zip}
+									{#if data.customer.invoiceStreet}
+										<div>{data.customer.invoiceStreet}</div>
+									{/if}
+									{#if data.customer.invoiceStreetExtra}
+										<div>{data.customer.invoiceStreetExtra}</div>
+									{/if}
+									{#if data.customer.invoiceCity || data.customer.invoiceState || data.customer.invoiceZip}
 										<div>
-											{data.customer.city}{#if data.customer.city && data.customer.state}, {/if}
-											{data.customer.state} {data.customer.zip}
+											{data.customer.invoiceCity}{#if data.customer.invoiceCity && data.customer.invoiceState}, {/if}
+											{data.customer.invoiceState} {data.customer.invoiceZip}
 										</div>
 									{/if}
-									{#if data.customer.country}
-										<div>{data.customer.country}</div>
+									{#if data.customer.invoiceCountry}
+										<div>{data.customer.invoiceCountry}</div>
+									{/if}
+									{#if data.customer.invoicePhone}
+										<div class="pt-2">
+											<span class="font-medium">Phone:</span> 
+											<a href="tel:{data.customer.invoicePhone}" class="text-blue-600 hover:text-blue-800 hover:underline ml-1">
+												{data.customer.invoicePhone}
+											</a>
+										</div>
 									{/if}
 								</div>
 							{:else}
-								<span class="text-muted-foreground">No address provided</span>
+								<span class="text-muted-foreground">No invoice address provided</span>
 							{/if}
 						</div>
 					</div>
-
-					<!-- Notes -->
-					{#if data.customer.notes}
-						<div>
-							<h3 class="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Notes</h3>
-							<div class="mt-2 p-3 bg-muted rounded-md">
-								{data.customer.notes}
-							</div>
-						</div>
-					{/if}
 				</div>
 			</div>
 		</CardContent>

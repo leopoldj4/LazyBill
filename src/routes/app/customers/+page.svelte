@@ -20,10 +20,10 @@
 			<TableHeader>
 				<TableRow>
 					<TableHead>Name</TableHead>
+					<TableHead>Representative</TableHead>
 					<TableHead>Email</TableHead>
 					<TableHead>Phone</TableHead>
-					<TableHead>Address</TableHead>
-					<TableHead>Customer Number</TableHead>
+					<TableHead>Invoice Address</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -34,21 +34,21 @@
 								{customer.name}
 							</a>
 						</TableCell>
+						<TableCell>{customer.representative || '-'}</TableCell>
 						<TableCell>{customer.email || '-'}</TableCell>
 						<TableCell>{customer.phone || '-'}</TableCell>
 						<TableCell>
-							{#if customer.street || customer.city || customer.state || customer.zip}
+							{#if customer.invoiceStreet || customer.invoiceCity || customer.invoiceState || customer.invoiceZip}
 								<div class="text-sm">
-									{#if customer.street}{customer.street}<br/>{/if}
-									{#if customer.city || customer.state || customer.zip}
-										{customer.city}{#if customer.city && customer.state}, {/if}{customer.state} {customer.zip}
+									{#if customer.invoiceStreet}{customer.invoiceStreet}<br/>{/if}
+									{#if customer.invoiceCity || customer.invoiceState || customer.invoiceZip}
+										{customer.invoiceCity}{#if customer.invoiceCity && customer.invoiceState}, {/if}{customer.invoiceState} {customer.invoiceZip}
 									{/if}
 								</div>
 							{:else}
 								-
 							{/if}
 						</TableCell>
-						<TableCell>{customer.customerNumber || '-'}</TableCell>
 					</TableRow>
 				{/each}
 			</TableBody>
