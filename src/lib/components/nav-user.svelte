@@ -10,9 +10,16 @@
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import type { SidebarUser } from '$lib/components/sidebar-user';
+	import { enhance } from '$app/forms';
 
 	let { user }: { user: SidebarUser } = $props();
 	const sidebar = useSidebar();
+	
+	let signoutForm: HTMLFormElement;
+	
+	function handleSignOut() {
+		signoutForm.requestSubmit();
+	}
 </script>
 
 <Sidebar.Menu>
@@ -43,7 +50,7 @@
 				align="end"
 				sideOffset={4}
 			>
-				<DropdownMenu.Item>
+				<DropdownMenu.Item onclick={handleSignOut}>
 					<LogOutIcon />
 					Log out
 				</DropdownMenu.Item>
@@ -51,3 +58,6 @@
 		</DropdownMenu.Root>
 	</Sidebar.MenuItem>
 </Sidebar.Menu>
+
+<form bind:this={signoutForm} method="POST" action="/app?/signout" use:enhance class="hidden">
+</form>

@@ -1,6 +1,8 @@
 import { db } from "$lib/server/db"
 import { customer, invoice } from "$lib/server/db/schema";
 import { eq, count } from "drizzle-orm";
+import { auth } from "$lib/server/auth";
+import { redirect } from "@sveltejs/kit";
 
 
 export async function load({ locals }) {
@@ -24,3 +26,12 @@ export async function load({ locals }) {
     }
 }
 
+export const actions = {
+    signout: async ({ request }) => {
+        await auth.api.signOut({ 
+            headers: request.headers 
+        });
+        
+        throw redirect(302, '/');
+    }
+};
