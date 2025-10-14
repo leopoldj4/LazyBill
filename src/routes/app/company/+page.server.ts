@@ -16,6 +16,9 @@ const schema = z.object({
   streetExtra: z.string().default(""),
   zip: z.string().min(1, "Zip code is required"),
   smallBusiness: z.boolean().default(false),
+  bankName: z.string().default(""),
+  bankIban: z.string().default(""),
+  bankBic: z.string().default(""),
 });
 
 export const load = async ({ locals }) => {
@@ -38,6 +41,9 @@ export const load = async ({ locals }) => {
     streetExtra: existingCompany?.streetExtra || "",
     zip: existingCompany?.zip || "",
     smallBusiness: existingCompany?.smallBusiness || false,
+    bankName: existingCompany?.bankName || "",
+    bankIban: existingCompany?.bankIban || "",
+    bankBic: existingCompany?.bankBic || "",
   }, zod4(schema));
 
   return { 
@@ -59,7 +65,7 @@ export const actions = {
     }
 
     try {
-      const { name, phone, country, state, city, street, streetExtra, zip, smallBusiness } = form.data;
+      const { name, phone, country, state, city, street, streetExtra, zip, smallBusiness, bankName, bankIban, bankBic } = form.data;
 
       // Check if company already exists
       const companies = await db.select().from(company).where(eq(company.userId, locals.user.id)).limit(1);
@@ -77,6 +83,9 @@ export const actions = {
             streetExtra,
             zip,
             smallBusiness,
+            bankName,
+            bankIban,
+            bankBic,
           })
           .where(eq(company.userId, locals.user.id));
       } else {
@@ -91,6 +100,9 @@ export const actions = {
           streetExtra,
           zip,
           smallBusiness,
+          bankName,
+          bankIban,
+          bankBic,
           userId: locals.user.id,
         });
       }

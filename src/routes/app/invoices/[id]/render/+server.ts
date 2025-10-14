@@ -89,9 +89,9 @@ function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
   // Bank account
   (
     name: "${company.name}",
-    bank: "Deutsche Postbank AG",
-    iban: "DE89370400440532013000",
-    bic: "PBNKDEFF",
+    bank: "${company.bankName}",
+    iban: "${company.bankIban}",
+    bic: "${company.bankBic}",
   ),
   // Umsatzsteuersatz (VAT)
   vat: 0.19,

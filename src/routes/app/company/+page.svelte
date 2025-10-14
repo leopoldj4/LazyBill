@@ -149,6 +149,47 @@
 
 				<div class="space-y-6">
 					<div>
+						<h3 class="text-lg font-semibold mb-4">Bank Information</h3>
+					</div>
+
+					<div class="grid grid-cols-1 gap-6">
+						<Field.Field>
+							<Field.Label for="bankName">Bank Name</Field.Label>
+							<Field.Description>The name of your bank</Field.Description>
+							<Input 
+								name="bankName" 
+								id="bankName" 
+								placeholder="Enter bank name" 
+								bind:value={$form.bankName} 
+							/>
+						</Field.Field>
+
+						<Field.Field>
+							<Field.Label for="bankIban">IBAN</Field.Label>
+							<Field.Description>International Bank Account Number</Field.Description>
+							<Input 
+								name="bankIban" 
+								id="bankIban" 
+								placeholder="Enter IBAN" 
+								bind:value={$form.bankIban} 
+							/>
+						</Field.Field>
+
+						<Field.Field>
+							<Field.Label for="bankBic">BIC</Field.Label>
+							<Field.Description>Bank Identifier Code (SWIFT code)</Field.Description>
+							<Input 
+								name="bankBic" 
+								id="bankBic" 
+								placeholder="Enter BIC" 
+								bind:value={$form.bankBic} 
+							/>
+						</Field.Field>
+					</div>
+				</div>
+
+				<div class="space-y-6">
+					<div>
 						<h3 class="text-lg font-semibold mb-4">Business Settings</h3>
 					</div>
 

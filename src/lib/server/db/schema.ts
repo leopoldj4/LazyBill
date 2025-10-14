@@ -119,6 +119,9 @@ export const company = pgTable("company", {
 	streetExtra: text('street_extra').notNull(),
 	zip: text('zip').notNull(),
 	smallBusiness: boolean('small_business').notNull().default(false),
+	bankName: text('bank_name').notNull().default(""),
+	bankIban: text('bank_iban').notNull().default(""),
+	bankBic: text('bank_bic').notNull().default(""),
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({
