@@ -20,8 +20,8 @@
 <Sidebar.Root {collapsible} {...restProps}>
 	<Sidebar.Header>
 		<a href="/app">
-			<img src={logo} alt="Kirei" class="mx-auto mt-3 h-6 w-6" />
-			<h1 class="p-3 text-center text-2xl font-bold">Kirei</h1>
+			<img src={logo} alt="Tempora" class="mx-auto mt-3 h-6 w-6" />
+			<h1 class="p-3 text-center text-2xl font-bold">Tempora</h1>
 		</a>
 	</Sidebar.Header>
 	<Sidebar.Content>

@@ -8,7 +8,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Kirei</title>
+	<title>Tempora</title>
 	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
