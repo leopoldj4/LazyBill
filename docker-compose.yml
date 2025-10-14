@@ -10,5 +10,10 @@ services:
       POSTGRES_DB: local
     volumes:
       - pgdata:/var/lib/postgresql/data
+    
+  typst-server:
+    image: ghcr.io/leopoldlabs/typst-server
+    ports:
+      - 8000:8000
 volumes:
   pgdata:
