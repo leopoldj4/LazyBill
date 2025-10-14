@@ -77,7 +77,7 @@ function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
     street: "${company.street}",
     zip: "${company.zip}",
     city: "${company.city}",
-    tax_nr: "TODO",
+    tax_nr: "${company.taxNumber}",
   ),
   // Recipient
   (

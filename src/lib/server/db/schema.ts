@@ -123,6 +123,7 @@ export const company = pgTable("company", {
 	bankIban: text('bank_iban').notNull().default(""),
 	bankBic: text('bank_bic').notNull().default(""),
 	representative: text('representative').notNull().default(""),
+	taxNumber: text('tax_number').notNull().default(""),
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({

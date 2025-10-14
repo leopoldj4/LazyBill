@@ -20,6 +20,7 @@ const schema = z.object({
   bankIban: z.string().default(""),
   bankBic: z.string().default(""),
   representative: z.string().default(""),
+  taxNumber: z.string().default(""),
 });
 
 export const load = async ({ locals }) => {
@@ -46,6 +47,7 @@ export const load = async ({ locals }) => {
     bankIban: existingCompany?.bankIban || "",
     bankBic: existingCompany?.bankBic || "",
     representative: existingCompany?.representative || "",
+    taxNumber: existingCompany?.taxNumber || "",
   }, zod4(schema));
 
   return { 
@@ -67,7 +69,7 @@ export const actions = {
     }
 
     try {
-      const { name, phone, country, state, city, street, streetExtra, zip, smallBusiness, bankName, bankIban, bankBic, representative } = form.data;
+      const { name, phone, country, state, city, street, streetExtra, zip, smallBusiness, bankName, bankIban, bankBic, representative, taxNumber } = form.data;
 
       // Check if company already exists
       const companies = await db.select().from(company).where(eq(company.userId, locals.user.id)).limit(1);
@@ -89,6 +91,7 @@ export const actions = {
             bankIban,
             bankBic,
             representative,
+            taxNumber,
           })
           .where(eq(company.userId, locals.user.id));
       } else {
@@ -107,6 +110,7 @@ export const actions = {
           bankIban,
           bankBic,
           representative,
+          taxNumber,
           userId: locals.user.id,
         });
       }

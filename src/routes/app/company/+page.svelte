@@ -165,6 +165,17 @@
 						</Field.Field>
 
 						<Field.Field>
+							<Field.Label for="taxNumber">Tax Number</Field.Label>
+							<Field.Description>Company tax identification number</Field.Description>
+							<Input 
+								name="taxNumber" 
+								id="taxNumber" 
+								placeholder="Enter tax number" 
+								bind:value={$form.taxNumber} 
+							/>
+						</Field.Field>
+
+						<Field.Field>
 							<Field.Label for="bankName">Bank Name</Field.Label>
 							<Field.Description>The name of your bank</Field.Description>
 							<Input 
