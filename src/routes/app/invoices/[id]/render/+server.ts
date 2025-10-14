@@ -88,7 +88,7 @@ function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
   ),
   // Bank account
   (
-    name: "${company.name}",
+    name: "${company.representative || company.name}",
     bank: "${company.bankName}",
     iban: "${company.bankIban}",
     bic: "${company.bankBic}",

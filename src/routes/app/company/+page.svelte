@@ -154,6 +154,17 @@
 
 					<div class="grid grid-cols-1 gap-6">
 						<Field.Field>
+							<Field.Label for="representative">Representative</Field.Label>
+							<Field.Description>Name of the company representative</Field.Description>
+							<Input 
+								name="representative" 
+								id="representative" 
+								placeholder="Enter representative name" 
+								bind:value={$form.representative} 
+							/>
+						</Field.Field>
+
+						<Field.Field>
 							<Field.Label for="bankName">Bank Name</Field.Label>
 							<Field.Description>The name of your bank</Field.Description>
 							<Input 
