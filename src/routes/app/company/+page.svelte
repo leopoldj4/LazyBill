@@ -5,6 +5,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import * as Field from '$lib/components/ui/field/';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { toast } from 'svelte-sonner';
 
 	const { data } = $props();
@@ -143,6 +144,24 @@
 							placeholder="Enter additional address details" 
 							bind:value={$form.streetExtra} 
 						/>
+					</Field.Field>
+				</div>
+
+				<div class="space-y-6">
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Business Settings</h3>
+					</div>
+
+					<Field.Field>
+						<div class="flex items-center space-x-2">
+							<Checkbox 
+								name="smallBusiness" 
+								id="smallBusiness" 
+								bind:checked={$form.smallBusiness} 
+							/>
+							<Field.Label for="smallBusiness">Small Business</Field.Label>
+						</div>
+						<Field.Description>Mark this company as a small business for tax and reporting purposes.</Field.Description>
 					</Field.Field>
 				</div>
 

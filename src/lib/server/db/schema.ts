@@ -118,6 +118,7 @@ export const company = pgTable("company", {
 	street: text('street').notNull(),
 	streetExtra: text('street_extra').notNull(),
 	zip: text('zip').notNull(),
+	smallBusiness: boolean('small_business').notNull().default(false),
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({
