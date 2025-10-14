@@ -95,7 +95,7 @@ function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
   ),
   // Umsatzsteuersatz (VAT)
   vat: 0.19,
-  kleinunternehmer: false,
+  kleinunternehmer: ${company.smallBusiness ? "true" : "false"},
 )
     `;
 }
