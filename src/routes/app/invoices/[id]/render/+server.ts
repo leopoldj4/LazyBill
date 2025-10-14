@@ -2,7 +2,7 @@ import { db } from "$lib/server/db";
 import type { RequestHandler } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import { error } from "@sveltejs/kit";
-import { invoice, customer, company } from "$lib/server/db/schema";
+import { invoice, customer, company, invoiceArticle } from "$lib/server/db/schema";
 import { compile } from "$lib/typst-server";
 import { TYPST_SERVER_URL } from "$env/static/private";
 
@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     where: and(eq(invoice.userId, userId), eq(invoice.id, invoiceId)),
     with: {
       customer: true,
+      articles: true,
     },
   });
 
@@ -41,12 +42,14 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 }
 
 type Invoice = typeof invoice.$inferSelect;
+type InvoiceArticle = typeof invoiceArticle.$inferSelect;
 type Customer = typeof customer.$inferSelect;
 type Company = typeof company.$inferSelect;
 
 type InvoiceWithCustomer = Invoice & {
   customer: Customer | null;
   customerId: string | null;
+  articles: InvoiceArticle[];
 };
 
 function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
@@ -62,14 +65,11 @@ function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
   datetime(year: ${invoiceDate.getFullYear()}, month: ${invoiceDate.getMonth() + 1}, day: ${invoiceDate.getDate()}),
   // Items
   (
-    (
-      description: "The first service provided. The first service provided. The first service provided",
-      price: 200,
-    ),
-    (
-      description: "The second service provided",
-      price: 150.2
-    ),
+    ${invoice.articles.map(article => `(
+        description: "${article.quantity} x ${article.article} (${article.price}€)",
+        price: ${article.price * article.quantity},
+      ),`).join(",\n")
+    }
   ),
   // Author
   (
