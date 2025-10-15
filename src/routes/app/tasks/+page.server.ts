@@ -21,7 +21,7 @@ export async function load({ locals }) {
 
 export const actions = {
     createTask: async ({ request, locals }) => {
-        const userId = locals.user.id;
+        const userId = locals.user!.id;
         const formData = await request.formData();
         const taskName = formData.get('taskName') as string;
         const customerId = formData.get('customerId') as string | null;
@@ -34,7 +34,7 @@ export const actions = {
     },
 
     updateTask: async ({ request, locals }) => {
-        const userId = locals.user.id;
+        const userId = locals.user!.id;
         const formData = await request.formData();
         const taskId = formData.get('taskId')! as string;
 

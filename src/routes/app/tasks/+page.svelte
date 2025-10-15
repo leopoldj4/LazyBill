@@ -18,7 +18,7 @@
 
 	let showDone = $state(false);
 
-	let tasks = $state(data.tasks);
+	let tasks = $derived(data.tasks);
 	let filteredTasks = $derived(tasks.filter((task) => task.done === showDone));
 
 	let selectedCustomer = $state<string | undefined>(undefined);
@@ -38,7 +38,7 @@
 
 <form class="flex flex-row gap-4" method="post" action="?/createTask" use:enhance={() => {return invalidateAll()}}>
 	<Select.Root type="single" bind:value={selectedCustomer} name="customerId" required>
-		<Select.Trigger class="w-[180px]">
+		<Select.Trigger class="w-[250px]">
 			{selectedCustomer
 				? data.customers.find((customer) => customer.id === selectedCustomer)!.name
 				: 'Select a customer'}
