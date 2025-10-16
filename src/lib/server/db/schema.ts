@@ -64,7 +64,6 @@ export const customer = pgTable("customer", {
 	email: text('email').notNull().default(""),
 	phone: text('phone').notNull().default(""),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	
 	// Invoice address fields
 	invoiceName: text('invoice_name').notNull().default(""),
 	invoiceCountry: text('invoice_country').notNull().default(""),
@@ -107,6 +106,14 @@ export const task = pgTable("task", {
 	updatedAt: timestamp('updated_at'),
 });
 
+export const timeEntry = pgTable("time_entry", {
+	id: uuid('id').primaryKey().defaultRandom(),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	taskId: uuid('task_id').references(() => task.id, { onDelete: 'cascade' }),
+	startTime: timestamp('start_time').notNull(),
+	stopTime: timestamp('stop_time'),
+});
+
 export const company = pgTable("company", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
@@ -131,13 +138,20 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	invoices: many(invoice),
 	customers: many(customer),
 	companies: one(company),
+	timeEntry: many(timeEntry),
 }));
 
-export const taskRelations = relations(task, ({ one }) => ({
+export const taskRelations = relations(task, ({ one, many }) => ({
 	customer: one(customer, {
 		fields: [task.customerId],
 		references: [customer.id],
 	}),
+	timeEntries: many(timeEntry),
+}));
+
+export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
+	task: one(task),
+	user: one(user),
 }));
 
 export const customerRelations = relations(customer, ({ many }) => ({
