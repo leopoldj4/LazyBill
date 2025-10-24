@@ -93,23 +93,10 @@ export const invoiceArticle = pgTable("invoice_article", {
 	price: integer('price').notNull(),
 });
 
-export const task = pgTable("task", {
-	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull(),
-	notes: text('notes'),
-	done: boolean('done').notNull().default(false),
-	dueDate: date('due_date'),
-	star: boolean('star').notNull().default(false),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at'),
-});
-
 export const timeEntry = pgTable("time_entry", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-	taskId: uuid('task_id').references(() => task.id, { onDelete: 'cascade' }),
+	description: text('description').notNull(),
 	startTime: timestamp('start_time').notNull(),
 	stopTime: timestamp('stop_time'),
 });
@@ -134,30 +121,13 @@ export const company = pgTable("company", {
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({
-	tasks: many(task),
 	invoices: many(invoice),
 	customers: many(customer),
 	company: one(company),
 	timeEntries: many(timeEntry),
 }));
 
-export const taskRelations = relations(task, ({ one, many }) => ({
-	customer: one(customer, {
-		fields: [task.customerId],
-		references: [customer.id],
-	}),
-	timeEntries: many(timeEntry),
-	user: one(user, {
-		fields: [task.userId],
-		references: [user.id],
-	}),
-}));
-
 export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
-	task: one(task, {
-		fields: [timeEntry.taskId],
-		references: [task.id],
-	}),
 	user: one(user, {
 		fields: [timeEntry.userId],
 		references: [user.id],
@@ -165,7 +135,6 @@ export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
 }));
 
 export const customerRelations = relations(customer, ({ many, one }) => ({
-	tasks: many(task),
 	invoices: many(invoice),
 	user: one(user, {
 		fields: [customer.userId],

@@ -3,7 +3,6 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import NavItem from './NavItem.svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
-	import TaskIcon from '@lucide/svelte/icons/list-todo';
 	import ClockIcon from '@lucide/svelte/icons/clock';
 	import InvoiceIcon from '@lucide/svelte/icons/file-text';
 	let { children, data } = $props();
@@ -86,7 +85,6 @@
 		<nav class="px-2">
 			<NavItem href="/app" icon={GaugeCircleIcon}>Dashboard</NavItem>
 			<NavItem href="/app/customers" icon={UsersIcon}>Customers</NavItem>
-			<NavItem href="/app/tasks" icon={TaskIcon}>Tasks</NavItem>
 			<NavItem href="/app/time-tracking" icon={ClockIcon}>Time Tracking</NavItem>
 			<NavItem href="/app/invoices" icon={InvoiceIcon}>Invoices</NavItem>
 		</nav>

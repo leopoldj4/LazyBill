@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import UsersIcon from '@lucide/svelte/icons/users';
-    import TaskIcon from '@lucide/svelte/icons/list-todo';
     import ClockIcon from '@lucide/svelte/icons/clock';
     import InvoiceIcon from '@lucide/svelte/icons/file-text';
 
@@ -11,11 +10,6 @@
 			url: '/app/customers',
 			icon: UsersIcon,
 		},
-        {
-            title: 'Tasks',
-            url: '/app/tasks',
-            icon: TaskIcon,
-        },
         {
             title: 'Time Tracking',
             url: '/app/time-tracking',

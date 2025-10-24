@@ -1,5 +1,5 @@
 import { db } from "$lib/server/db";
-import { customer, task, timeEntry } from "$lib/server/db/schema";
+import { timeEntry } from "$lib/server/db/schema";
 import { fail } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import { superValidate } from "sveltekit-superforms";
@@ -9,32 +9,25 @@ import z from "zod";
 export async function load({ locals }) {
     const userId = locals.user!.id;
 
-    const customers = await db.query.customer.findMany({
-        where: eq(customer.userId, userId),
-    });
-
-    const tasks = await db.query.task.findMany({
-        where: and(eq(task.done, false), eq(task.userId, userId)),
-        with: {
-            timeEntries: true,
-        },
+    const timeEntries = await db.query.timeEntry.findMany({
+        where: eq(timeEntry.userId, userId),
+        orderBy: (timeEntry, { desc }) => [desc(timeEntry.startTime)],
     });
 
     return {
-        customers,
-        tasks,
+        timeEntries,
     }
 }
 
 const timeEntrySaveSchema = z.object({
-    taskId: z.string(),
+    description: z.string(),
     startTime: z.date(),
     stopTime: z.date().optional(),
 });
 
 const timeEntryUpdateSchema = z.object({
     id: z.string(),
-    taskId: z.string(),
+    description: z.string(),
     startTime: z.date(),
     stopTime: z.date().optional(),
 });
@@ -52,7 +45,7 @@ export const actions = {
         try {
             await db.insert(timeEntry).values({
                 userId,
-                taskId: form.data.taskId,
+                description: form.data.description,
                 startTime: form.data.startTime,
                 stopTime: form.data.stopTime,
             });
@@ -75,7 +68,7 @@ export const actions = {
 
         try {
             db.update(timeEntry).set({
-                taskId: form.data.taskId,
+                description: form.data.description,
                 startTime: form.data.startTime,
                 stopTime: form.data.stopTime,
             }).where(
