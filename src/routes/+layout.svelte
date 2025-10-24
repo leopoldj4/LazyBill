@@ -1,5 +1,6 @@
 <script lang="ts">
-	import '@fontsource/atkinson-hyperlegible';
+	import '@fontsource/atkinson-hyperlegible/400';
+	import '@fontsource/atkinson-hyperlegible/700';
 	import '../app.css';
 	import favicon from '$lib/assets/logo.svg';
 

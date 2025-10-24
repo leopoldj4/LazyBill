@@ -15,6 +15,9 @@ export async function load({ locals }) {
 
     const tasks = await db.query.task.findMany({
         where: and(eq(task.done, false), eq(task.userId, userId)),
+        with: {
+            timeEntries: true,
+        },
     });
 
     return {

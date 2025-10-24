@@ -137,8 +137,8 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	tasks: many(task),
 	invoices: many(invoice),
 	customers: many(customer),
-	companies: one(company),
-	timeEntry: many(timeEntry),
+	company: one(company),
+	timeEntries: many(timeEntry),
 }));
 
 export const taskRelations = relations(task, ({ one, many }) => ({
@@ -147,15 +147,30 @@ export const taskRelations = relations(task, ({ one, many }) => ({
 		references: [customer.id],
 	}),
 	timeEntries: many(timeEntry),
+	user: one(user, {
+		fields: [task.userId],
+		references: [user.id],
+	}),
 }));
 
 export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
-	task: one(task),
-	user: one(user),
+	task: one(task, {
+		fields: [timeEntry.taskId],
+		references: [task.id],
+	}),
+	user: one(user, {
+		fields: [timeEntry.userId],
+		references: [user.id],
+	}),
 }));
 
-export const customerRelations = relations(customer, ({ many }) => ({
+export const customerRelations = relations(customer, ({ many, one }) => ({
 	tasks: many(task),
+	invoices: many(invoice),
+	user: one(user, {
+		fields: [customer.userId],
+		references: [user.id],
+	}),
 }));
 
 export const invoiceRelations = relations(invoice, ({ many, one }) => ({
@@ -164,11 +179,22 @@ export const invoiceRelations = relations(invoice, ({ many, one }) => ({
 		references: [customer.id],
 	}),
 	articles: many(invoiceArticle),
+	user: one(user, {
+		fields: [invoice.userId],
+		references: [user.id],
+	}),
 }));
 
 export const invoiceArticleRelations = relations(invoiceArticle, ({ one }) => ({
 	invoice: one(invoice, {
 		fields: [invoiceArticle.invoiceId],
 		references: [invoice.id],
+	}),
+}));
+
+export const companyRelations = relations(company, ({ one }) => ({
+	user: one(user, {
+		fields: [company.userId],
+		references: [user.id],
 	}),
 }));

@@ -7,6 +7,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import TimerIcon from '@lucide/svelte/icons/timer';
 	import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
+	import DebouncedInput from '$lib/components/DebouncedInput.svelte';
 
 	type TaskRepr = {
 		id: string;
@@ -80,6 +81,7 @@
 			value={taskState.customerId || undefined}
 			onValueChange={(newValue) => {
 				taskState.customerId = newValue || null;
+				updateTask();
 			}}
 			name="customerId"
 		>
@@ -96,7 +98,7 @@
 		</Select.Root>
 	</Table.Cell>
 	<Table.Cell>
-		<Input type="text" bind:value={taskState.name} onblur={updateTask} />
+		<DebouncedInput bind:value={taskState.name} onDebounce={updateTask} class="border-none" />
 	</Table.Cell>
 	<Table.Cell>
 		<Button variant="outline" class="mr-3">
