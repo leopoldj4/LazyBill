@@ -1,5 +1,5 @@
 import { db } from "$lib/server/db";
-import { timeEntry } from "$lib/server/db/schema";
+import { timeEntry, customer } from "$lib/server/db/schema";
 import { fail } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import { superValidate } from "sveltekit-superforms";
@@ -14,8 +14,13 @@ export async function load({ locals }) {
         orderBy: (timeEntry, { desc }) => [desc(timeEntry.startTime)],
     });
 
+    const customers = await db.query.customer.findMany({
+        where: eq(customer.userId, userId),
+    });
+
     return {
         timeEntries,
+        customers,
     }
 }
 
@@ -56,7 +61,7 @@ export const actions = {
 
         return { form };
     },
-    
+
     update: async ({ locals, request }) => {
         const form = await superValidate(request, zod4(timeEntryUpdateSchema));
 
