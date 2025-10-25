@@ -32,7 +32,7 @@
 	<header class="flex items-center justify-between pr-2 pl-4">
 		<a class="flex items-center gap-1" href="/app">
 			<img src={Logo} alt="Tempora" class="-mt-3 size-8" />
-			<div class="font-bold">tempora</div>
+			<div class="font-display text-xl">tempora</div>
 		</a>
 		<button
 			class="grid h-9 w-9 place-items-center rounded-md hover:bg-gray-100"

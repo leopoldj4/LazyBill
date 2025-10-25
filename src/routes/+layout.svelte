@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '@fontsource/atkinson-hyperlegible/400';
 	import '@fontsource/atkinson-hyperlegible/700';
+	import '@fontsource-variable/funnel-display';
+
 	import '../app.css';
 	import favicon from '$lib/assets/logo.svg';
 

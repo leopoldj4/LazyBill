@@ -75,6 +75,8 @@ export const customer = pgTable("customer", {
 	invoiceZip: text('invoice_zip').notNull().default(""),
 });
 
+export type Customer = typeof customer.$inferSelect;
+
 export const invoice = pgTable("invoice", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -119,6 +121,8 @@ export const company = pgTable("company", {
 	representative: text('representative').notNull().default(""),
 	taxNumber: text('tax_number').notNull().default(""),
 });
+
+export type TimeEntry = typeof timeEntry.$inferSelect;
 
 export const userRelations = relations(user, ({ many, one }) => ({
 	invoices: many(invoice),

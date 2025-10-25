@@ -19,6 +19,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import SquareIcon from '@lucide/svelte/icons/square';
 	import XIcon from '@lucide/svelte/icons/x';
+	import TimeEntryView from './TimeEntryView.svelte';
 
 	const { data } = $props();
 
@@ -208,44 +209,10 @@
 
 <!-- Time Entries List -->
 <div class="mt-8">
-	<h2 class="mb-4 text-2xl font-semibold">Time Entries</h2>
+	<h2 class="mb-4 text-2xl font-display">Time Entries</h2>
 
 	{#if data.timeEntries.length > 0}
-		<div class="space-y-2">
-			{#each data.timeEntries as timeEntry (timeEntry.id)}
-				<Card>
-					<CardContent class="flex items-center justify-between py-4">
-						<div class="flex items-center gap-3">
-							<ClockIcon class="h-4 w-4 text-gray-500" />
-							<div>
-								<div class="text-sm font-medium">
-									{timeEntry.description}
-								</div>
-								<div class="text-xs text-gray-500">
-									{formatDateTime(new Date(timeEntry.startTime))}
-									{#if timeEntry.stopTime}
-										— {formatDateTime(new Date(timeEntry.stopTime))}
-									{:else}
-										<span class="ml-2 font-medium text-green-600">Currently running</span>
-									{/if}
-								</div>
-							</div>
-						</div>
-						<div class="text-right">
-							<div class="font-mono text-sm font-medium">
-								{formatDuration(
-									new Date(timeEntry.startTime),
-									timeEntry.stopTime ? new Date(timeEntry.stopTime) : undefined,
-								)}
-							</div>
-							{#if !timeEntry.stopTime}
-								<div class="text-xs text-green-600">Active</div>
-							{/if}
-						</div>
-					</CardContent>
-				</Card>
-			{/each}
-		</div>
+		<TimeEntryView {data} />
 	{:else}
 		<div class="py-8 text-center text-gray-500">
 			<ClockIcon class="mx-auto mb-4 h-12 w-12 text-gray-300" />

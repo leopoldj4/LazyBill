@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/funnel-display':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@fontsource/atkinson-hyperlegible':
         specifier: ^5.2.8
         version: 5.2.8
@@ -574,6 +577,9 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@fontsource-variable/funnel-display@5.2.8':
+    resolution: {integrity: sha512-krvlZmy6EoFdmCKldTHpAzxxt5gFRXebueyDZ7DUIQ37YRAD8SrH0ljwoLOL/ZSCD5jHqKS6EhFPXLuhuJrOGA==}
 
   '@fontsource/atkinson-hyperlegible@5.2.8':
     resolution: {integrity: sha512-HciLcJ5DIK/OVOdo71EbEN4NnvDFlp6/SpAxtcbWf2aAdcsOuPqITxj5KNEXb48qSPSdnnZdGGnSJChPKi3/bA==}
@@ -2101,6 +2107,8 @@ snapshots:
       '@floating-ui/utils': 0.2.10
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@fontsource-variable/funnel-display@5.2.8': {}
 
   '@fontsource/atkinson-hyperlegible@5.2.8': {}
 

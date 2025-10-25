@@ -29,7 +29,7 @@
 <div class="flex h-screen w-full items-center justify-center px-4">
 	<Card.Root class="mx-auto w-full max-w-sm">
 		<Card.Header>
-			<Card.Title class="text-2xl">Login</Card.Title>
+			<Card.Title class="text-2xl font-display">Login</Card.Title>
 			<Card.Description>Enter your email below to login to your account</Card.Description>
 		</Card.Header>
 		<Card.Content>
