@@ -1,24 +1,20 @@
 <script lang="ts">
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import ClockIcon from '@lucide/svelte/icons/clock';
-	import TimerIcon from '@lucide/svelte/icons/timer';
-	import CalendarIcon from '@lucide/svelte/icons/calendar';
-	import { onDestroy } from 'svelte';
-	import CardContent from '$lib/components/ui/card/card-content.svelte';
-	import Card from '$lib/components/ui/card/card.svelte';
-	import CardHeader from '$lib/components/ui/card/card-header.svelte';
-	import CardTitle from '$lib/components/ui/card/card-title.svelte';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Popover from '$lib/components/ui/popover';
-	import { cn } from '$lib/utils.js';
 	import { Calendar } from '$lib/components/ui/calendar';
-	import { isEqualMonth, type DateValue } from '@internationalized/date';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
+	import { cn } from '$lib/utils.js';
+	import { type DateValue } from '@internationalized/date';
+	import CalendarIcon from '@lucide/svelte/icons/calendar';
+	import ClockIcon from '@lucide/svelte/icons/clock';
 	import SquareIcon from '@lucide/svelte/icons/square';
+	import TimerIcon from '@lucide/svelte/icons/timer';
 	import XIcon from '@lucide/svelte/icons/x';
+	import { onDestroy } from 'svelte';
 	import TimeEntryView from './TimeEntryView.svelte';
 
 	const { data } = $props();
@@ -97,6 +93,9 @@
 				: 'Select a customer'}
 		</Select.Trigger>
 		<Select.Content>
+			<Select.Item value="">No customer</Select.Item>
+			<Select.Separator />
+			<Select.Label>Customers</Select.Label>
 			{#each data.customers as customer}
 				<Select.Item value={customer.id}>{customer.name}</Select.Item>
 			{/each}

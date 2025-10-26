@@ -98,6 +98,7 @@ export const invoiceArticle = pgTable("invoice_article", {
 export const timeEntry = pgTable("time_entry", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
 	description: text('description').notNull(),
 	startTime: timestamp('start_time').notNull(),
 	stopTime: timestamp('stop_time'),
@@ -136,10 +137,15 @@ export const timeEntryRelations = relations(timeEntry, ({ one }) => ({
 		fields: [timeEntry.userId],
 		references: [user.id],
 	}),
+	customer: one(customer, {
+		fields: [timeEntry.customerId],
+		references: [customer.id],
+	}),
 }));
 
 export const customerRelations = relations(customer, ({ many, one }) => ({
 	invoices: many(invoice),
+	timeEntries: many(timeEntry),
 	user: one(user, {
 		fields: [customer.userId],
 		references: [user.id],
