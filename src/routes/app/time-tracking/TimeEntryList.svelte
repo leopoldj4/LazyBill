@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { Customer, TimeEntry } from '$lib/server/db/schema';
 	import * as Select from '$lib/components/ui/select';
-	import UsersIcon from '@lucide/svelte/icons/users';
-	import FilterIcon from '@lucide/svelte/icons/filter';
-	import DollarSignIcon from '@lucide/svelte/icons/dollar-sign';
-	import DebouncedInput from '$lib/components/DebouncedInput.svelte';
+	import type { Customer, TimeEntry } from '$lib/server/db/schema';
 	import ClockIcon from '@lucide/svelte/icons/clock';
+	import DollarSignIcon from '@lucide/svelte/icons/dollar-sign';
+	import FilterIcon from '@lucide/svelte/icons/filter';
+	import UsersIcon from '@lucide/svelte/icons/users';
+	import TimeEntryListItem from './TimeEntryListItem.svelte';
 
 	type Data = {
 		timeEntries: TimeEntry[];
@@ -40,24 +40,6 @@
 	function resetFilters() {
 		customerId = '';
 		withoutDescription = false;
-	}
-
-	function formatTime(time: Date): string {
-		return (
-			time.getUTCHours().toString().padStart(2, '0') +
-			':' +
-			time.getUTCMinutes().toString().padStart(2, '0')
-		);
-	}
-
-	function duration(timeEntry: TimeEntry): string {
-		if (timeEntry.stopTime) {
-			const duration = timeEntry.stopTime.getTime() - timeEntry.startTime.getTime();
-			const hours = Math.floor(duration / 3600000);
-			const minutes = Math.floor((duration % 3600000) / 60000);
-			return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-		}
-		return '-';
 	}
 </script>
 
@@ -111,18 +93,6 @@
 				<h3>{timeEntry.startTime.toLocaleDateString()}</h3>
 			</div>
 		{/if}
-		<div class="flex flex-row items-center gap-4">
-			<div class="flex flex-col gap-1 mr-2">
-				<div class="text-xs text-nowrap text-muted-foreground">
-					{formatTime(timeEntry.startTime)}
-					{#if timeEntry.stopTime}
-						&mdash;
-						{formatTime(timeEntry.stopTime)}
-					{/if}
-				</div>
-				<div class="text-lg text-nowrap">{duration(timeEntry)}</div>
-			</div>
-			
-		</div>
+		<TimeEntryListItem {timeEntry} customers={data.customers} />
 	{/each}
 </div>

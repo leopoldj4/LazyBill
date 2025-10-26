@@ -21,8 +21,8 @@
 
 	let isOpen = $state(true);
 
-		let signoutForm: HTMLFormElement;
-	
+	let signoutForm: HTMLFormElement;
+
 	function handleSignOut() {
 		signoutForm.requestSubmit();
 	}
@@ -67,14 +67,23 @@
 					align="end"
 					class="rounded-xl border border-gray-200 bg-white p-2 shadow"
 				>
-					<a href="/app/company" class="flex items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100 w-full">
+					<a
+						href="/app/company"
+						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+					>
 						<BuildingIcon class="size-4" /> Manage company
 					</a>
-					<a href="/app/account" class="flex items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100 w-full">
+					<a
+						href="/app/account"
+						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+					>
 						<UsersIcon class="size-4" /> My account
 					</a>
 					<Separator class="my-2" />
-					<button class="flex items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100 w-full" onclick={handleSignOut}>
+					<button
+						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+						onclick={handleSignOut}
+					>
 						<LogOutIcon class="size-4" /> Log out
 					</button>
 				</DropdownMenu.Content>
@@ -100,8 +109,4 @@
 	</div>
 </div>
 
-
-
-
-<form bind:this={signoutForm} method="POST" action="/app?/signout" class="hidden">
-</form>
+<form bind:this={signoutForm} method="POST" action="/app?/signout" class="hidden"></form>
