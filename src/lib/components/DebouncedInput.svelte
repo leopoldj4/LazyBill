@@ -5,11 +5,13 @@
 
 	type Props = WithElementRef<HTMLInputAttributes> & {
 		debounce?: number;
+		styled: boolean;
 		onDebounce: () => void;
 	};
 
 	let {
 		debounce = 1000,
+		styled = true,
 		onDebounce,
 		ref = $bindable(null),
 		type,
@@ -31,4 +33,15 @@
 	}
 </script>
 
-<Input onkeyup={textInputDebounce} bind:ref type={type || 'text'} bind:value {...props} />
+{#if styled}
+	<Input onkeyup={textInputDebounce} bind:ref type={type || 'text'} bind:value {...props} />
+{:else}
+	<input
+		onkeyup={() => {
+			textInputDebounce();
+		}}
+		type={type || 'text'}
+		bind:value
+		{...props}
+	/>
+{/if}

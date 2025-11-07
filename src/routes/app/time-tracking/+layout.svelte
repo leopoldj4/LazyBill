@@ -84,7 +84,7 @@
 	let customerId = $state<string | undefined>(undefined);
 </script>
 
-<div class={['grid', page.url.pathname !== '/app/time-tracking' && 'grid-cols-[1fr_1fr]']}>
+<div class={['h-full grid gap-8', page.url.pathname !== '/app/time-tracking' && 'grid-cols-[1fr_1fr]']}>
 	<div class="flex flex-col gap-8">
 		<SiteHeader>What needs to be done?</SiteHeader>
 
@@ -224,7 +224,7 @@
 		</div>
 	</div>
 
-	<div class="flex flex-col gap-8">
+	<div class="flex flex-col gap-8 min-h-full">
 		{@render children?.()}
 	</div>
 </div>

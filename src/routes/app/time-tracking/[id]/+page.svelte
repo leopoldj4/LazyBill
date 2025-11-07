@@ -1,10 +1,79 @@
 <script lang="ts">
 	import XIcon from '@lucide/svelte/icons/x';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import DebouncedInput from '$lib/components/DebouncedInput.svelte';
+	import Label from '$lib/components/ui/label/label.svelte';
+
+	const { data } = $props();
+
+	let description = $state(data.entry.description);
+
+	function formatDateTime(date: Date | string): string {
+		const dateObj = typeof date === 'string' ? new Date(date) : date;
+		return dateObj.toLocaleString();
+	}
+
+	function formatDuration(startTime: Date | string, stopTime?: Date | string | null): string {
+		const start = typeof startTime === 'string' ? new Date(startTime) : startTime;
+		const end = stopTime
+			? typeof stopTime === 'string'
+				? new Date(stopTime)
+				: stopTime
+			: new Date();
+		const duration = end.getTime() - start.getTime();
+
+		const hours = Math.floor(duration / 3600000);
+		const minutes = Math.floor((duration % 3600000) / 60000);
+		const seconds = Math.floor((duration % 60000) / 1000);
+
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	}
 </script>
 
-<div class="flex justify-end">
-	<a href="/app/time-tracking" class={buttonVariants({ variant: 'outline' })}>
-		<XIcon /> Close
-	</a>
+<div class="flex flex-col gap-4 p-8 border-l border-l-border min-h-full">
+	<div>
+		<a href="/app/time-tracking" class={buttonVariants({ variant: 'outline' })}>
+			<XIcon /> Close
+		</a>
+	</div>
+
+	<DebouncedInput
+		styled={false}
+		onDebounce={() => {}}
+		bind:value={description}
+		class="border-none text-3xl shadow-none outline-none focus:outline-none"
+		placeholder="Enter title"
+	/>
+
+	<div class="flex flex-col gap-4 mt-4">
+		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+			<Label class="text-muted-foreground">Customer</Label>
+			<div>
+				{data.entry.customer?.name || 'No customer assigned'}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+			<Label class="text-muted-foreground">Start Time</Label>
+			<div>
+				{formatDateTime(data.entry.startTime)}
+			</div>
+		</div>
+
+		{#if data.entry.stopTime}
+			<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+				<Label class="text-muted-foreground">Stop Time</Label>
+				<div>
+					{formatDateTime(data.entry.stopTime)}
+				</div>
+			</div>
+		{/if}
+
+		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+			<Label class="text-muted-foreground">Duration</Label>
+			<div class="font-mono">
+				{formatDuration(data.entry.startTime, data.entry.stopTime)}
+			</div>
+		</div>
+	</div>
 </div>
