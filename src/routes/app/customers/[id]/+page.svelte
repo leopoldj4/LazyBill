@@ -58,6 +58,9 @@
 						<h3 class="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Basic Information</h3>
 						<div class="mt-2 space-y-2">
 							<div>
+								<span class="font-medium">Customernumber:</span> {data.customer.customerNumber}
+							</div>
+							<div>
 								<span class="font-medium">Name:</span> {data.customer.name}
 							</div>
 							{#if data.customer.representative}

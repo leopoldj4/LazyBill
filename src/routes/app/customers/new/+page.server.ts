@@ -3,7 +3,8 @@ import { zod4 } from "sveltekit-superforms/adapters";
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod/v4";
 import { db } from "$lib/server/db/index.js";
-import { customer } from "$lib/server/db/schema";
+import { eq, sql } from "drizzle-orm";
+import { customer, company } from "$lib/server/db/schema";
 
 
 const schema = z.object({
@@ -39,10 +40,30 @@ export const actions = {
       return fail(400, { form });
     }
 
-    const [customerResult] = await db.insert(customer).values({
-      userId,
-      ...form.data,
-    }).returning();
+    const customerResult = await db.transaction(async (tx) => {
+      const [updatedCompany] = await tx
+        .update(company)
+        .set({
+          customerNumberCounter: sql`${company.customerNumberCounter} + 1`,
+        })
+        .where(eq(company.userId, userId))
+        .returning({ counter: company.customerNumberCounter });
+
+      if (!updatedCompany) {
+        throw new Error("Company not found");
+      }
+
+      const [newCustomer] = await tx
+        .insert(customer)
+        .values({
+          userId,
+          customerNumber: updatedCompany.counter - 1,
+          ...form.data,
+        })
+        .returning();
+
+      return newCustomer;
+    });
 
     console.log(customerResult.id);
 

@@ -1,6 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, boolean, uuid, date, integer } from 'drizzle-orm/pg-core';
 
+// #region better-auth
+
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
@@ -57,13 +59,17 @@ export const verification = pgTable('verification', {
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 });
 
+// #endregion
+
 export const customer = pgTable("customer", {
 	id: uuid('id').primaryKey().defaultRandom(),
+	customerNumber: integer('customer_number').notNull().default(0),
 	name: text('name').notNull(),
 	representative: text('representative').notNull().default(""),
 	email: text('email').notNull().default(""),
 	phone: text('phone').notNull().default(""),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+
 	// Invoice address fields
 	invoiceName: text('invoice_name').notNull().default(""),
 	invoiceCountry: text('invoice_country').notNull().default(""),
@@ -81,7 +87,7 @@ export const invoice = pgTable("invoice", {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
 	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
-	invoiceNumber: text('invoice_number').notNull(),
+	invoiceNumber: integer('invoice_number').notNull().default(0),
 	invoiceDate: date('invoice_date').notNull(),
 	invoiceDueDate: date('invoice_due_date').notNull(),
 	notes: text('notes').notNull().default(""),
@@ -121,6 +127,8 @@ export const company = pgTable("company", {
 	bankBic: text('bank_bic').notNull().default(""),
 	representative: text('representative').notNull().default(""),
 	taxNumber: text('tax_number').notNull().default(""),
+	customerNumberCounter: integer('customer_number_counter').notNull().default(0),
+	invoiceNumberCounter: integer('invoice_number_counter').notNull().default(0),
 });
 
 export type TimeEntry = typeof timeEntry.$inferSelect;
