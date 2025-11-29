@@ -3,10 +3,14 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import DebouncedInput from '$lib/components/DebouncedInput.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import { superForm } from 'sveltekit-superforms';
 
 	const { data } = $props();
 
-	let description = $state(data.entry.description);
+	const { form, enhance, submit } = superForm(data.form, {
+		resetForm: false,
+		invalidateAll: true
+	});
 
 	function formatDateTime(date: Date | string): string {
 		const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -28,9 +32,13 @@
 
 		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
+
+	function handleDebounce() {
+		submit();
+	}
 </script>
 
-<div class="flex flex-col gap-4 p-8 border-l border-l-border min-h-full">
+<form method="post" action="?/updateDescription" use:enhance class="flex flex-col gap-4 p-8 border-l border-l-border min-h-full">
 	<div>
 		<a href="/app/time-tracking" class={buttonVariants({ variant: 'outline' })}>
 			<XIcon /> Close
@@ -39,10 +47,11 @@
 
 	<DebouncedInput
 		styled={false}
-		onDebounce={() => {}}
-		bind:value={description}
+		onDebounce={handleDebounce}
+		bind:value={$form.description}
 		class="border-none text-3xl shadow-none outline-none focus:outline-none"
 		placeholder="Enter title"
+		name="description"
 	/>
 
 	<div class="flex flex-col gap-4 mt-4">
@@ -76,4 +85,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</form>

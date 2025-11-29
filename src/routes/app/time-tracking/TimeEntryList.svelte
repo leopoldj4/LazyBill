@@ -18,7 +18,6 @@
 	};
 
 	const { data }: Props = $props();
-	let timeEntries = $state(data.timeEntries);
 
 	// Filters
 	type SelectedCustomer = '' | 'without' | string;
@@ -26,7 +25,7 @@
 	let withoutDescription = $state(false);
 
 	let filtered = $derived(
-		timeEntries.filter((timeEntry) => {
+		data.timeEntries.filter((timeEntry) => {
 			if (customerId === '') {
 				return true;
 			}
