@@ -11,6 +11,24 @@
 
 	let { form, enhance } = superForm(data.form);
 
+	// Track if invoice fields have been manually edited
+	let invoiceNameManuallyEdited = $state(false);
+	let invoicePhoneManuallyEdited = $state(false);
+
+	// Sync invoice name with representative unless manually edited
+	$effect(() => {
+		if (!invoiceNameManuallyEdited) {
+			$form.invoiceName = $form.representative;
+		}
+	});
+
+	// Sync invoice phone with customer phone unless manually edited
+	$effect(() => {
+		if (!invoicePhoneManuallyEdited) {
+			$form.invoicePhone = $form.phone;
+		}
+	});
+
 	function handleAddressSelect(address: ParsedAddress) {
 		// Combine street and house number for the street field
 		const streetWithNumber = address.houseNumber 
@@ -82,6 +100,7 @@
 						autocomplete="off"
 						placeholder="Tiger GmbH"
 						bind:value={$form.invoiceName}
+						oninput={() => invoiceNameManuallyEdited = true}
 					/>
 				</Field.Field>
 				<Field.Field>
@@ -92,6 +111,7 @@
 						autocomplete="off"
 						placeholder="0123456789"
 						bind:value={$form.invoicePhone}
+						oninput={() => invoicePhoneManuallyEdited = true}
 					/>
 				</Field.Field>
 			</div>
