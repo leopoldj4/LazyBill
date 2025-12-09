@@ -1,36 +1,40 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button/button.svelte';
-	import SaveIcon from '@lucide/svelte/icons/save';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
-	import { superForm } from 'sveltekit-superforms';
-	import { buttonVariants } from '$lib/components/ui/button';
 	import CustomerForm from '$lib/components/CustomerForm.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import { superForm } from 'sveltekit-superforms';
+	import SiteHeader from '$lib/components/site-header.svelte';
 
 	const { data } = $props();
 
 	let { form, enhance } = superForm(data.form);
 </script>
 
-<div>
-	<!-- Header with back button -->
-	<div class="flex items-center justify-between mb-6">
-		<div class="flex items-center gap-4">
-			<a href="/app/customers/{data.customer.id}" class={buttonVariants({ variant: 'outline', size: 'sm' })}>
-				<ArrowLeftIcon class="h-4 w-4" />
-				Back to Customer
-			</a>
-			<h1 class="text-2xl font-bold">Edit Customer</h1>
-		</div>
-		<Button type="submit" form="edit-form">
-			<SaveIcon />
-			Save Changes
-		</Button>
-	</div>
+<Breadcrumb.Root>
+	<Breadcrumb.List>
+		<Breadcrumb.Item>
+			<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+		</Breadcrumb.Item>
+		<Breadcrumb.Separator />
+		<Breadcrumb.Item>
+			<Breadcrumb.Link href="/app/customers/{data.customer.id}"
+				>{data.customer.name}</Breadcrumb.Link
+			>
+		</Breadcrumb.Item>
+		<Breadcrumb.Separator />
+		<Breadcrumb.Item>Bearbeiten</Breadcrumb.Item></Breadcrumb.List
+	>
+</Breadcrumb.Root>
 
-	<Separator />
-
-	<form id="edit-form" method="post" class="mt-8" use:enhance>
-		<CustomerForm bind:form={$form} mode="edit" />
-	</form>
+<div class="mb-6 flex items-center justify-between">
+	<SiteHeader>Kunde bearbeiten</SiteHeader>
+	<Button type="submit" form="edit-form">
+		<CheckIcon />
+		Fertig
+	</Button>
 </div>
+
+<form id="edit-form" method="post" class="mt-8" use:enhance>
+	<CustomerForm bind:form={$form} mode="edit" />
+</form>

@@ -12,6 +12,7 @@ const schema = z.object({
   representative: z.string(),
   email: z.string(),
   phone: z.string(),
+  notes: z.string(),
 
   invoiceName: z.string(),
   invoiceCountry: z.string(),

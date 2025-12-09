@@ -1,25 +1,36 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import SaveIcon from '@lucide/svelte/icons/save';
+	import CheckIcon from '@lucide/svelte/icons/check';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import CustomerForm from '$lib/components/CustomerForm.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import SiteHeader from '$lib/components/site-header.svelte';
 
 	const { data } = $props();
 
 	let { form, enhance } = superForm(data.form);
 </script>
 
+<Breadcrumb.Root>
+	<Breadcrumb.List>
+		<Breadcrumb.Item>
+			<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+		</Breadcrumb.Item>
+		<Breadcrumb.Separator />
+		<Breadcrumb.Item>Neuer Kunde</Breadcrumb.Item>
+	</Breadcrumb.List>
+</Breadcrumb.Root>
+
 <form method="post" use:enhance>
 	<div class="flex flex-row justify-between">
-		<h1 class="text-2xl font-bold">New Customer</h1>
+		<SiteHeader>Neuer Kunde</SiteHeader>
 		<Button type="submit">
-			<SaveIcon />
-			Save Customer
+			<CheckIcon />
+			Fertig
 		</Button>
 	</div>
 
-	<Separator class="my-8" />
 
 	<CustomerForm bind:form={$form} mode="create" />
 </form>

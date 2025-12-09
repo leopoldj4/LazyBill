@@ -1,20 +1,19 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { Textarea } from '$lib/components/ui/textarea/';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import * as Field from '$lib/components/ui/field/';
 	import AddressInput, { type ParsedAddress } from '$lib/components/AddressInput.svelte';
 
 	export type CustomerFormData = {
 		name: string;
-		representative: string;
+
 		email: string;
-		phone: string;
-		invoiceName: string;
+		notes: string;
 		invoiceCountry: string;
 		invoiceState: string;
 		invoiceCity: string;
 		invoiceStreet: string;
-		invoicePhone: string;
 		invoiceStreetExtra: string;
 		invoiceZip: string;
 	};
@@ -38,22 +37,9 @@
 	}: Props = $props();
 
 	// Track if invoice fields have been manually edited (only relevant in create mode)
-	let invoiceNameManuallyEdited = $state(false);
-	let invoicePhoneManuallyEdited = $state(false);
 
 	// Sync invoice name with representative unless manually edited (only in create mode)
-	$effect(() => {
-		if (mode === 'create' && !invoiceNameManuallyEdited) {
-			form.invoiceName = form.representative;
-		}
-	});
 
-	// Sync invoice phone with customer phone unless manually edited (only in create mode)
-	$effect(() => {
-		if (mode === 'create' && !invoicePhoneManuallyEdited) {
-			form.invoicePhone = form.phone;
-		}
-	});
 
 	function handleAddressSelect(address: ParsedAddress) {
 		// Combine street and house number for the street field
@@ -80,7 +66,7 @@
 		<h2 class="text-lg font-bold">Basisdaten</h2>
 		<div class="grid grid-cols-2 gap-x-8 gap-y-6">
 			<Field.Field>
-				<Field.Label for="name">Kundenname</Field.Label>
+				<Field.Label for="name">Kundenname (intern)</Field.Label>
 				<Input 
 					name="name" 
 					id="name" 
@@ -91,15 +77,16 @@
 					required 
 				/>
 			</Field.Field>
-			<Field.Field>
-				<Field.Label for="representative">Ansprechpartner</Field.Label>
-				<Input
-					name="representative"
-					id="representative"
+			<Field.Field class="row-span-2 col-start-2">
+				<Field.Label for="notes">Notizen</Field.Label>
+				<Textarea
+					name="notes"
+					id="notes"
 					autocomplete="off"
-					placeholder="Max Mustermann"
-					bind:value={form.representative}
+					placeholder="Interne Notizen zum Kunden..."
+					bind:value={form.notes}
 					oninput={handleFieldChange}
+					rows={3}
 				/>
 			</Field.Field>
 			<Field.Field>
@@ -113,56 +100,14 @@
 					oninput={handleFieldChange}
 				/>
 			</Field.Field>
-			<Field.Field>
-				<Field.Label for="phone">Telefon</Field.Label>
-				<Input 
-					name="phone" 
-					id="phone" 
-					autocomplete="off" 
-					placeholder="0123456789" 
-					bind:value={form.phone}
-					oninput={handleFieldChange}
-				/>
-			</Field.Field>
+			
 		</div>
 	</div>
 
 	<div class="grid grid-cols-[12rem_1fr] gap-4">
-		<h2 class="text-lg font-bold">Rechnungsadresse</h2>
+		<h2 class="text-lg font-bold">Adresse</h2>
 		<div class="flex flex-col gap-6">
-			<div class="grid grid-cols-2 gap-x-8 gap-y-6">
-				<Field.Field>
-					<Field.Label for="invoiceName">Name</Field.Label>
-					<Input
-						name="invoiceName"
-						id="invoiceName"
-						autocomplete="off"
-						placeholder="Tiger GmbH"
-						bind:value={form.invoiceName}
-						oninput={() => {
-							if (mode === 'create') invoiceNameManuallyEdited = true;
-							handleFieldChange();
-						}}
-					/>
-				</Field.Field>
-				<Field.Field>
-					<Field.Label for="invoicePhone">Telefon</Field.Label>
-					<Input
-						name="invoicePhone"
-						id="invoicePhone"
-						autocomplete="off"
-						placeholder="0123456789"
-						bind:value={form.invoicePhone}
-						oninput={() => {
-							if (mode === 'create') invoicePhoneManuallyEdited = true;
-							handleFieldChange();
-						}}
-					/>
-				</Field.Field>
-			</div>
-
-			<Separator />
-
+			
 			<Field.Field>
 				<Field.Label>Adresse suchen</Field.Label>
 				<AddressInput onAddressSelect={handleAddressSelect} placeholder="Adresse suchen..." />

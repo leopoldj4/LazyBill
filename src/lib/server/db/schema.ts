@@ -68,6 +68,7 @@ export const customer = pgTable("customer", {
 	representative: text('representative').notNull().default(""),
 	email: text('email').notNull().default(""),
 	phone: text('phone').notNull().default(""),
+	notes: text('notes').notNull().default(""),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
 
 	// Invoice address fields

@@ -11,6 +11,7 @@ const schema = z.object({
   representative: z.string(),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
   phone: z.string().optional(),
+  notes: z.string(),
   
   // Invoice address fields
   invoiceName: z.string(),
