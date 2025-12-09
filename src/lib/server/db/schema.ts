@@ -185,3 +185,5 @@ export const companyRelations = relations(company, ({ one }) => ({
 		references: [user.id],
 	}),
 }));
+
+export type Company = typeof company.$inferSelect;

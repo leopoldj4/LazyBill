@@ -1,5 +1,5 @@
 import { db } from "$lib/server/db";
-import { customer, invoice, invoiceArticle } from "$lib/server/db/schema";
+import { company, customer, invoice, invoiceArticle } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod/v4";
 import { fail, superValidate } from "sveltekit-superforms";
@@ -22,12 +22,16 @@ const schema = z.object({
 export const load = async ({ locals }) => {
     const form = await superValidate(zod4(schema));
     const userId = locals.user!.id;
+    const companyData = await db.query.company.findFirst({
+        where: eq(company.userId, userId),
+    });
     const customers = await db.query.customer.findMany({
         where: eq(customer.userId, userId),
     });
     return {
         customers,
-        form
+        form,
+        company: companyData,
     };
 };
 

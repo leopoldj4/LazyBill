@@ -2,9 +2,10 @@ import { db } from "$lib/server/db";
 import type { RequestHandler } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import { error } from "@sveltejs/kit";
-import { invoice, customer, company, invoiceArticle } from "$lib/server/db/schema";
+import { invoice, company } from "$lib/server/db/schema";
 import { compile } from "$lib/typst-server";
 import { TYPST_SERVER_URL } from "$env/static/private";
+import { invoiceTemplate } from "$lib/render";
 
 export const GET: RequestHandler = async ({ locals, params }) => {
   const userId = locals.user!.id;
@@ -39,63 +40,4 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       "Content-Type": "application/pdf",
     },
   });
-}
-
-type Invoice = typeof invoice.$inferSelect;
-type InvoiceArticle = typeof invoiceArticle.$inferSelect;
-type Customer = typeof customer.$inferSelect;
-type Company = typeof company.$inferSelect;
-
-type InvoiceWithCustomer = Invoice & {
-  customer: Customer | null;
-  customerId: string | null;
-  articles: InvoiceArticle[];
-};
-
-function invoiceTemplate(invoice: InvoiceWithCustomer, company: Company) {
-
-  const invoiceDate = new Date(invoice.invoiceDate);
-  return `
-    #import "@preview/classy-german-invoice:0.3.1": invoice
-
-#show: invoice(
-  // Invoice number
-  "${invoice.invoiceNumber}",
-  // Invoice date
-  datetime(year: ${invoiceDate.getFullYear()}, month: ${invoiceDate.getMonth() + 1}, day: ${invoiceDate.getDate()}),
-  // Items
-  (
-    ${invoice.articles.map(article => `(
-        description: "${article.quantity} x ${article.article} (${article.price}€)",
-        price: ${article.price * article.quantity},
-      ),`).join(",\n")
-    }
-  ),
-  // Author
-  (
-    name: "${company.name}",
-    street: "${company.street}",
-    zip: "${company.zip}",
-    city: "${company.city}",
-    tax_nr: "${company.taxNumber}",
-  ),
-  // Recipient
-  (
-    name: "${invoice.customer?.name}",
-    street: "${invoice.customer?.invoiceStreet}",
-    zip: "${invoice.customer?.invoiceZip}",
-    city: "${invoice.customer?.invoiceCity}",
-  ),
-  // Bank account
-  (
-    name: "${company.representative || company.name}",
-    bank: "${company.bankName}",
-    iban: "${company.bankIban}",
-    bic: "${company.bankBic}",
-  ),
-  // Umsatzsteuersatz (VAT)
-  vat: 0.19,
-  kleinunternehmer: ${company.smallBusiness ? "true" : "false"},
-)
-    `;
 }
