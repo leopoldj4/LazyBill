@@ -76,8 +76,8 @@
 <div class="grid h-screen grid-cols-[256px_1fr] grid-rows-[52px_1fr]">
 	<header class="flex items-center justify-between pr-2 pl-4">
 		<a class="flex items-center gap-1" href="/app">
-			<img src={Logo} alt="Tempora" class="-mt-3 size-8" />
-			<div class="font-display text-xl">tempora</div>
+			<img src={Logo} alt="ClearSails Logo" class="-mt-3 size-8" />
+			<div class="font-display text-xl">ClearSails</div>
 		</a>
 		<button
 			class="grid h-9 w-9 place-items-center rounded-md hover:bg-gray-100"
