@@ -8,7 +8,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
-	import { invoiceTemplate } from '$lib/render';
+	import { invoiceTemplate } from '$lib/invoicetemplate';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import Preview from '$lib/Preview.svelte';
 
