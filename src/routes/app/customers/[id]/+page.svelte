@@ -1,5 +1,10 @@
 <script lang="ts">
+	import SiteHeader from '$lib/components/site-header.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import {
 		Table,
 		TableBody,
@@ -8,19 +13,12 @@
 		TableHeader,
 		TableRow,
 	} from '$lib/components/ui/table';
-	import { Separator } from '$lib/components/ui/separator';
-	import EyeIcon from '@lucide/svelte/icons/eye';
+	import PhoneIcon from '@lucide/svelte/icons/phone';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 	import EditIcon from '@lucide/svelte/icons/edit';
-	import TrashIcon from '@lucide/svelte/icons/trash';
-	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
-	import { buttonVariants } from '$lib/components/ui/button';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import SiteHeader from '$lib/components/site-header.svelte';
-	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
-
-	import { formatDistance, subDays } from 'date-fns';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { PlusIcon } from '@lucide/svelte';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import { formatDistance } from 'date-fns';
+	import { Textarea } from "$lib/components/ui/textarea";
 
 	let { data } = $props();
 
@@ -67,8 +65,16 @@
 		</CardHeader>
 
 		<CardContent>
-			{data.customer.email}<br />
-			{data.customer.phone}
+			<div class="flex flex-col gap-2">
+				<a href="mailto:{data.customer.email}" class={buttonVariants({ variant: 'outline', class: 'justify-start' })}>
+					<MailIcon class="h-4 w-4" />
+					{data.customer.email || 'Keine Email'}
+				</a>
+				<a href="tel:{data.customer.phone}" class={buttonVariants({ variant: 'outline', class: 'justify-start' })}>
+					<PhoneIcon class="h-4 w-4" />
+					{data.customer.phone || 'Keine Telefonnummer'}
+				</a>
+				</div>
 		</CardContent>
 	</Card>
 	<Card>
@@ -76,7 +82,7 @@
 			<CardTitle>Notizen</CardTitle>
 		</CardHeader>
 		<CardContent>
-			{data.customer.notes}
+			<Textarea value={data.customer.notes} rows={10} disabled />
 		</CardContent>
 	</Card>
 	<Card>
@@ -141,17 +147,23 @@
 		<CardFooter>
 			<ButtonGroup>
 				<ButtonGroup>
-			<a href="/app/customers/{data.customer.id}/invoices" class={buttonVariants({ variant: 'outline' })}>
-				Alle anzeigen
-			</a>
-		</ButtonGroup>
-		<ButtonGroup>
-			<a href="/app/customers/{data.customer.id}/invoices/new" class={buttonVariants({ variant: 'outline' })}>
-				<PlusIcon />
-				Hinzufügen
-			</a>
-		</ButtonGroup>
-		</ButtonGroup>
+					<a
+						href="/app/customers/{data.customer.id}/invoices"
+						class={buttonVariants({ variant: 'outline' })}
+					>
+						Alle anzeigen
+					</a>
+				</ButtonGroup>
+				<ButtonGroup>
+					<a
+						href="/app/customers/{data.customer.id}/invoices/new"
+						class={buttonVariants({ variant: 'outline' })}
+					>
+						<PlusIcon />
+						Hinzufügen
+					</a>
+				</ButtonGroup>
+			</ButtonGroup>
 		</CardFooter>
 	</Card>
 </div>

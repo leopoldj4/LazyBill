@@ -22,15 +22,13 @@
 	</Breadcrumb.List>
 </Breadcrumb.Root>
 
+<SiteHeader>Neuer Kunde</SiteHeader>
+<div>
+	<Button type="submit">
+		<CheckIcon />
+		Fertig
+	</Button>
+</div>
 <form method="post" use:enhance>
-	<div class="flex flex-row justify-between">
-		<SiteHeader>Neuer Kunde</SiteHeader>
-		<Button type="submit">
-			<CheckIcon />
-			Fertig
-		</Button>
-	</div>
-
-
-	<CustomerForm bind:form={$form} mode="create" />
+	<CustomerForm bind:form={$form} />
 </form>

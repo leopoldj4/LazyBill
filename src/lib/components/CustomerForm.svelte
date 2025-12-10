@@ -9,6 +9,7 @@
 		name: string;
 
 		email: string;
+		phone: string;
 		notes: string;
 		invoiceCountry: string;
 		invoiceState: string;
@@ -20,29 +21,15 @@
 
 	type Props = {
 		form: CustomerFormData;
-		/** 
-		 * Mode determines behavior:
-		 * - 'create': Auto-syncs invoice name/phone with basic info unless manually edited
-		 * - 'edit': No auto-sync, all fields are independent
-		 */
-		mode?: 'create' | 'edit';
-		/** Called when any form field changes */
 		onchange?: (form: CustomerFormData) => void;
 	};
 
 	let {
 		form = $bindable(),
-		mode = 'create',
 		onchange
 	}: Props = $props();
 
-	// Track if invoice fields have been manually edited (only relevant in create mode)
-
-	// Sync invoice name with representative unless manually edited (only in create mode)
-
-
 	function handleAddressSelect(address: ParsedAddress) {
-		// Combine street and house number for the street field
 		const streetWithNumber = address.houseNumber 
 			? `${address.street} ${address.houseNumber}` 
 			: address.street;
@@ -66,7 +53,7 @@
 		<h2 class="text-lg font-bold">Basisdaten</h2>
 		<div class="grid grid-cols-2 gap-x-8 gap-y-6">
 			<Field.Field>
-				<Field.Label for="name">Kundenname (intern)</Field.Label>
+				<Field.Label for="name">Kundenname</Field.Label>
 				<Input 
 					name="name" 
 					id="name" 
@@ -86,7 +73,17 @@
 					placeholder="Interne Notizen zum Kunden..."
 					bind:value={form.notes}
 					oninput={handleFieldChange}
-					rows={3}
+				/>
+			</Field.Field>
+			<Field.Field>
+				<Field.Label for="phone">Telefon</Field.Label>
+				<Input
+					name="phone"
+					id="phone"
+					autocomplete="off"
+					placeholder="+49 123 456789"
+					bind:value={form.phone}
+					oninput={handleFieldChange}
 				/>
 			</Field.Field>
 			<Field.Field>
@@ -112,6 +109,9 @@
 				<Field.Label>Adresse suchen</Field.Label>
 				<AddressInput onAddressSelect={handleAddressSelect} placeholder="Adresse suchen..." />
 			</Field.Field>
+
+			<Separator />
+
 			<div class="grid grid-cols-2 gap-x-8 gap-y-6">
 				<Field.Field>
 					<Field.Label for="invoiceStreet">Adresse</Field.Label>
