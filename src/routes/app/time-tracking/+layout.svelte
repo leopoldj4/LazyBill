@@ -17,18 +17,29 @@
 	import { onDestroy } from 'svelte';
 	import TimeEntryView from './TimeEntryList.svelte';
 	import { page } from '$app/state';
-	import { saveTimeEntry, createManualTimeEntry } from './data.remote';
+	import { startTimeEntry, updateTimeEntry, deleteTimeEntry, createManualTimeEntry } from './data.remote';
 
 	const { children, data } = $props();
 
 	let description = $state<string>('');
 
+	let trackingEntryId = $state<string | undefined>(undefined);
 	let trackingStartTime = $state<Date | undefined>(undefined);
 	let trackingInterval = $state<NodeJS.Timeout | undefined>(undefined);
 	let trackingDisplay = $state<string | undefined>(undefined);
 
-	function startTracking() {
-		trackingStartTime = new Date();
+	async function startTracking() {
+		const startTime = new Date();
+		
+		// Save the entry immediately and get its ID
+		const entry = await startTimeEntry({
+			description,
+			customerId: customerId || null,
+			startTime: startTime.toISOString(),
+		});
+		
+		trackingEntryId = entry.id;
+		trackingStartTime = startTime;
 		trackingDisplay = '00:00:00';
 		window.onbeforeunload = () => {
 			return 'You are currently tracking time. Are you sure you want to leave?';
@@ -44,26 +55,37 @@
 		}, 1000);
 	}
 
-	function abortTracking() {
+	async function abortTracking() {
+		// Delete the time entry if it was created
+		if (trackingEntryId) {
+			await deleteTimeEntry({ id: trackingEntryId });
+		}
+		
 		clearInterval(trackingInterval);
+		trackingEntryId = undefined;
 		trackingStartTime = undefined;
 		trackingDisplay = undefined;
 		window.onbeforeunload = null;
 	}
 
 	async function stopTracking() {
-		if (!trackingStartTime) return;
+		if (!trackingEntryId) return;
 
 		const stopTime = new Date();
 
-		await saveTimeEntry({
+		// Update the existing entry with the stop time
+		await updateTimeEntry({
+			id: trackingEntryId,
 			description,
 			customerId: customerId || null,
-			startTime: trackingStartTime.toISOString(),
 			stopTime: stopTime.toISOString(),
 		});
 
-		abortTracking();
+		clearInterval(trackingInterval);
+		trackingEntryId = undefined;
+		trackingStartTime = undefined;
+		trackingDisplay = undefined;
+		window.onbeforeunload = null;
 		description = '';
 		customerId = undefined;
 		selectedDate = undefined;
