@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { render } from './render';
+	import { typst } from '$lib/render';
 
 	type Props = {
 		typstDocument: string;
@@ -10,20 +10,29 @@
 
 	let preview: HTMLDivElement | null = $state(null);
 
-	function renderSvg(svg: string) {
+	async function render(doc: string) {
+		const svg = await typst.svg({mainContent: doc});
 		preview!.innerHTML = svg;
 
-		const svgElem = preview!.firstElementChild!;
+		const parentWidth = preview!.clientWidth;
 
-		svgElem.setAttribute('width', '500px');
-		svgElem.setAttribute('height', '700px');
+		const svgElem = preview!.firstElementChild!;
+		const width = Number.parseFloat(svgElem!.getAttribute('width')!);
+		const height = Number.parseFloat(svgElem!.getAttribute('height')!);
+		const newHeight = (parentWidth / width) * height;
+		svgElem!.setAttribute('height', newHeight.toString());
+		svgElem!.setAttribute('width', parentWidth.toString());
 	}
 
-	if (browser) window.addEventListener('resize', () => render(typstDocument).then(renderSvg));
+	if (browser) {
+		window.addEventListener('resize', () => render(typstDocument));
+	}
 
 	$effect(() => {
-		render(typstDocument).then(renderSvg);
+		if (!browser) return;
+		render(typstDocument);
 	});
 </script>
 
-<div bind:this={preview} class="w-[500px] h-[700px] border border-gray-300"></div>
+<div bind:this={preview} class="relative w-full border">
+</div>

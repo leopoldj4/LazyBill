@@ -1,5 +1,8 @@
 import type { SidebarUser } from '$lib/components/sidebar-user';
 import { error } from '@sveltejs/kit';
+import { db } from '$lib/server/db';
+import { customer } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load = async ({ locals }) => {
 	if (!locals.user) {
@@ -12,5 +15,9 @@ export const load = async ({ locals }) => {
 		avatar: locals.user.image || '',
 	};
 
-	return { user };
+	const customers = await db.query.customer.findMany({
+		where: eq(customer.userId, locals.user.id),
+	});
+
+	return { user, customers };
 };

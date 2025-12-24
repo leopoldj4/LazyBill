@@ -52,15 +52,16 @@
     city: "${data.customer!.invoiceCity}, ${data.customer!.invoiceState}, ${data.customer!.invoiceZip}, ${data.customer!.invoiceCountry}"
   ),
 
-  invoice-nr: "000",
+  invoice-nr: "###",
   date: datetime(year: ${invoiceDate.year}, month: ${invoiceDate.month}, day: ${invoiceDate.day}),
   tax-nr: "${data.company!.taxNumber}",
   vat-exempt-small-biz: ${data.company!.smallBusiness ? 'true' : 'false'},
+  font: "Arial",
 )
 
 // Add Invoice Items
 #invoice-line-items(
-  ${articles.map((article) => `item([${article.name}], price: ${article.price || 0})`).join('\n')}
+  ${articles.map((article) => `item([${article.name}], price: ${article.price || 0}),`).join('\n')}
 )
 
 // Payment Terms
@@ -81,23 +82,23 @@
 
 <div class="grid grid-cols-2 gap-12">
 	<div class="flex flex-col gap-8">
-        <Breadcrumb.Root>
-            <Breadcrumb.List>
-                <Breadcrumb.Item>
-                    <Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
-                </Breadcrumb.Item>
-                <Breadcrumb.Separator />
-                <Breadcrumb.Item>
-                    <Breadcrumb.Link href="/app/customers/{data.customer!.id}"
-                        >{data.customer!.name}</Breadcrumb.Link
-                    >
-                </Breadcrumb.Item>
-                <Breadcrumb.Separator />
-                <Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
-            </Breadcrumb.List>
-        </Breadcrumb.Root>
-        
-        <SiteHeader>Neue Rechnung</SiteHeader>
+		<Breadcrumb.Root>
+			<Breadcrumb.List>
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href="/app/customers/{data.customer!.id}"
+						>{data.customer!.name}</Breadcrumb.Link
+					>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator />
+				<Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
+
+		<SiteHeader>Neue Rechnung</SiteHeader>
 
 		<div class="flex w-full flex-col items-stretch gap-6">
 			<DatePicker label="Rechnungsdatum" value={invoiceDate} />
@@ -134,10 +135,6 @@
 				<PlusIcon />
 				Add Article
 			</Button>
-			<div class="col-span-2 text-right">Gesamt:</div>
-			<div>
-				{articles.reduce((acc, article) => acc + article.price, 0)}
-			</div>
 		</div>
 
 		<div class="flex flex-col gap-4">
@@ -146,7 +143,7 @@
 		</div>
 	</div>
 
-    <div class="h-full w-full overflow-scroll">
-	    <Preview typstDocument={typstDocument()} />
-    </div>
+
+    <Preview typstDocument={typstDocument()} />
+
 </div>

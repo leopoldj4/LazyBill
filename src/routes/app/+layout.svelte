@@ -20,6 +20,7 @@
 	import { DropdownMenu } from 'bits-ui';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import * as Command from '$lib/components/ui/command';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 
 	let isOpen = $state(false);
 
@@ -47,9 +48,8 @@
 	};
 
 	const pages = [
-		{ href: '/app', icon: GaugeCircleIcon, title: 'Dashboard' },
-		{ href: '/app/customers', icon: UsersIcon, title: 'Customers' },
-		{ href: '/app/invoices', icon: InvoiceIcon, title: 'Invoices' },
+		{ href: '/app/customers', icon: UsersIcon, title: 'Kunden' },
+
 	];
 </script>
 
@@ -58,8 +58,8 @@
 <Command.Dialog bind:open={commandOpen}>
 	<Command.Input placeholder="Type a command or search..." />
 	<Command.List>
-		<Command.Empty>No results found.</Command.Empty>
-		<Command.Group heading="Pages">
+		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
+		<Command.Group heading="Seiten">
 			{#each pages as page}
 				<Command.LinkItem href={page.href} onclick={closeCommand}
 					><page.icon /> {page.title}</Command.LinkItem
@@ -67,90 +67,84 @@
 			{/each}
 		</Command.Group>
 		<Command.Separator />
-		<Command.Group heading="Settings">
+		<Command.Group heading="Kunden">
+			{#each data.customers as customer}
+				<Command.LinkItem href={`/app/customers/${customer.id}`} onclick={closeCommand}
+					><UsersIcon /> {customer.name}</Command.LinkItem
+				>
+			{/each}
+		</Command.Group>
+		<Command.Group heading="Einstellungen">
 			<Command.LinkItem href="/app/company" onclick={closeCommand}
-				><BuildingIcon /> Manage company</Command.LinkItem
+				><BuildingIcon /> Firma verwalten</Command.LinkItem
 			>
 			<Command.LinkItem href="/app/account" onclick={closeCommand}
-				><UsersIcon /> My account</Command.LinkItem
+				><UsersIcon /> Mein Konto</Command.LinkItem
 			>
 		</Command.Group>
 	</Command.List>
 </Command.Dialog>
 
-<div class="grid h-screen grid-cols-[256px_1fr] grid-rows-[52px_1fr]">
-	<header class="flex items-center justify-between pr-2 pl-4">
-		<a class="flex items-center gap-1" href="/app">
-			<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
-			<div class="font-display text-xl">Watchtower</div>
-		</a>
-		<button
-			class="grid h-9 w-9 place-items-center rounded-md hover:bg-gray-100"
-			onclick={() => (isOpen = !isOpen)}
-		>
-			{#if isOpen}
-				<SidebarCloseIcon class="size-4" />
-			{:else}
-				<SidebarOpenIcon class="size-4" />
-			{/if}
-		</button>
-	</header>
-	<div class="flex items-center justify-between pr-4">
-		<button
-			onclick={() => (commandOpen = true)}
-			class="flex h-9 w-full max-w-lg min-w-[20vw] cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600"
-		>
-			Quick Switcher
-			<SearchIcon class="size-4" />
-		</button>
+<div class="h-screen">
+	<div class="flex flex-row items-center justify-between w-full h-[52px] px-4">
+		<header class="flex items-center gap-2 pr-2">
+			<a class="flex items-center gap-1 shrink-0 mr-4" href="/app">
+				<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
+				<div class="font-display text-xl">Watchtower</div>
+			</a>
 
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger
-				class="flex h-9 flex-row items-center justify-end gap-2 rounded-md px-4 hover:bg-gray-100"
+			<button
+				onclick={() => (commandOpen = true)}
+				class="flex h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600"
 			>
-				{data.user.name}
-				<ChevronDownIcon class="size-4" />
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
-					sideOffset={4}
-					alignOffset={4}
-					align="end"
-					class="rounded-xl border border-gray-200 bg-white p-2 shadow"
+				Quick Switcher
+				<SearchIcon class="size-4" />
+			</button>
+
+			<a class={buttonVariants({ variant: 'ghost' })} href="/app/customers">Kunden</a>
+		</header>
+		<div class="flex items-center justify-between">
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger
+					class="flex h-9 flex-row items-center justify-end gap-2 rounded-md px-4 hover:bg-gray-100"
 				>
-					<a
-						href="/app/company"
-						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+					{data.user.name}
+					<ChevronDownIcon class="size-4" />
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Portal>
+					<DropdownMenu.Content
+						sideOffset={4}
+						alignOffset={4}
+						align="end"
+						class="rounded-xl border border-gray-200 bg-white p-2 shadow"
 					>
-						<BuildingIcon class="size-4" /> Manage company
-					</a>
-					<a
-						href="/app/account"
-						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
-					>
-						<UsersIcon class="size-4" /> My account
-					</a>
-					<Separator class="my-2" />
-					<button
-						class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
-						onclick={handleSignOut}
-					>
-						<LogOutIcon class="size-4" /> Log out
-					</button>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+						<a
+							href="/app/company"
+							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+						>
+							<BuildingIcon class="size-4" /> Manage company
+						</a>
+						<a
+							href="/app/account"
+							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+						>
+							<UsersIcon class="size-4" /> My account
+						</a>
+						<Separator class="my-2" />
+						<button
+							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
+							onclick={handleSignOut}
+						>
+							<LogOutIcon class="size-4" /> Log out
+						</button>
+					</DropdownMenu.Content>
+				</DropdownMenu.Portal>
+			</DropdownMenu.Root>
+		</div>
 	</div>
-	{#if isOpen}
-		<nav class="px-2">
-			{#each pages as page}
-				<NavItem href={page.href} icon={page.icon}>{page.title}</NavItem>
-			{/each}
-		</nav>
-	{/if}
 	<div
 		class={[
-			'flex flex-col gap-6 border-t border-l border-border p-8',
+			'flex flex-col gap-6 border-l border-border p-8',
 			!isOpen && 'col-span-2',
 			isOpen && 'rounded-tl-md',
 		]}
