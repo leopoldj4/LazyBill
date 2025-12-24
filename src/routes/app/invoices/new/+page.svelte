@@ -117,7 +117,7 @@
 					}}
 				>
 					<PlusIcon />
-					Add Article
+					Artikel hinzufügen
 				</Button>
 
 				<div class="text-right font-bold">

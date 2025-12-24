@@ -2,13 +2,17 @@ type InvoiceTemplateData = {
 	invoiceNumber: number;
 	invoiceDate: string;
 	customer: Customer | null;
-	articles: { name: string; quantity: number; price: number }[];
+	articles: { name: string; price: number }[];
 };
 
 export function invoiceTemplate(invoice: InvoiceTemplateData, company: Company) {
 	const invoiceDate = new Date(invoice.invoiceDate);
+
+	console.log(invoice);
+	console.log(company);
+
 	return `
-      #import "@preview/classy-german-invoice:0.3.1": invoice
+      #import "@preview/classy-german-invoice:0.3.2": invoice
   
   #show: invoice(
     // Invoice number
@@ -20,11 +24,11 @@ export function invoiceTemplate(invoice: InvoiceTemplateData, company: Company) 
       ${invoice.articles
 				.map(
 					(article) => `(
-          description: "${article.quantity} x ${article.name} (${article.price}€)",
-          price: ${article.price * article.quantity},
+          description: "${article.name}",
+          price: ${article.price},
         )`,
 				)
-				.join(',\n')}
+				.join(',\n')},
     ),
     // Author
     (

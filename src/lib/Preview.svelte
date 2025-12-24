@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { render } from './render';
 
 	type Props = {
@@ -9,18 +10,20 @@
 
 	let preview: HTMLDivElement | null = $state(null);
 
-	$effect(() => {
-		render(typstDocument).then((svg) => {
-			preview!.innerHTML = svg;
+	function renderSvg(svg: string) {
+		preview!.innerHTML = svg;
 
-			const svgElem = preview!.firstElementChild!;
-			const width = Number.parseFloat(svgElem.getAttribute('width')!);
-			const height = Number.parseFloat(svgElem.getAttribute('height')!);
-			const cw = (document.body.clientWidth - 40) / 2.5;
-			svgElem.setAttribute('width', cw.toString());
-			svgElem.setAttribute('height', ((height * cw) / width).toString());
-		});
+		const svgElem = preview!.firstElementChild!;
+
+		svgElem.setAttribute('width', '500px');
+		svgElem.setAttribute('height', '700px');
+	}
+
+	if (browser) window.addEventListener('resize', () => render(typstDocument).then(renderSvg));
+
+	$effect(() => {
+		render(typstDocument).then(renderSvg);
 	});
 </script>
 
-<div bind:this={preview} class="border border-red-400"></div>
+<div bind:this={preview} class="w-[500px] h-[700px] border border-gray-300"></div>

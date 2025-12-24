@@ -10,6 +10,9 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import Preview from '$lib/Preview.svelte';
+	import { invoiceTemplate } from '$lib/invoicetemplate';
+
 	let { data } = $props();
 
 	let invoiceDate = $state<CalendarDate>(today(getLocalTimeZone()));
@@ -23,37 +26,88 @@
 		name: string;
 		price: number;
 	};
+
+	let typstDocument = $derived(() => {
+		let doc = `
+#import "@preview/invoice-pro:0.1.0": *
+
+// Set language to German for correct date/number formatting
+#set text(lang: "de") 
+
+#show: invoice.with(
+  format: "DIN-5008-A", // or "DIN-5008-B"
+  
+  sender: (
+    name: "${data.company!.name}",
+    address: "${data.company!.street} ${data.company!.streetExtra}",
+    city: "${data.company!.city}",
+    extra: (
+      "Tel": [${data.company!.phone}],
+    )
+  ),
+
+  recipient: (
+    name: "${data.customer!.name}",
+    address: "${data.customer!.invoiceStreet} ${data.customer!.invoiceStreetExtra}",
+    city: "${data.customer!.invoiceCity}, ${data.customer!.invoiceState}, ${data.customer!.invoiceZip}, ${data.customer!.invoiceCountry}"
+  ),
+
+  invoice-nr: "000",
+  date: datetime(year: ${invoiceDate.year}, month: ${invoiceDate.month}, day: ${invoiceDate.day}),
+  tax-nr: "${data.company!.taxNumber}",
+  vat-exempt-small-biz: ${data.company!.smallBusiness ? 'true' : 'false'},
+)
+
+// Add Invoice Items
+#invoice-line-items(
+  ${articles.map((article) => `item([${article.name}], price: ${article.price || 0})`).join('\n')}
+)
+
+// Payment Terms
+#payment-goal(days: 30)
+
+// Bank Details with QR Code
+#bank-details(
+  bank: "${data.company!.bankName}",
+  iban: "${data.company!.bankIban}",
+  bic: "${data.company!.bankBic}",
+)
+
+#signature(signature: block[${data.company!.representative || data.company!.name}])
+    `;
+		return doc;
+	});
 </script>
-
-<Breadcrumb.Root>
-	<Breadcrumb.List>
-		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
-		</Breadcrumb.Item>
-		<Breadcrumb.Separator />
-		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/app/customers/{data.customer!.id}"
-				>{data.customer!.name}</Breadcrumb.Link
-			>
-		</Breadcrumb.Item>
-		<Breadcrumb.Separator />
-		<Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
-	</Breadcrumb.List>
-</Breadcrumb.Root>
-
-<SiteHeader>Neue Rechnung</SiteHeader>
 
 <div class="grid grid-cols-2 gap-12">
 	<div class="flex flex-col gap-8">
+        <Breadcrumb.Root>
+            <Breadcrumb.List>
+                <Breadcrumb.Item>
+                    <Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+                </Breadcrumb.Item>
+                <Breadcrumb.Separator />
+                <Breadcrumb.Item>
+                    <Breadcrumb.Link href="/app/customers/{data.customer!.id}"
+                        >{data.customer!.name}</Breadcrumb.Link
+                    >
+                </Breadcrumb.Item>
+                <Breadcrumb.Separator />
+                <Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
+            </Breadcrumb.List>
+        </Breadcrumb.Root>
+        
+        <SiteHeader>Neue Rechnung</SiteHeader>
+
 		<div class="flex w-full flex-col items-stretch gap-6">
 			<DatePicker label="Rechnungsdatum" value={invoiceDate} />
-			<DatePicker label="Fälligkeitsdatum" value={invoiceDueDate} />
+			<!-- <DatePicker label="Fälligkeitsdatum" value={invoiceDueDate} /> -->
 		</div>
 
 		<h2 class="text-xl">Artikel</h2>
 
 		<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
-			<div />
+			<div></div>
 			<p>Name</p>
 			<p>Preis</p>
 
@@ -92,5 +146,7 @@
 		</div>
 	</div>
 
-	<div></div>
+    <div class="h-full w-full overflow-scroll">
+	    <Preview typstDocument={typstDocument()} />
+    </div>
 </div>
