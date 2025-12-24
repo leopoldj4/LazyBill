@@ -1,11 +1,10 @@
 <script lang="ts">
+	import CustomerForm from '$lib/components/CustomerForm.svelte';
+	import SiteHeader from '$lib/components/site-header.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { superForm } from 'sveltekit-superforms';
-	import CustomerForm from '$lib/components/CustomerForm.svelte';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import SiteHeader from '$lib/components/site-header.svelte';
 
 	const { data } = $props();
 

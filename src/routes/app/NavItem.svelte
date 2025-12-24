@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
 	import type { Icon as IconType } from '@lucide/svelte';
+	import type { Snippet } from 'svelte';
 
 	let {
 		children,

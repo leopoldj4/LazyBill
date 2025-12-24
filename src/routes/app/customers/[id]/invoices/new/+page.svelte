@@ -1,18 +1,16 @@
 <script lang="ts">
+	import DatePicker from '$lib/components/DatePicker.svelte';
+	import Preview from '$lib/components/Preview.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import DatePicker from '$lib/components/DatePicker.svelte';
-	import { today, type CalendarDate } from '@internationalized/date';
-	import { getLocalTimeZone } from '@internationalized/date';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import PlusIcon from '@lucide/svelte/icons/plus';
+	import * as InputGroup from "$lib/components/ui/input-group";
 	import Input from '$lib/components/ui/input/input.svelte';
-	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-	import Preview from '$lib/Preview.svelte';
-	import { invoice } from '$lib/invoice';
-    import * as InputGroup from "$lib/components/ui/input-group";
 	import Label from '$lib/components/ui/label/label.svelte';
+	import { invoiceTemplate } from '$lib/typst/invoice.js';
+	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
+	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 
 
 	let { data } = $props();
@@ -29,7 +27,7 @@
 		price: number;
 	};
 
-	let typstDocument = $derived(() => invoice(data.company!, data.customer!, articles, invoiceDate, "###", due || 0));
+	let typstDocument = $derived(() => invoiceTemplate(data.company!, data.customer!, articles, invoiceDate, "###", due || 0));
 </script>
 
 <div class="grid grid-cols-2 gap-12">

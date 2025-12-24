@@ -1,36 +1,26 @@
 <script lang="ts">
-	import AppSidebar from '$lib/components/app-sidebar.svelte';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import NavItem from './NavItem.svelte';
-	import UsersIcon from '@lucide/svelte/icons/users';
-	import ClockIcon from '@lucide/svelte/icons/clock';
-	import InvoiceIcon from '@lucide/svelte/icons/file-text';
-	import type { Icon as IconType } from '@lucide/svelte';
-	let { children, data } = $props();
-	import Logo from './icon.png';
+	import Logo from '$lib/assets/logo.png';
+	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import * as Command from '$lib/components/ui/command';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import {
 		BuildingIcon,
 		ChevronDownIcon,
-		GaugeCircleIcon,
 		LogOutIcon,
-		SearchIcon,
-		SidebarCloseIcon,
-		SidebarOpenIcon,
+		SearchIcon
 	} from '@lucide/svelte';
+	import UsersIcon from '@lucide/svelte/icons/users';
 	import { DropdownMenu } from 'bits-ui';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import * as Command from '$lib/components/ui/command';
-	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+
+	const { children, data } = $props();
 
 	let isOpen = $state(false);
-
 	let signoutForm: HTMLFormElement;
+	let commandOpen = $state(false);
 
 	function handleSignOut() {
 		signoutForm.requestSubmit();
 	}
-
-	let commandOpen = $state(false);
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -40,31 +30,16 @@
 	}
 
 	const closeCommand = () => (commandOpen = false);
-
-	type Page = {
-		href: string;
-		icon: typeof IconType;
-		title: string;
-	};
-
-	const pages = [
-		{ href: '/app/customers', icon: UsersIcon, title: 'Kunden' },
-
-	];
 </script>
-
-<svelte:document onkeydown={handleKeydown} />
 
 <Command.Dialog bind:open={commandOpen}>
 	<Command.Input placeholder="Type a command or search..." />
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Seiten">
-			{#each pages as page}
-				<Command.LinkItem href={page.href} onclick={closeCommand}
-					><page.icon /> {page.title}</Command.LinkItem
+				<Command.LinkItem href="/app/customers" onclick={closeCommand}
+					><UsersIcon /> Kunden</Command.LinkItem
 				>
-			{/each}
 		</Command.Group>
 		<Command.Separator />
 		<Command.Group heading="Kunden">

@@ -4,7 +4,6 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import {
 		Table,
 		TableBody,
@@ -13,12 +12,12 @@
 		TableHeader,
 		TableRow,
 	} from '$lib/components/ui/table';
-	import PhoneIcon from '@lucide/svelte/icons/phone';
-	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import EditIcon from '@lucide/svelte/icons/edit';
 	import MailIcon from '@lucide/svelte/icons/mail';
+	import PhoneIcon from '@lucide/svelte/icons/phone';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { formatDistance } from 'date-fns';
-	import { Textarea } from '$lib/components/ui/textarea';
 
 	let { data } = $props();
 

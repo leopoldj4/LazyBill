@@ -1,4 +1,3 @@
-import type { SidebarUser } from '$lib/components/sidebar-user';
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { customer } from '$lib/server/db/schema';
@@ -9,7 +8,7 @@ export const load = async ({ locals }) => {
 		throw error(401, 'Unauthorized');
 	}
 
-	const user: SidebarUser = {
+	const user = {
 		name: locals.user.name,
 		email: locals.user.email,
 		avatar: locals.user.image || '',

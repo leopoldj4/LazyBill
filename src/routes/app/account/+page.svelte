@@ -1,17 +1,10 @@
 <script lang="ts">
-	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import SaveIcon from '@lucide/svelte/icons/save';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import { superForm } from 'sveltekit-superforms';
 	import * as Field from '$lib/components/ui/field/';
-	import {
-		Card,
-		CardContent,
-		CardDescription,
-		CardHeader,
-		CardTitle,
-	} from '$lib/components/ui/card';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import SaveIcon from '@lucide/svelte/icons/save';
+	import { superForm } from 'sveltekit-superforms';
 
 	const { data } = $props();
 

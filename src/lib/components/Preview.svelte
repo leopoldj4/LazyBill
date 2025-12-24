@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { typst } from '$lib/render';
-	import { Spinner } from './components/ui/spinner';
+	import { typst } from '$lib/typst';
+	import { Spinner } from './ui/spinner';
 
 
 	type Props = {

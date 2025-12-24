@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
-import { customer, invoice, invoiceArticle } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { customer, invoice } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
+import { and, eq } from 'drizzle-orm';
 
 export async function load({ params, locals }) {
 	const userId = locals.user!.id;

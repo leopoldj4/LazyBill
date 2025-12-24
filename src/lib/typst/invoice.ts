@@ -1,5 +1,5 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { Company, Customer } from "./server/db/schema";
+import type { Company, Customer } from "$lib/server/db/schema";
 
 type Article = {
     name: string;
@@ -13,7 +13,7 @@ function encode(x: any): string {
         }")`
 }
 
-export function invoice(company: Company, customer: Customer, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number) {
+export function invoiceTemplate(company: Company, customer: Customer, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number) {
     return `
 #import "@preview/invoice-pro:0.1.0": *
 

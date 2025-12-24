@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import CircleDollarSignIcon from '@lucide/svelte/icons/circle-dollar-sign';
 
 	let { data } = $props();
 </script>
