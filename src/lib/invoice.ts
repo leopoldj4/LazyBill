@@ -13,7 +13,7 @@ function encode(x: any): string {
         }")`
 }
 
-export function invoice(company: Company, customer: Customer, articles: Article[], invoiceDate: CalendarDate, nr: number, due: number) {
+export function invoice(company: Company, customer: Customer, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number) {
     return `
 #import "@preview/invoice-pro:0.1.0": *
 

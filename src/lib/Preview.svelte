@@ -3,14 +3,22 @@
 	import { typst } from '$lib/render';
 	import { Spinner } from './components/ui/spinner';
 
+
 	type Props = {
 		typstDocument: string;
+		rerender?: () => void;
 	};
 
-	let { typstDocument }: Props = $props();
+	let { typstDocument, rerender = $bindable() }: Props = $props();
 
 	let preview: HTMLDivElement | null = $state(null);
 	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+
+	if (rerender) {
+		rerender = () => render(typstDocument);
+	}
+
 
 	async function render(doc: string) {
 		const svg = await typst.svg({ mainContent: doc });
@@ -34,7 +42,7 @@
 	}
 
 	if (browser) {
-		window.addEventListener('resize', () => renderDebounced	(typstDocument));
+		window.addEventListener('resize', () => renderDebounced(typstDocument));
 	}
 
 	$effect(() => {

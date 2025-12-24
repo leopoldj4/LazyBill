@@ -29,7 +29,7 @@
 		price: number;
 	};
 
-	let typstDocument = $derived(() => invoice(data.company!, data.customer!, articles, invoiceDate, 0, due || 0));
+	let typstDocument = $derived(() => invoice(data.company!, data.customer!, articles, invoiceDate, "###", due || 0));
 </script>
 
 <div class="grid grid-cols-2 gap-12">
