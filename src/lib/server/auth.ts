@@ -9,5 +9,5 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 	},
-	plugins: [sveltekitCookies(getRequestEvent)]
+	plugins: [sveltekitCookies(getRequestEvent)],
 });

@@ -23,12 +23,11 @@
 </Breadcrumb.Root>
 
 <SiteHeader>Neuer Kunde</SiteHeader>
-<div>
-	<Button type="submit">
+
+<form method="post" use:enhance>
+	<Button type="submit" class="mb-8">
 		<CheckIcon />
 		Fertig
 	</Button>
-</div>
-<form method="post" use:enhance>
 	<CustomerForm bind:form={$form} />
 </form>

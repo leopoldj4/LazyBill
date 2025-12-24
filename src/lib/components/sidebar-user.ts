@@ -1,1 +1,5 @@
-export interface SidebarUser { name: string; email: string; avatar: string }
+export interface SidebarUser {
+	name: string;
+	email: string;
+	avatar: string;
+}

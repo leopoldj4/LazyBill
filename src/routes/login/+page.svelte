@@ -31,7 +31,7 @@
 	}
 </script>
 
-<h1 class="font-display text-5xl">ClearSails</h1>
+<h1 class="font-display text-5xl">Watchtower</h1>
 
 <div class="flex w-full max-w-xs flex-col gap-4">
 	<a

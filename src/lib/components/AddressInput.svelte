@@ -150,7 +150,7 @@
 
 			const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
 				headers: {
-					'User-Agent': 'Tempora/1.0'
+					'User-Agent': 'Watchtower/1.0'
 				}
 			});
 

@@ -21,7 +21,7 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import * as Command from '$lib/components/ui/command';
 
-	let isOpen = $state(true);
+	let isOpen = $state(false);
 
 	let signoutForm: HTMLFormElement;
 
@@ -49,7 +49,6 @@
 	const pages = [
 		{ href: '/app', icon: GaugeCircleIcon, title: 'Dashboard' },
 		{ href: '/app/customers', icon: UsersIcon, title: 'Customers' },
-		{ href: '/app/time-tracking', icon: ClockIcon, title: 'Time Tracking' },
 		{ href: '/app/invoices', icon: InvoiceIcon, title: 'Invoices' },
 	];
 </script>
@@ -76,8 +75,8 @@
 <div class="grid h-screen grid-cols-[256px_1fr] grid-rows-[52px_1fr]">
 	<header class="flex items-center justify-between pr-2 pl-4">
 		<a class="flex items-center gap-1" href="/app">
-			<img src={Logo} alt="ClearSails Logo" class="-mt-3 size-8" />
-			<div class="font-display text-xl">ClearSails</div>
+			<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
+			<div class="font-display text-xl">Watchtower</div>
 		</a>
 		<button
 			class="grid h-9 w-9 place-items-center rounded-md hover:bg-gray-100"

@@ -1,15 +1,13 @@
-
 type InvoiceTemplateData = {
-    invoiceNumber: number;
-    invoiceDate: string;
-    customer: Customer | null;
-    articles: { name: string; quantity: number; price: number }[];
-  };
-  
-  export function invoiceTemplate(invoice: InvoiceTemplateData, company: Company) {
-  
-    const invoiceDate = new Date(invoice.invoiceDate);
-    return `
+	invoiceNumber: number;
+	invoiceDate: string;
+	customer: Customer | null;
+	articles: { name: string; quantity: number; price: number }[];
+};
+
+export function invoiceTemplate(invoice: InvoiceTemplateData, company: Company) {
+	const invoiceDate = new Date(invoice.invoiceDate);
+	return `
       #import "@preview/classy-german-invoice:0.3.1": invoice
   
   #show: invoice(
@@ -19,11 +17,14 @@ type InvoiceTemplateData = {
     datetime(year: ${invoiceDate.getFullYear()}, month: ${invoiceDate.getMonth() + 1}, day: ${invoiceDate.getDate()}),
     // Items
     (
-      ${invoice.articles.map(article => `(
+      ${invoice.articles
+				.map(
+					(article) => `(
           description: "${article.quantity} x ${article.name} (${article.price}€)",
           price: ${article.price * article.quantity},
-        )`).join(",\n")
-      }
+        )`,
+				)
+				.join(',\n')}
     ),
     // Author
     (
@@ -49,7 +50,7 @@ type InvoiceTemplateData = {
     ),
     // Umsatzsteuersatz (VAT)
     vat: 0.19,
-    kleinunternehmer: ${company.smallBusiness ? "true" : "false"},
+    kleinunternehmer: ${company.smallBusiness ? 'true' : 'false'},
   )
       `;
-  }
+}

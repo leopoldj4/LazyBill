@@ -8,11 +8,10 @@ export async function load({ locals }) {
 		with: {
 			articles: true,
 			customer: true,
-		}
+		},
 	});
 
 	return {
 		invoices,
 	};
 }
-

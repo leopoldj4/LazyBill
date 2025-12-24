@@ -1,6 +1,6 @@
 {
-    "name": "Tempora",
-    "short_name": "Tempora",
+    "name": "Watchtower",
+    "short_name": "Watchtower",
     "description": "Manage your business with ease",
     "start_url": "/",
     "display": "minimal-ui",

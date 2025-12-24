@@ -61,40 +61,44 @@ export const verification = pgTable('verification', {
 
 // #endregion
 
-export const customer = pgTable("customer", {
+export const customer = pgTable('customer', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	customerNumber: integer('customer_number').notNull().default(0),
 	name: text('name').notNull(),
-	representative: text('representative').notNull().default(""),
-	email: text('email').notNull().default(""),
-	phone: text('phone').notNull().default(""),
-	notes: text('notes').notNull().default(""),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	representative: text('representative').notNull().default(''),
+	email: text('email').notNull().default(''),
+	phone: text('phone').notNull().default(''),
+	notes: text('notes').notNull().default(''),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
 
 	// Invoice address fields
-	invoiceName: text('invoice_name').notNull().default(""),
-	invoiceCountry: text('invoice_country').notNull().default(""),
-	invoiceState: text('invoice_state').notNull().default(""),
-	invoiceCity: text('invoice_city').notNull().default(""),
-	invoiceStreet: text('invoice_street').notNull().default(""),
-	invoicePhone: text('invoice_phone').notNull().default(""),
-	invoiceStreetExtra: text('invoice_street_extra').notNull().default(""),
-	invoiceZip: text('invoice_zip').notNull().default(""),
+	invoiceName: text('invoice_name').notNull().default(''),
+	invoiceCountry: text('invoice_country').notNull().default(''),
+	invoiceState: text('invoice_state').notNull().default(''),
+	invoiceCity: text('invoice_city').notNull().default(''),
+	invoiceStreet: text('invoice_street').notNull().default(''),
+	invoicePhone: text('invoice_phone').notNull().default(''),
+	invoiceStreetExtra: text('invoice_street_extra').notNull().default(''),
+	invoiceZip: text('invoice_zip').notNull().default(''),
 });
 
 export type Customer = typeof customer.$inferSelect;
 
-export const invoice = pgTable("invoice", {
+export const invoice = pgTable('invoice', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
 	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
 	invoiceNumber: integer('invoice_number').notNull().default(0),
 	invoiceDate: date('invoice_date').notNull(),
 	invoiceDueDate: date('invoice_due_date').notNull(),
-	notes: text('notes').notNull().default(""),
+	notes: text('notes').notNull().default(''),
 });
 
-export const invoiceArticle = pgTable("invoice_article", {
+export const invoiceArticle = pgTable('invoice_article', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	invoiceId: uuid('invoice_id').references(() => invoice.id, { onDelete: 'cascade' }),
 	article: text('article').notNull(),
@@ -102,19 +106,23 @@ export const invoiceArticle = pgTable("invoice_article", {
 	price: integer('price').notNull(),
 });
 
-export const timeEntry = pgTable("time_entry", {
+export const timeEntry = pgTable('time_entry', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
 	customerId: uuid('customer_id').references(() => customer.id, { onDelete: 'cascade' }),
 	description: text('description').notNull(),
 	startTime: timestamp('start_time').notNull(),
 	stopTime: timestamp('stop_time'),
 });
 
-export const company = pgTable("company", {
+export const company = pgTable('company', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
-	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
 	phone: text('phone').notNull(),
 	country: text('country').notNull(),
 	state: text('state').notNull(),
@@ -123,11 +131,11 @@ export const company = pgTable("company", {
 	streetExtra: text('street_extra').notNull(),
 	zip: text('zip').notNull(),
 	smallBusiness: boolean('small_business').notNull().default(false),
-	bankName: text('bank_name').notNull().default(""),
-	bankIban: text('bank_iban').notNull().default(""),
-	bankBic: text('bank_bic').notNull().default(""),
-	representative: text('representative').notNull().default(""),
-	taxNumber: text('tax_number').notNull().default(""),
+	bankName: text('bank_name').notNull().default(''),
+	bankIban: text('bank_iban').notNull().default(''),
+	bankBic: text('bank_bic').notNull().default(''),
+	representative: text('representative').notNull().default(''),
+	taxNumber: text('tax_number').notNull().default(''),
 	customerNumberCounter: integer('customer_number_counter').notNull().default(0),
 	invoiceNumberCounter: integer('invoice_number_counter').notNull().default(0),
 });

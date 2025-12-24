@@ -1,40 +1,40 @@
-import { db } from "$lib/server/db";
-import { timeEntry, customer } from "$lib/server/db/schema";
-import { fail } from "@sveltejs/kit";
-import { and, eq } from "drizzle-orm";
-import { superValidate } from "sveltekit-superforms";
-import { zod4 } from "sveltekit-superforms/adapters";
-import z from "zod";
+import { db } from '$lib/server/db';
+import { timeEntry, customer } from '$lib/server/db/schema';
+import { fail } from '@sveltejs/kit';
+import { and, eq } from 'drizzle-orm';
+import { superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import z from 'zod';
 
 export async function load({ locals }) {
-    const userId = locals.user!.id;
+	const userId = locals.user!.id;
 
-    const timeEntries = await db.query.timeEntry.findMany({
-        where: eq(timeEntry.userId, userId),
-        orderBy: (timeEntry, { desc }) => [desc(timeEntry.startTime)],
-    });
+	const timeEntries = await db.query.timeEntry.findMany({
+		where: eq(timeEntry.userId, userId),
+		orderBy: (timeEntry, { desc }) => [desc(timeEntry.startTime)],
+	});
 
-    const customers = await db.query.customer.findMany({
-        where: eq(customer.userId, userId),
-    });
+	const customers = await db.query.customer.findMany({
+		where: eq(customer.userId, userId),
+	});
 
-    return {
-        timeEntries,
-        customers,
-    }
+	return {
+		timeEntries,
+		customers,
+	};
 }
 
 const timeEntrySaveSchema = z.object({
-    description: z.string(),
-    startTime: z.date(),
-    stopTime: z.date().optional(),
+	description: z.string(),
+	startTime: z.date(),
+	stopTime: z.date().optional(),
 });
 
 const timeEntryUpdateSchema = z.object({
-    id: z.string(),
-    description: z.string(),
-    startTime: z.date(),
-    stopTime: z.date().optional(),
+	id: z.string(),
+	description: z.string(),
+	startTime: z.date(),
+	stopTime: z.date().optional(),
 });
 
 // export const actions = {

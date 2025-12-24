@@ -11,7 +11,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Tempora</title>
+	<title>Watchtower</title>
 	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
