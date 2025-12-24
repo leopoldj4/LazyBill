@@ -4,21 +4,23 @@
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { today, type CalendarDate } from '@internationalized/date';
 	import { getLocalTimeZone } from '@internationalized/date';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Preview from '$lib/Preview.svelte';
-	import { invoiceTemplate } from '$lib/invoicetemplate';
+	import { invoice } from '$lib/invoice';
+    import * as InputGroup from "$lib/components/ui/input-group";
+	import Label from '$lib/components/ui/label/label.svelte';
+
 
 	let { data } = $props();
 
 	let invoiceDate = $state<CalendarDate>(today(getLocalTimeZone()));
 	let invoiceDueDate = $state<CalendarDate>(today(getLocalTimeZone()).add({ days: 30 }));
 
-	let notes = $state<string>('');
+    let due = $state<number | null>(30);
 
 	let articles = $state<Article[]>([{ name: '', price: 0 }]);
 
@@ -27,57 +29,7 @@
 		price: number;
 	};
 
-	let typstDocument = $derived(() => {
-		let doc = `
-#import "@preview/invoice-pro:0.1.0": *
-
-// Set language to German for correct date/number formatting
-#set text(lang: "de") 
-
-#show: invoice.with(
-  format: "DIN-5008-A", // or "DIN-5008-B"
-  
-  sender: (
-    name: "${data.company!.name}",
-    address: "${data.company!.street} ${data.company!.streetExtra}",
-    city: "${data.company!.city}",
-    extra: (
-      "Tel": [${data.company!.phone}],
-    )
-  ),
-
-  recipient: (
-    name: "${data.customer!.name}",
-    address: "${data.customer!.invoiceStreet} ${data.customer!.invoiceStreetExtra}",
-    city: "${data.customer!.invoiceCity}, ${data.customer!.invoiceState}, ${data.customer!.invoiceZip}, ${data.customer!.invoiceCountry}"
-  ),
-
-  invoice-nr: "###",
-  date: datetime(year: ${invoiceDate.year}, month: ${invoiceDate.month}, day: ${invoiceDate.day}),
-  tax-nr: "${data.company!.taxNumber}",
-  vat-exempt-small-biz: ${data.company!.smallBusiness ? 'true' : 'false'},
-  font: "Arial",
-)
-
-// Add Invoice Items
-#invoice-line-items(
-  ${articles.map((article) => `item([${article.name}], price: ${article.price || 0}),`).join('\n')}
-)
-
-// Payment Terms
-#payment-goal(days: 30)
-
-// Bank Details with QR Code
-#bank-details(
-  bank: "${data.company!.bankName}",
-  iban: "${data.company!.bankIban}",
-  bic: "${data.company!.bankBic}",
-)
-
-#signature(signature: block[${data.company!.representative || data.company!.name}])
-    `;
-		return doc;
-	});
+	let typstDocument = $derived(() => invoice(data.company!, data.customer!, articles, invoiceDate, 0, due || 0));
 </script>
 
 <div class="grid grid-cols-2 gap-12">
@@ -100,9 +52,19 @@
 
 		<SiteHeader>Neue Rechnung</SiteHeader>
 
-		<div class="flex w-full flex-col items-stretch gap-6">
-			<DatePicker label="Rechnungsdatum" value={invoiceDate} />
-			<!-- <DatePicker label="Fälligkeitsdatum" value={invoiceDueDate} /> -->
+		<div class="grid grid-cols-2 gap-6">
+			<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
+            <div class="flex flex-col gap-3">
+            <Label>Fällig in</Label>
+            <InputGroup.Root>
+                <InputGroup.Input class="text-right" bind:value={due} type="number" min="1" max="600"></InputGroup.Input>
+                <InputGroup.Addon align="inline-end">
+                    <InputGroup.Text>
+                    Tagen
+                    </InputGroup.Text>
+                </InputGroup.Addon>
+            </InputGroup.Root>
+        </div>
 		</div>
 
 		<h2 class="text-xl">Artikel</h2>
@@ -121,7 +83,7 @@
 				>
 					<CircleMinusIcon color="gray" />
 				</Button>
-				<Input type="text" bind:value={article.name} />
+				<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
 				<Input type="number" bind:value={article.price} />
 			{/each}
 
@@ -133,13 +95,8 @@
 				}}
 			>
 				<PlusIcon />
-				Add Article
+				Neuer Artikel
 			</Button>
-		</div>
-
-		<div class="flex flex-col gap-4">
-			<h2 class="text-xl">Notizen</h2>
-			<Textarea bind:value={notes} />
 		</div>
 	</div>
 
