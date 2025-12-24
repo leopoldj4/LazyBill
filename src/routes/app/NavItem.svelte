@@ -13,7 +13,7 @@
 	} = $props();
 </script>
 
-<a {href} class="flex flex-row items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-sm">
+<a {href} class="flex flex-row items-center gap-2 rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100">
 	<Icon class="size-4" />
 	{@render children?.()}
 </a>

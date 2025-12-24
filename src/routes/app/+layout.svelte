@@ -61,13 +61,19 @@
 		<Command.Empty>No results found.</Command.Empty>
 		<Command.Group heading="Pages">
 			{#each pages as page}
-				<Command.LinkItem href={page.href} onclick={closeCommand}><page.icon /> {page.title}</Command.LinkItem>
+				<Command.LinkItem href={page.href} onclick={closeCommand}
+					><page.icon /> {page.title}</Command.LinkItem
+				>
 			{/each}
 		</Command.Group>
 		<Command.Separator />
 		<Command.Group heading="Settings">
-			<Command.LinkItem href="/app/company" onclick={closeCommand}><BuildingIcon /> Manage company</Command.LinkItem>
-			<Command.LinkItem href="/app/account" onclick={closeCommand}><UsersIcon /> My account</Command.LinkItem>
+			<Command.LinkItem href="/app/company" onclick={closeCommand}
+				><BuildingIcon /> Manage company</Command.LinkItem
+			>
+			<Command.LinkItem href="/app/account" onclick={closeCommand}
+				><UsersIcon /> My account</Command.LinkItem
+			>
 		</Command.Group>
 	</Command.List>
 </Command.Dialog>

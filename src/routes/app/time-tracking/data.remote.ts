@@ -14,8 +14,8 @@ export const getTimeEntries = query(async () => {
 		where: eq(timeEntry.userId, userId),
 		orderBy: [desc(timeEntry.startTime)],
 		with: {
-			customer: true
-		}
+			customer: true,
+		},
 	});
 
 	return entries;
@@ -45,13 +45,16 @@ export const startTimeEntry = command(startTimeEntrySchema, async (data) => {
 	const { locals } = getRequestEvent();
 	const userId = locals.user!.id;
 
-	const [entry] = await db.insert(timeEntry).values({
-		userId,
-		description: data.description,
-		customerId: data.customerId || null,
-		startTime: new Date(data.startTime),
-		stopTime: null,
-	}).returning();
+	const [entry] = await db
+		.insert(timeEntry)
+		.values({
+			userId,
+			description: data.description,
+			customerId: data.customerId || null,
+			startTime: new Date(data.startTime),
+			stopTime: null,
+		})
+		.returning();
 
 	// Refresh the time entries query
 	await getTimeEntries().refresh();
@@ -72,7 +75,8 @@ export const updateTimeEntry = command(updateTimeEntrySchema, async (data) => {
 	const { locals } = getRequestEvent();
 	const userId = locals.user!.id;
 
-	const [entry] = await db.update(timeEntry)
+	const [entry] = await db
+		.update(timeEntry)
 		.set({
 			description: data.description,
 			customerId: data.customerId || null,
@@ -97,8 +101,7 @@ export const deleteTimeEntry = command(deleteTimeEntrySchema, async (data) => {
 	const { locals } = getRequestEvent();
 	const userId = locals.user!.id;
 
-	await db.delete(timeEntry)
-		.where(eq(timeEntry.id, data.id));
+	await db.delete(timeEntry).where(eq(timeEntry.id, data.id));
 
 	// Refresh the time entries query
 	await getTimeEntries().refresh();
@@ -131,18 +134,19 @@ export const createManualTimeEntry = command(manualTimeEntrySchema, async (data)
 		stopDateTime.setDate(stopDateTime.getDate() + 1);
 	}
 
-	const [entry] = await db.insert(timeEntry).values({
-		userId,
-		description: data.description,
-		customerId: data.customerId || null,
-		startTime: startDateTime,
-		stopTime: stopDateTime,
-	}).returning();
+	const [entry] = await db
+		.insert(timeEntry)
+		.values({
+			userId,
+			description: data.description,
+			customerId: data.customerId || null,
+			startTime: startDateTime,
+			stopTime: stopDateTime,
+		})
+		.returning();
 
 	// Refresh the time entries query
 	await getTimeEntries().refresh();
 
 	return entry;
 });
-
-

@@ -55,9 +55,9 @@
 						<Label for="password">Password</Label>
 						<Input id="password" type="password" required bind:value={password} />
 					</div>
-                    {#if error}
-                        <p class="text-red-500">{error}</p>
-                    {/if}
+					{#if error}
+						<p class="text-red-500">{error}</p>
+					{/if}
 					<Button type="submit" class="w-full">Sign Up</Button>
 				</div>
 

@@ -14,9 +14,9 @@
 
 	let { user }: { user: SidebarUser } = $props();
 	const sidebar = useSidebar();
-	
+
 	let signoutForm: HTMLFormElement;
-	
+
 	function handleSignOut() {
 		signoutForm.requestSubmit();
 	}
@@ -59,5 +59,10 @@
 	</Sidebar.MenuItem>
 </Sidebar.Menu>
 
-<form bind:this={signoutForm} method="POST" action="/app?/signout" use:enhance class="hidden">
-</form>
+<form
+	bind:this={signoutForm}
+	method="POST"
+	action="/app?/signout"
+	use:enhance
+	class="hidden"
+></form>

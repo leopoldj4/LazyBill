@@ -1,3 +1,1 @@
-<a href="/login">
-	login
-</a>
+<a href="/login"> login </a>

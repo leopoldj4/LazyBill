@@ -24,22 +24,19 @@
 		onchange?: (form: CustomerFormData) => void;
 	};
 
-	let {
-		form = $bindable(),
-		onchange
-	}: Props = $props();
+	let { form = $bindable(), onchange }: Props = $props();
 
 	function handleAddressSelect(address: ParsedAddress) {
-		const streetWithNumber = address.houseNumber 
-			? `${address.street} ${address.houseNumber}` 
+		const streetWithNumber = address.houseNumber
+			? `${address.street} ${address.houseNumber}`
 			: address.street;
-		
+
 		form.invoiceStreet = streetWithNumber;
 		form.invoiceCity = address.city;
 		form.invoiceState = address.state;
 		form.invoiceZip = address.postalCode;
 		form.invoiceCountry = address.country;
-		
+
 		onchange?.(form);
 	}
 
@@ -54,17 +51,17 @@
 		<div class="grid grid-cols-2 gap-x-8 gap-y-6">
 			<Field.Field>
 				<Field.Label for="name">Kundenname</Field.Label>
-				<Input 
-					name="name" 
-					id="name" 
-					autocomplete="off" 
-					placeholder="Tiger GmbH" 
-					bind:value={form.name} 
+				<Input
+					name="name"
+					id="name"
+					autocomplete="off"
+					placeholder="Tiger GmbH"
+					bind:value={form.name}
 					oninput={handleFieldChange}
-					required 
+					required
 				/>
 			</Field.Field>
-			<Field.Field class="row-span-2 col-start-2">
+			<Field.Field class="col-start-2 row-span-2">
 				<Field.Label for="notes">Notizen</Field.Label>
 				<Textarea
 					name="notes"
@@ -97,14 +94,12 @@
 					oninput={handleFieldChange}
 				/>
 			</Field.Field>
-			
 		</div>
 	</div>
 
 	<div class="grid grid-cols-[12rem_1fr] gap-4">
 		<h2 class="text-lg font-bold">Adresse</h2>
 		<div class="flex flex-col gap-6">
-			
 			<Field.Field>
 				<Field.Label>Adresse suchen</Field.Label>
 				<AddressInput onAddressSelect={handleAddressSelect} placeholder="Adresse suchen..." />
@@ -183,4 +178,3 @@
 		</div>
 	</div>
 </div>
-

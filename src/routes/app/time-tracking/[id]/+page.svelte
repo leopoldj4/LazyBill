@@ -9,7 +9,7 @@
 
 	const { form, enhance, submit } = superForm(data.form, {
 		resetForm: false,
-		invalidateAll: true
+		invalidateAll: true,
 	});
 
 	function formatDateTime(date: Date | string): string {
@@ -38,7 +38,12 @@
 	}
 </script>
 
-<form method="post" action="?/updateDescription" use:enhance class="flex flex-col gap-4 p-8 border-l border-l-border min-h-full">
+<form
+	method="post"
+	action="?/updateDescription"
+	use:enhance
+	class="flex min-h-full flex-col gap-4 border-l border-l-border p-8"
+>
 	<div>
 		<a href="/app/time-tracking" class={buttonVariants({ variant: 'outline' })}>
 			<XIcon /> Close
@@ -54,15 +59,15 @@
 		name="description"
 	/>
 
-	<div class="flex flex-col gap-4 mt-4">
-		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+	<div class="mt-4 flex flex-col gap-4">
+		<div class="grid grid-cols-[120px_1fr] items-center gap-2">
 			<Label class="text-muted-foreground">Customer</Label>
 			<div>
 				{data.entry.customer?.name || 'No customer assigned'}
 			</div>
 		</div>
 
-		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+		<div class="grid grid-cols-[120px_1fr] items-center gap-2">
 			<Label class="text-muted-foreground">Start Time</Label>
 			<div>
 				{formatDateTime(data.entry.startTime)}
@@ -70,7 +75,7 @@
 		</div>
 
 		{#if data.entry.stopTime}
-			<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+			<div class="grid grid-cols-[120px_1fr] items-center gap-2">
 				<Label class="text-muted-foreground">Stop Time</Label>
 				<div>
 					{formatDateTime(data.entry.stopTime)}
@@ -78,7 +83,7 @@
 			</div>
 		{/if}
 
-		<div class="grid grid-cols-[120px_1fr] gap-2 items-center">
+		<div class="grid grid-cols-[120px_1fr] items-center gap-2">
 			<Label class="text-muted-foreground">Duration</Label>
 			<div class="font-mono">
 				{formatDuration(data.entry.startTime, data.entry.stopTime)}

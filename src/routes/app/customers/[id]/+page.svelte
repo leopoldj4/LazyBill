@@ -18,7 +18,7 @@
 	import EditIcon from '@lucide/svelte/icons/edit';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import { formatDistance } from 'date-fns';
-	import { Textarea } from "$lib/components/ui/textarea";
+	import { Textarea } from '$lib/components/ui/textarea';
 
 	let { data } = $props();
 
@@ -66,15 +66,21 @@
 
 		<CardContent>
 			<div class="flex flex-col gap-2">
-				<a href="mailto:{data.customer.email}" class={buttonVariants({ variant: 'outline', class: 'justify-start' })}>
+				<a
+					href="mailto:{data.customer.email}"
+					class={buttonVariants({ variant: 'outline', class: 'justify-start' })}
+				>
 					<MailIcon class="h-4 w-4" />
 					{data.customer.email || 'Keine Email'}
 				</a>
-				<a href="tel:{data.customer.phone}" class={buttonVariants({ variant: 'outline', class: 'justify-start' })}>
+				<a
+					href="tel:{data.customer.phone}"
+					class={buttonVariants({ variant: 'outline', class: 'justify-start' })}
+				>
 					<PhoneIcon class="h-4 w-4" />
 					{data.customer.phone || 'Keine Telefonnummer'}
 				</a>
-				</div>
+			</div>
 		</CardContent>
 	</Card>
 	<Card>

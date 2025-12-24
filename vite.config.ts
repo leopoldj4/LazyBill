@@ -6,6 +6,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
 	optimizeDeps: {
-        exclude: ['@myriaddreamin/typst.ts']
-    }
+		exclude: ['@myriaddreamin/typst.ts'],
+	},
 });

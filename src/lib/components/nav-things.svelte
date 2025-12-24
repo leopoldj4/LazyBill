@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import UsersIcon from '@lucide/svelte/icons/users';
-    import ClockIcon from '@lucide/svelte/icons/clock';
-    import InvoiceIcon from '@lucide/svelte/icons/file-text';
+	import ClockIcon from '@lucide/svelte/icons/clock';
+	import InvoiceIcon from '@lucide/svelte/icons/file-text';
 
 	const items = [
 		{
@@ -10,16 +10,16 @@
 			url: '/app/customers',
 			icon: UsersIcon,
 		},
-        {
-            title: 'Time Tracking',
-            url: '/app/time-tracking',
-            icon: ClockIcon,
-        },
-        {
-            title: 'Invoices',
-            url: '/app/invoices',
-            icon: InvoiceIcon,
-        }
+		{
+			title: 'Time Tracking',
+			url: '/app/time-tracking',
+			icon: ClockIcon,
+		},
+		{
+			title: 'Invoices',
+			url: '/app/invoices',
+			icon: InvoiceIcon,
+		},
 	];
 </script>
 

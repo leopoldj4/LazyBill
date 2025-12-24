@@ -17,7 +17,12 @@
 	import { onDestroy } from 'svelte';
 	import TimeEntryView from './TimeEntryList.svelte';
 	import { page } from '$app/state';
-	import { startTimeEntry, updateTimeEntry, deleteTimeEntry, createManualTimeEntry } from './data.remote';
+	import {
+		startTimeEntry,
+		updateTimeEntry,
+		deleteTimeEntry,
+		createManualTimeEntry,
+	} from './data.remote';
 
 	const { children, data } = $props();
 
@@ -30,14 +35,14 @@
 
 	async function startTracking() {
 		const startTime = new Date();
-		
+
 		// Save the entry immediately and get its ID
 		const entry = await startTimeEntry({
 			description,
 			customerId: customerId || null,
 			startTime: startTime.toISOString(),
 		});
-		
+
 		trackingEntryId = entry.id;
 		trackingStartTime = startTime;
 		trackingDisplay = '00:00:00';
@@ -60,7 +65,7 @@
 		if (trackingEntryId) {
 			await deleteTimeEntry({ id: trackingEntryId });
 		}
-		
+
 		clearInterval(trackingInterval);
 		trackingEntryId = undefined;
 		trackingStartTime = undefined;
@@ -162,9 +167,9 @@
 					<Select.Item value="">No customer</Select.Item>
 					<Select.Separator />
 					<Select.Label>Customers</Select.Label>
-						{#each data.customers as customer}
-							<Select.Item value={customer.id}>{customer.name}</Select.Item>
-						{/each}
+					{#each data.customers as customer}
+						<Select.Item value={customer.id}>{customer.name}</Select.Item>
+					{/each}
 				</Select.Content>
 			</Select.Root>
 

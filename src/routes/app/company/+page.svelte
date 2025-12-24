@@ -30,7 +30,7 @@
 	<title>Company Settings</title>
 </svelte:head>
 
-<div class="container max-w-3xl"	>
+<div class="container max-w-3xl">
 	<div class="mb-6 flex flex-row items-center justify-between">
 		<div>
 			<h1 class="text-3xl font-bold">Company Settings</h1>
@@ -39,7 +39,7 @@
 	</div>
 
 	<Separator />
-	<form method="post" class="space-y-6 mt-8" use:enhance>
+	<form method="post" class="mt-8 space-y-6" use:enhance>
 		<div class="grid grid-cols-1 gap-6">
 			<Field.Field>
 				<Field.Label for="name">Company Name</Field.Label>

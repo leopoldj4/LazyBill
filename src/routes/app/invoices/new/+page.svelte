@@ -135,10 +135,15 @@
 			</Form.Control>
 		</Form.Field>
 	</form>
-	<Preview typstDocument={invoiceTemplate({
-		customer: data.customers.find((customer) => customer.id === $formData.customerId)!,
-		articles: $formData.articles,
-		invoiceNumber: Number.parseInt($formData.invoiceNumber),
-		invoiceDate: $formData.invoiceDate,
-	}, data.company!)} />
+	<Preview
+		typstDocument={invoiceTemplate(
+			{
+				customer: data.customers.find((customer) => customer.id === $formData.customerId)!,
+				articles: $formData.articles,
+				invoiceNumber: Number.parseInt($formData.invoiceNumber),
+				invoiceDate: $formData.invoiceDate,
+			},
+			data.company!,
+		)}
+	/>
 </div>

@@ -20,7 +20,7 @@
 		addresstype: z.string(),
 		name: z.string(),
 		display_name: z.string(),
-		boundingbox: z.array(z.string())
+		boundingbox: z.array(z.string()),
 	});
 
 	const NominatimResponseSchema = z.array(NominatimResultSchema);
@@ -52,7 +52,7 @@
 		class: className,
 		placeholder = 'Adresse eingeben...',
 		selectedAddress = $bindable(null),
-		onAddressSelect
+		onAddressSelect,
 	}: Props = $props();
 
 	let inputValue = $state('');
@@ -126,7 +126,7 @@
 			country,
 			lat: result.lat,
 			lon: result.lon,
-			displayName: result.display_name
+			displayName: result.display_name,
 		};
 	}
 
@@ -145,13 +145,13 @@
 			const params = new URLSearchParams({
 				q: query,
 				countrycodes: 'de',
-				format: 'jsonv2'
+				format: 'jsonv2',
 			});
 
 			const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
 				headers: {
-					'User-Agent': 'Watchtower/1.0'
-				}
+					'User-Agent': 'Watchtower/1.0',
+				},
 			});
 
 			if (!response.ok) {
@@ -243,7 +243,7 @@
 				<MapPinIcon class="size-4 shrink-0 opacity-50" />
 				<input
 					type="text"
-					class="placeholder:text-muted-foreground flex h-9 w-full bg-transparent py-1 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50"
+					class="flex h-9 w-full bg-transparent py-1 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
 					{placeholder}
 					value={inputValue}
 					oninput={handleInput}
@@ -258,11 +258,11 @@
 
 			{#if isOpen}
 				<Command.List
-					class="bg-popover absolute top-full right-0 left-0 z-50 mt-1 max-h-[300px] overflow-y-auto rounded-md border shadow-md"
+					class="absolute top-full right-0 left-0 z-50 mt-1 max-h-[300px] overflow-y-auto rounded-md border bg-popover shadow-md"
 				>
-				{#if showLoader}
-					<div class="text-muted-foreground py-6 text-center text-sm">Suche...</div>
-				{:else if results.length === 0 && hasSearched}
+					{#if showLoader}
+						<div class="py-6 text-center text-sm text-muted-foreground">Suche...</div>
+					{:else if results.length === 0 && hasSearched}
 						<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 					{:else}
 						<Command.Group>
@@ -272,7 +272,7 @@
 									onSelect={() => selectAddress(result)}
 									class="cursor-pointer"
 								>
-									<MapPinIcon class="text-muted-foreground mr-2 size-4" />
+									<MapPinIcon class="mr-2 size-4 text-muted-foreground" />
 									<span class="truncate">{result.display_name}</span>
 								</Command.Item>
 							{/each}
@@ -285,11 +285,10 @@
 
 	{#if selectedAddress}
 		<div
-			class="text-muted-foreground mt-2 flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm"
+			class="mt-2 flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
 		>
 			<MapPinIcon class="size-4 shrink-0" />
 			<span>{formatSummary(selectedAddress)}</span>
 		</div>
 	{/if}
 </div>
-

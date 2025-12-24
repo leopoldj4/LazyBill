@@ -30,7 +30,7 @@
 		</div>
 	</div>
 	<Separator />
-	<form method="post" class="space-y-6 mt-6" use:enhance>
+	<form method="post" class="mt-6 space-y-6" use:enhance>
 		<div class="grid grid-cols-1 gap-6">
 			<Field.Field>
 				<Field.Label for="name">Full Name</Field.Label>

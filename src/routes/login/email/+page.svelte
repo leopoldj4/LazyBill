@@ -43,9 +43,9 @@
 		<Input id="password" type="password" placeholder="********" required bind:value={password} />
 	</div>
 
-    {#if error}
-        <p class="text-red-500">{error}</p>
-    {/if}
+	{#if error}
+		<p class="text-red-500">{error}</p>
+	{/if}
 
 	<Button type="submit" class="mt-4 w-full">Login</Button>
 </form>
