@@ -7,16 +7,12 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
-		experimental: {
-			remoteFunctions: true,
-		},
 		adapter: adapter(),
+		alias: {
+			$convex: './src/convex',
+		}
 	},
-	compilerOptions: {
-		experimental: {
-			async: true,
-		},
-	},
+	compilerOptions: {},
 };
 
 export default config;

@@ -12,8 +12,8 @@
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useQuery } from 'convex-svelte';
-	import { api } from '../../../../../../convex/_generated/api.js';
-	import type { Id } from '../../../../../../convex/_generated/dataModel.js';
+	import { api } from '$convex/_generated/api.js';
+	import type { Id } from '$convex/_generated/dataModel.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	let { data } = $props();

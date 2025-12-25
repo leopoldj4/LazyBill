@@ -45,7 +45,7 @@
 	});
 
 	import { useQuery } from 'convex-svelte';
-	import { api } from '../../convex/_generated/api.js';
+	import { api } from '$convex/_generated/api.js';
 
 	const query = useQuery(api.customers.list, {});
 </script>

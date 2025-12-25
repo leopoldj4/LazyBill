@@ -5,7 +5,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { api } from '../../../../convex/_generated/api.js';
+	import { api } from '$convex/_generated/api.js';
 	import { debounce } from '$lib';
 
 	const client = useConvexClient();

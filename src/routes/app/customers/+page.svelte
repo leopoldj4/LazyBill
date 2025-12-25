@@ -18,7 +18,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { api } from '../../../convex/_generated/api.js';
+	import { api } from '$convex/_generated/api.js';
 	import { goto } from '$app/navigation';
 
 	let search = $state('');

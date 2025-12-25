@@ -21,8 +21,8 @@
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { api } from '../../../../convex/_generated/api.js';
-	import type { Id } from '../../../../convex/_generated/dataModel.js';
+	import { api } from '$convex/_generated/api.js';
+	import type { Id } from '$convex/_generated/dataModel.js';
 	const client = useConvexClient();
 
 	let { data } = $props();
