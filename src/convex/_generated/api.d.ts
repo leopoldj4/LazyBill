@@ -8,7 +8,7 @@
  * @module
  */
 
-import type * as company from "../company.js";
+import type * as companies from "../companies.js";
 import type * as customers from "../customers.js";
 
 import type {
@@ -18,7 +18,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  company: typeof company;
+  companies: typeof companies;
   customers: typeof customers;
 }>;
 

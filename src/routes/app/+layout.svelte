@@ -60,6 +60,9 @@
 			<Command.LinkItem href="/app/customers" onclick={closeCommand}
 				><UsersIcon /> Kunden</Command.LinkItem
 			>
+			<Command.LinkItem href="/app/settings" onclick={closeCommand}
+				><BuildingIcon /> Einstellungen</Command.LinkItem
+			>
 		</Command.Group>
 		<Command.Separator />
 		{#if query.data}
@@ -72,11 +75,8 @@
 			</Command.Group>
 		{/if}
 		<Command.Group heading="Einstellungen">
-			<Command.LinkItem href="/app/company" onclick={closeCommand}
-				><BuildingIcon /> Firma verwalten</Command.LinkItem
-			>
-			<Command.LinkItem href="/app/account" onclick={closeCommand}
-				><UsersIcon /> Mein Konto</Command.LinkItem
+			<Command.LinkItem href="/app/settings/company" onclick={closeCommand}
+				><BuildingIcon /> Meine Firma</Command.LinkItem
 			>
 		</Command.Group>
 	</Command.List>
@@ -97,8 +97,6 @@
 				Quick Switcher
 				<SearchIcon class="size-4" />
 			</button>
-
-			<a class={buttonVariants({ variant: 'ghost' })} href="/app/customers">Kunden</a>
 		</header>
 		<div class="flex items-center justify-between">
 			{#if status.isWebSocketConnected}
@@ -119,42 +117,7 @@
 					Connecting...
 				</div>
 			{/if}
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger
-					class="flex h-9 flex-row items-center justify-end gap-2 rounded-md px-4 hover:bg-gray-100"
-				>
-					More
-					<ChevronDownIcon class="size-4" />
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Portal>
-					<DropdownMenu.Content
-						sideOffset={4}
-						alignOffset={4}
-						align="end"
-						class="rounded-xl border border-gray-200 bg-white p-2 shadow"
-					>
-						<a
-							href="/app/company"
-							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
-						>
-							<BuildingIcon class="size-4" /> Manage company
-						</a>
-						<a
-							href="/app/account"
-							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
-						>
-							<UsersIcon class="size-4" /> My account
-						</a>
-						<Separator class="my-2" />
-						<button
-							class="flex w-full items-center gap-2 rounded-md px-3 py-1 hover:bg-gray-100"
-							onclick={handleSignOut}
-						>
-							<LogOutIcon class="size-4" /> Log out
-						</button>
-					</DropdownMenu.Content>
-				</DropdownMenu.Portal>
-			</DropdownMenu.Root>
+			<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>Einstellungen</a>
 		</div>
 	</div>
 	<div

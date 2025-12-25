@@ -58,7 +58,12 @@ export const update = mutation({
         key: v.string(),
         value: v.string(),
     },
-    handler: async (ctx, args) => await ctx.db.patch("customers", args.id, {
-        [args.key]: args.value,
-    })
+    handler: async (ctx, args) => {
+        if (!['email', 'phone', 'notes'].includes(args.key)) {
+            throw new Error("Invalid key");
+        }
+        await ctx.db.patch("customers", args.id, {
+            [args.key]: args.value,
+        })
+    },
 })

@@ -24,6 +24,7 @@
 	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import { PlusIcon } from '@lucide/svelte';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
+	import { debounce } from '$lib';
 	const client = useConvexClient();
 
 	let { data } = $props();
@@ -53,19 +54,6 @@
 			key: key,
 			value: (event.target as HTMLInputElement).value,
 		});
-	}
-	
-	function debounce<T>(fn: (value: T) => Promise<void>): (value: T) => void {
-		let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-
-		return (value: T) => {
-			if (debounceTimer) {
-				clearTimeout(debounceTimer);
-			}
-			debounceTimer = setTimeout(async () => {
-				await fn(value);
-			}, 500);
-		};
 	}
 
 	let updateNotes = debounce((event: Event) => updateValue('notes', event));

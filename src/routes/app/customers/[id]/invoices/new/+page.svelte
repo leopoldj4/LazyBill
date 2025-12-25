@@ -18,7 +18,7 @@
 
 	let { data } = $props();
 
-	const companyQuery = useQuery(api.company.get, {});
+	const companyQuery = useQuery(api.companies.get, {});
 	const customerQuery = useQuery(api.customers.get, () => ({
 		id: data.customerId as Id<'customers'>,
 	}));
