@@ -9,8 +9,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 
-	import GoogleIcon from './google.svg';
-
 	let email = $state('');
 	let password = $state('');
 

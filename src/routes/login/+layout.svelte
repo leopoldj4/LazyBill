@@ -5,9 +5,7 @@
 
 <div class="grid h-screen grid-cols-[40%_60%]">
 	<div class="flex h-screen flex-col items-start justify-between p-8">
-		<a href="/" class="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
-			<ChevronLeftIcon class="size-4" /> Back to the homepage
-		</a>
+		<div />
 		<div class="flex w-full flex-col items-center justify-center gap-20">
 			<slot />
 		</div>

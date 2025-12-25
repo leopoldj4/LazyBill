@@ -6,13 +6,9 @@
 	import { BuildingIcon, ChevronDownIcon, LogOutIcon, SearchIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { DropdownMenu } from 'bits-ui';
-	import { PUBLIC_CONVEX_URL } from '$env/static/public';
-	import { setupConvex } from 'convex-svelte';
 	import { useConvexClient } from 'convex-svelte';
 	import { onMount } from 'svelte';
 	import type { ConnectionState } from 'convex/browser';
-
-	setupConvex(PUBLIC_CONVEX_URL);
 
 	const { children } = $props();
 
