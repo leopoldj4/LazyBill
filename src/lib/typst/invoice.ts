@@ -61,6 +61,7 @@ export function invoiceTemplate(company: Company, customer: Customer, articles: 
 #payment-goal(days: due)
 
 #bank-details(
+    name: company.representative,
     bank: company.bankName,
     iban: company.bankIban,
     bic: company.bankBic,
