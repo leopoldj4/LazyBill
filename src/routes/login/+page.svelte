@@ -41,13 +41,6 @@
 		<MailIcon class="size-4" />
 		Sign in with E-Mail
 	</a>
-	<a
-		href="/login"
-		class="flex w-full flex-row items-center gap-4 rounded-md border border-border px-6 py-4"
-	>
-		<img src={GoogleIcon} alt="Google" class="size-4" />
-		Sign in with Google
-	</a>
 
 	<div class="mt-4 text-center">
 		Don't have an account?
