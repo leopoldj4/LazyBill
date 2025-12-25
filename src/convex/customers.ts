@@ -52,12 +52,13 @@ export const create = mutation({
     }
 });
 
-export const setNotes = mutation({
+export const update = mutation({
     args: {
         id: v.id('customers'),
-        notes: v.string(),
+        key: v.string(),
+        value: v.string(),
     },
-    handler: async (ctx, args) => {
-        await ctx.db.patch("customers", args.id, { notes: args.notes });
-    }
-});
+    handler: async (ctx, args) => await ctx.db.patch("customers", args.id, {
+        [args.key]: args.value,
+    })
+})

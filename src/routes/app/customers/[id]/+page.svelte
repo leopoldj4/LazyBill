@@ -6,15 +6,24 @@
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import EditIcon from '@lucide/svelte/icons/edit';
+	import CopyIcon from '@lucide/svelte/icons/copy';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
 	import { useQuery } from 'convex-svelte';
 	import { api } from '../../../../convex/_generated/api.js';
 	import type { Id } from '../../../../convex/_generated/dataModel.js';
 	import { useConvexClient } from 'convex-svelte';
-	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table/index.js';
+	import {
+		Table,
+		TableBody,
+		TableCell,
+		TableHead,
+		TableHeader,
+		TableRow,
+	} from '$lib/components/ui/table/index.js';
 	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import { PlusIcon } from '@lucide/svelte';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	const client = useConvexClient();
 
 	let { data } = $props();
@@ -37,19 +46,31 @@
 		id: data.customerId as Id<'customers'>,
 	}));
 
-	let notesDebounceTimer = $state<ReturnType<typeof setTimeout> | null>(null);
-	function handleNotesChange(event: Event) {
-		const textarea = event.target as HTMLTextAreaElement;
-		if (notesDebounceTimer) {
-			clearTimeout(notesDebounceTimer);
-		}
-		notesDebounceTimer = setTimeout(() => {
-			client.mutation(api.customers.setNotes, {
-				id: data.customerId as Id<'customers'>,
-				notes: textarea.value,
-			});
-		}, 500);
+
+	async function updateValue(key: string, event: Event) {
+		await client.mutation(api.customers.update, {
+			id: data.customerId as Id<'customers'>,
+			key: key,
+			value: (event.target as HTMLInputElement).value,
+		});
 	}
+	
+	function debounce<T>(fn: (value: T) => Promise<void>): (value: T) => void {
+		let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+		return (value: T) => {
+			if (debounceTimer) {
+				clearTimeout(debounceTimer);
+			}
+			debounceTimer = setTimeout(async () => {
+				await fn(value);
+			}, 500);
+		};
+	}
+
+	let updateNotes = debounce((event: Event) => updateValue('notes', event));
+	let updateEmail = debounce((event: Event) => updateValue('email', event));
+	let updatePhone = debounce((event: Event) => updateValue('phone', event));
 </script>
 
 {#if query.data}
@@ -75,29 +96,29 @@
 				<CardTitle>Kontakt</CardTitle>
 			</CardHeader>
 
-			<CardContent>
-				<div class="grid grid-cols-[1fr_min-content] gap-2">
-					<a
-						href="mailto:{customer.email}"
-						class={buttonVariants({ variant: 'outline', class: 'justify-start' })}
-					>
+			<CardContent class="flex flex-col gap-2">
+				<InputGroup.Root>
+					<InputGroup.Addon align="inline-start">
 						<MailIcon class="h-4 w-4" />
-						{customer.email || 'Keine Email'}
-					</a>
-					<Button variant="outline">
-						<EditIcon class="h-4 w-4" />
-					</Button>
-					<a
-						href="tel:{customer.phone}"
-						class={buttonVariants({ variant: 'outline', class: 'justify-start' })}
-					>
+					</InputGroup.Addon>
+					<InputGroup.Input value={customer.email} type="email" placeholder="Email" oninput={updateEmail} onkeydown={updateEmail} />
+					<InputGroup.Addon align="inline-end">
+						<InputGroup.Button>
+							<CopyIcon class="h-4 w-4" />
+						</InputGroup.Button>
+					</InputGroup.Addon>
+				</InputGroup.Root>
+				<InputGroup.Root>
+					<InputGroup.Addon align="inline-start">
 						<PhoneIcon class="h-4 w-4" />
-						{customer.phone || 'Keine Telefonnummer'}
-					</a>
-					<Button variant="outline">
-						<EditIcon class="h-4 w-4" />
-					</Button>
-				</div>
+					</InputGroup.Addon>
+					<InputGroup.Input value={customer.phone} type="tel" placeholder="Telefon" oninput={updatePhone} onkeydown={updatePhone} />
+					<InputGroup.Addon align="inline-end">
+						<InputGroup.Button>
+							<CopyIcon class="h-4 w-4" />
+						</InputGroup.Button>
+					</InputGroup.Addon>
+				</InputGroup.Root>
 			</CardContent>
 		</Card>
 
@@ -109,8 +130,7 @@
 				{customer.invoiceStreet}<br />
 				{customer.invoiceZip}
 				{query.data.customer.invoiceCity}<br />
-				{customer
-					.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
+				{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
 					-
 				{/if}{customer.invoiceCountry}
 			</CardContent>
@@ -131,8 +151,8 @@
 			<CardContent>
 				<Textarea
 					value={customer.notes}
-					onchange={handleNotesChange}
-					onkeydown={handleNotesChange}
+					onchange={updateNotes}
+					onkeydown={updateNotes}
 				/>
 			</CardContent>
 		</Card>
