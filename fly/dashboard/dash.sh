@@ -1,0 +1,1 @@
+docker run -e 'NEXT_PUBLIC_DEPLOYMENT_URL=https://watchtower-backend.fly.dev' -p '6791:6791' 'ghcr.io/get-convex/convex-dashboard:latest'
