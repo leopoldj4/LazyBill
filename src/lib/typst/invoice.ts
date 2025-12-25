@@ -1,5 +1,5 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { Company, Customer } from "$lib/server/db/schema";
+import type { Doc } from "../../convex/_generated/dataModel";
 
 type Article = {
     name: string;
@@ -13,7 +13,7 @@ function encode(x: any): string {
         }")`
 }
 
-export function invoiceTemplate(company: Company, customer: Customer, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number) {
+export function invoiceTemplate(company: Doc<"companies">, customer: Doc<"customers">, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number, notes: string) {
     return `
 #import "@preview/invoice-pro:0.1.0": *
 
@@ -27,6 +27,7 @@ export function invoiceTemplate(company: Company, customer: Customer, articles: 
         "month": invoiceDate.month,
         "day": invoiceDate.day,
     })})
+#let notes = ${encode(notes)}
 
 #set text(lang: "de") 
 
@@ -35,7 +36,7 @@ export function invoiceTemplate(company: Company, customer: Customer, articles: 
 
     sender: (
         name: company.name,
-        address: company.street + company.streetExtra,
+        address: company.street,
         city: company.city,
         extra: (
             "Tel": [#company.phone],
@@ -44,7 +45,7 @@ export function invoiceTemplate(company: Company, customer: Customer, articles: 
 
     recipient: (
         name: customer.name,
-        address: customer.invoiceStreet + customer.invoiceStreetExtra,
+        address: customer.invoiceStreet,
         city: customer.invoiceZip + " " + customer.invoiceCity
     ),
 
@@ -66,6 +67,8 @@ export function invoiceTemplate(company: Company, customer: Customer, articles: 
     iban: company.bankIban,
     bic: company.bankBic,
 )
+
+#notes
 
 #signature(signature: block[#company.representative])
 `;

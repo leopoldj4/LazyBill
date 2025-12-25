@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import SiteHeader from '$lib/components/site-header.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import { ButtonGroup } from '$lib/components/ui/button-group';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import {
 		Table,
 		TableBody,
@@ -9,16 +13,36 @@
 		TableRow,
 	} from '$lib/components/ui/table';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import SiteHeader from '$lib/components/site-header.svelte';
-	import { ButtonGroup } from '$lib/components/ui/button-group';
-
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import SearchIcon from '@lucide/svelte/icons/search';
-
-	const { data } = $props();
+	import { Input } from '$lib/components/ui/input/index.js';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import { useConvexClient, useQuery } from 'convex-svelte';
+	import { api } from '../../../convex/_generated/api.js';
+	import { goto } from '$app/navigation';
 
 	let search = $state('');
+
+	const client = useConvexClient();
+
+	let newCustomerOpen = $state(false);
+
+	async function handleNewCustomerSubmit(event: Event) {
+		event.preventDefault();
+		const form = event.target as HTMLFormElement;
+		const formData = new FormData(form);
+		const name = formData.get('name') as string;
+
+		const { _id } = await client.mutation(api.customers.create, {
+			name: name,
+		});
+
+		newCustomerOpen = false;
+
+		await goto(`/app/customers/${_id}`);
+	}
+
+	const query = useQuery(api.customers.list, {});
 </script>
 
 <Breadcrumb.Root>
@@ -39,45 +63,78 @@
 		</InputGroup.Root>
 	</ButtonGroup>
 	<ButtonGroup>
-		<a href="/app/customers/new" class={buttonVariants({ variant: 'outline' })}>
-			<PlusIcon />
-			Kunde hinzufügen
-		</a>
+		<Button
+			variant="outline"
+			onclick={() => {
+				newCustomerOpen = true;
+			}}><PlusIcon /> Kunde hinzufügen</Button
+		>
 	</ButtonGroup>
 </ButtonGroup>
 
-<Table>
-	<TableHeader>
-		<TableRow>
-			<TableHead>Name</TableHead>
-			<TableHead>Email</TableHead>
-			<TableHead>Invoice Address</TableHead>
-		</TableRow>
-	</TableHeader>
-	<TableBody>
-		{#each data.customers as customer}
-			<a href={`/app/customers/${customer.id}`} class="contents">
-				<TableRow>
-					<TableCell>
-						{customer.name}
-					</TableCell>
-					<TableCell>{customer.email || '-'}</TableCell>
-					<TableCell>
-						{#if customer.invoiceStreet || customer.invoiceCity || customer.invoiceState || customer.invoiceZip}
+{#if query.isLoading}
+	<div class="grid h-[60vh] w-full place-items-center">
+		<div class="flex flex-row items-center gap-3"><Spinner /> Loading ..</div>
+	</div>
+{:else if query.error}
+	Error: {query.error.name}
+{:else}
+	<Table>
+		<TableHeader>
+			<TableRow>
+				<TableHead>Name</TableHead>
+				<TableHead>Email</TableHead>
+				<TableHead>Invoice Address</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody>
+			{#each query.data as customer}
+				<a href={`/app/customers/${customer._id}`} class="contents">
+					<TableRow>
+						<TableCell>
+							{customer.name}
+						</TableCell>
+						<TableCell>{customer.email}</TableCell>
+						<TableCell>
 							<div class="text-sm">
-								{#if customer.invoiceStreet}{customer.invoiceStreet}<br />{/if}
-								{#if customer.invoiceCity || customer.invoiceState || customer.invoiceZip}
-									{customer.invoiceCity}{#if customer.invoiceCity && customer.invoiceState},
-									{/if}{customer.invoiceState}
-									{customer.invoiceZip}
-								{/if}
+								{customer.invoiceStreet}<br />
+								{customer.invoiceZip}
+								{customer.invoiceCity}<br />
+								{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry} - {/if}{customer.invoiceCountry}
 							</div>
-						{:else}
-							-
-						{/if}
-					</TableCell>
-				</TableRow>
-			</a>
-		{/each}
-	</TableBody>
-</Table>
+						</TableCell>
+					</TableRow>
+				</a>
+			{/each}
+		</TableBody>
+	</Table>
+{/if}
+
+<Dialog.Root
+	open={newCustomerOpen}
+	onOpenChange={(value) => {
+		newCustomerOpen = value;
+	}}
+>
+	<Dialog.Portal>
+		<Dialog.Overlay />
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Kunde hinzufügen</Dialog.Title>
+				<Dialog.Description>Bitte geben Sie den Namen des Kunden ein.</Dialog.Description>
+			</Dialog.Header>
+			<form onsubmit={handleNewCustomerSubmit} class="flex flex-col gap-4">
+				<Input type="text" placeholder="Name" name="name" />
+				<Dialog.Footer>
+					<Button
+						variant="outline"
+						onclick={() => {
+							newCustomerOpen = false;
+						}}>Abbrechen</Button
+					>
+					<Button type="submit">Hinzufügen</Button>
+				</Dialog.Footer>
+			</form>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>

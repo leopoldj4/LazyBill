@@ -3,16 +3,18 @@
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import {
-		BuildingIcon,
-		ChevronDownIcon,
-		LogOutIcon,
-		SearchIcon
-	} from '@lucide/svelte';
+	import { BuildingIcon, ChevronDownIcon, LogOutIcon, SearchIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { DropdownMenu } from 'bits-ui';
+	import { PUBLIC_CONVEX_URL } from '$env/static/public';
+	import { setupConvex } from 'convex-svelte';
+	import { useConvexClient } from 'convex-svelte';
+	import { onMount } from 'svelte';
+	import type { ConnectionState } from 'convex/browser';
 
-	const { children, data } = $props();
+	setupConvex(PUBLIC_CONVEX_URL);
+
+	const { children } = $props();
 
 	let isOpen = $state(false);
 	let signoutForm: HTMLFormElement;
@@ -30,25 +32,45 @@
 	}
 
 	const closeCommand = () => (commandOpen = false);
+
+	const client = useConvexClient();
+	let status: ConnectionState = $state(client.connectionState());
+
+	onMount(() => {
+		const unsubscribe = client.subscribeToConnectionState((newState) => {
+			status = newState;
+		});
+
+		return unsubscribe;
+	});
+
+	import { useQuery } from 'convex-svelte';
+	import { api } from '../../convex/_generated/api.js';
+
+	const query = useQuery(api.customers.list, {});
 </script>
+
+<svelte:document onkeydown={handleKeydown} />
 
 <Command.Dialog bind:open={commandOpen}>
 	<Command.Input placeholder="Type a command or search..." />
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Seiten">
-				<Command.LinkItem href="/app/customers" onclick={closeCommand}
-					><UsersIcon /> Kunden</Command.LinkItem
-				>
+			<Command.LinkItem href="/app/customers" onclick={closeCommand}
+				><UsersIcon /> Kunden</Command.LinkItem
+			>
 		</Command.Group>
 		<Command.Separator />
-		<Command.Group heading="Kunden">
-			{#each data.customers as customer}
-				<Command.LinkItem href={`/app/customers/${customer.id}`} onclick={closeCommand}
-					><UsersIcon /> {customer.name}</Command.LinkItem
-				>
-			{/each}
-		</Command.Group>
+		{#if query.data}
+			<Command.Group heading="Kunden">
+				{#each query.data as customer}
+					<Command.LinkItem href={`/app/customers/${customer._id}`} onclick={closeCommand}
+						><UsersIcon /> {customer.name}</Command.LinkItem
+					>
+				{/each}
+			</Command.Group>
+		{/if}
 		<Command.Group heading="Einstellungen">
 			<Command.LinkItem href="/app/company" onclick={closeCommand}
 				><BuildingIcon /> Firma verwalten</Command.LinkItem
@@ -61,9 +83,9 @@
 </Command.Dialog>
 
 <div class="h-screen">
-	<div class="flex flex-row items-center justify-between w-full h-[52px] px-4">
+	<div class="flex h-[52px] w-full flex-row items-center justify-between px-4">
 		<header class="flex items-center gap-2 pr-2">
-			<a class="flex items-center gap-1 shrink-0 mr-4" href="/app">
+			<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 				<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
 				<div class="font-display text-xl">Watchtower</div>
 			</a>
@@ -79,11 +101,29 @@
 			<a class={buttonVariants({ variant: 'ghost' })} href="/app/customers">Kunden</a>
 		</header>
 		<div class="flex items-center justify-between">
+			{#if status.isWebSocketConnected}
+				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+					<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
+					Connected
+				</div>
+			{:else if status.hasEverConnected}
+				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+					<div class="size-2 rounded-full bg-red-500"></div>
+					Disconnected
+				</div>
+			{:else}
+				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+					<div
+						class="size-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
+					></div>
+					Connecting...
+				</div>
+			{/if}
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger
 					class="flex h-9 flex-row items-center justify-end gap-2 rounded-md px-4 hover:bg-gray-100"
 				>
-					{data.user.name}
+					More
 					<ChevronDownIcon class="size-4" />
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Portal>

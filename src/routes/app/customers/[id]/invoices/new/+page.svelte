@@ -4,101 +4,123 @@
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import * as InputGroup from "$lib/components/ui/input-group";
+	import * as InputGroup from '$lib/components/ui/input-group';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { invoiceTemplate } from '$lib/typst/invoice.js';
 	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-
+	import { useQuery } from 'convex-svelte';
+	import { api } from '../../../../../../convex/_generated/api.js';
+	import type { Id } from '../../../../../../convex/_generated/dataModel.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	let { data } = $props();
 
+	const companyQuery = useQuery(api.company.get, {});
+	const customerQuery = useQuery(api.customers.get, () => ({
+		id: data.customerId as Id<'customers'>,
+	}));
+
 	let invoiceDate = $state<CalendarDate>(today(getLocalTimeZone()));
-	let invoiceDueDate = $state<CalendarDate>(today(getLocalTimeZone()).add({ days: 30 }));
 
-    let due = $state<number | null>(30);
-
+	let due = $state<number | null>(30);
 	let articles = $state<Article[]>([{ name: '', price: 0 }]);
+	let notes = $state<string>('');
 
 	type Article = {
 		name: string;
 		price: number;
 	};
 
-	let typstDocument = $derived(() => invoiceTemplate(data.company!, data.customer!, articles, invoiceDate, "###", due || 0));
+	let typstDocument = $derived(() => {
+		if (!companyQuery.data || !customerQuery.data) return '';
+
+		return invoiceTemplate(
+			companyQuery.data!,
+			customerQuery.data!,
+			articles,
+			invoiceDate,
+			'###',
+			due || 0,
+			notes,
+		);
+	});
 </script>
 
-<div class="grid grid-cols-2 gap-12">
-	<div class="flex flex-col gap-8">
-		<Breadcrumb.Root>
-			<Breadcrumb.List>
-				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
-				</Breadcrumb.Item>
-				<Breadcrumb.Separator />
-				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/app/customers/{data.customer!.id}"
-						>{data.customer!.name}</Breadcrumb.Link
+{#if customerQuery.data}
+	{@const customer = customerQuery.data}
+	<div class="grid grid-cols-2 gap-12">
+		<div class="flex flex-col gap-8">
+			<Breadcrumb.Root>
+				<Breadcrumb.List>
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					<Breadcrumb.Separator />
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href="/app/customers/{customer._id}">{customer.name}</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					<Breadcrumb.Separator />
+					<Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
+
+			<SiteHeader>Neue Rechnung</SiteHeader>
+
+			<div class="grid grid-cols-2 gap-6">
+				<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
+				<div class="flex flex-col gap-3">
+					<Label>Fällig in</Label>
+					<InputGroup.Root>
+						<InputGroup.Input class="text-right" bind:value={due} type="number" min="1" max="600"
+						></InputGroup.Input>
+						<InputGroup.Addon align="inline-end">
+							<InputGroup.Text>Tagen</InputGroup.Text>
+						</InputGroup.Addon>
+					</InputGroup.Root>
+				</div>
+			</div>
+
+			<h2 class="text-xl">Artikel</h2>
+
+			<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
+				<div></div>
+				<p>Name</p>
+				<p>Preis</p>
+
+				{#each articles as article}
+					<Button
+						variant="ghost"
+						onclick={() => {
+							articles.splice(articles.indexOf(article), 1);
+						}}
 					>
-				</Breadcrumb.Item>
-				<Breadcrumb.Separator />
-				<Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
-			</Breadcrumb.List>
-		</Breadcrumb.Root>
+						<CircleMinusIcon color="gray" />
+					</Button>
+					<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
+					<Input type="number" bind:value={article.price} />
+				{/each}
 
-		<SiteHeader>Neue Rechnung</SiteHeader>
-
-		<div class="grid grid-cols-2 gap-6">
-			<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
-            <div class="flex flex-col gap-3">
-            <Label>Fällig in</Label>
-            <InputGroup.Root>
-                <InputGroup.Input class="text-right" bind:value={due} type="number" min="1" max="600"></InputGroup.Input>
-                <InputGroup.Addon align="inline-end">
-                    <InputGroup.Text>
-                    Tagen
-                    </InputGroup.Text>
-                </InputGroup.Addon>
-            </InputGroup.Root>
-        </div>
-		</div>
-
-		<h2 class="text-xl">Artikel</h2>
-
-		<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
-			<div></div>
-			<p>Name</p>
-			<p>Preis</p>
-
-			{#each articles as article}
 				<Button
-					variant="ghost"
+					variant="outline"
+					class="col-span-3"
 					onclick={() => {
-						articles.splice(articles.indexOf(article), 1);
+						articles.push({ name: '', price: 0 });
 					}}
 				>
-					<CircleMinusIcon color="gray" />
+					<PlusIcon />
+					Neuer Artikel
 				</Button>
-				<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
-				<Input type="number" bind:value={article.price} />
-			{/each}
+			</div>
 
-			<Button
-				variant="outline"
-				class="col-span-3"
-				onclick={() => {
-					articles.push({ name: '', price: 0 });
-				}}
-			>
-				<PlusIcon />
-				Neuer Artikel
-			</Button>
+			<div class="flex flex-col gap-3">
+				<h2 class="text-xl">Anmerkungen</h2>
+				<Textarea bind:value={notes} placeholder="Notizen zur Rechnung" />
+			</div>
 		</div>
+
+		<Preview typstDocument={typstDocument()} />
 	</div>
-
-
-    <Preview typstDocument={typstDocument()} />
-
-</div>
+{/if}
