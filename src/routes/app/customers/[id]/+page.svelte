@@ -1,18 +1,12 @@
 <script lang="ts">
+	import { debounce } from '$lib';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import EditIcon from '@lucide/svelte/icons/edit';
-	import CopyIcon from '@lucide/svelte/icons/copy';
-	import MailIcon from '@lucide/svelte/icons/mail';
-	import PhoneIcon from '@lucide/svelte/icons/phone';
-	import { useQuery } from 'convex-svelte';
-	import { api } from '../../../../convex/_generated/api.js';
-	import type { Id } from '../../../../convex/_generated/dataModel.js';
-	import { useConvexClient } from 'convex-svelte';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import {
 		Table,
 		TableBody,
@@ -21,10 +15,14 @@
 		TableHeader,
 		TableRow,
 	} from '$lib/components/ui/table/index.js';
-	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
 	import { PlusIcon } from '@lucide/svelte';
-	import * as InputGroup from '$lib/components/ui/input-group/index.js';
-	import { debounce } from '$lib';
+	import CopyIcon from '@lucide/svelte/icons/copy';
+	import EditIcon from '@lucide/svelte/icons/edit';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import PhoneIcon from '@lucide/svelte/icons/phone';
+	import { useConvexClient, useQuery } from 'convex-svelte';
+	import { api } from '../../../../convex/_generated/api.js';
+	import type { Id } from '../../../../convex/_generated/dataModel.js';
 	const client = useConvexClient();
 
 	let { data } = $props();
@@ -92,7 +90,7 @@
 					<InputGroup.Input value={customer.email} type="email" placeholder="Email" oninput={updateEmail} onkeydown={updateEmail} />
 					<InputGroup.Addon align="inline-end">
 						<InputGroup.Button>
-							<CopyIcon class="h-4 w-4" />
+							<CopyIcon class="h-4 w-4" /> Kopieren
 						</InputGroup.Button>
 					</InputGroup.Addon>
 				</InputGroup.Root>
@@ -103,7 +101,7 @@
 					<InputGroup.Input value={customer.phone} type="tel" placeholder="Telefon" oninput={updatePhone} onkeydown={updatePhone} />
 					<InputGroup.Addon align="inline-end">
 						<InputGroup.Button>
-							<CopyIcon class="h-4 w-4" />
+							<CopyIcon class="h-4 w-4" /> Kopieren
 						</InputGroup.Button>
 					</InputGroup.Addon>
 				</InputGroup.Root>
@@ -134,14 +132,20 @@
 
 		<Card>
 			<CardHeader>
-				<CardTitle>Notizen</CardTitle>
+				<CardTitle class="flex items-center gap-3">
+					Notizen
+					<span class="text-xs text-gray-500">
+						Nur für Sie sichtbar.
+					</span>
+				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<Textarea
+				<textarea class="w-full border-none outline-none field-sizing-content min-h-32"
 					value={customer.notes}
 					onchange={updateNotes}
 					onkeydown={updateNotes}
-				/>
+					placeholder="Notizen zum Kunden..."
+				></textarea>
 			</CardContent>
 		</Card>
 	</div>
