@@ -10,7 +10,7 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$convex: './src/convex',
-		}
+		},
 	},
 	compilerOptions: {},
 };

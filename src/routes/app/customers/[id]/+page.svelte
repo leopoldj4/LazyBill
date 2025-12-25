@@ -45,7 +45,6 @@
 		id: data.customerId as Id<'customers'>,
 	}));
 
-
 	async function updateValue(key: string, event: Event) {
 		await client.mutation(api.customers.update, {
 			id: data.customerId as Id<'customers'>,
@@ -87,7 +86,13 @@
 					<InputGroup.Addon align="inline-start">
 						<MailIcon class="h-4 w-4" />
 					</InputGroup.Addon>
-					<InputGroup.Input value={customer.email} type="email" placeholder="Email" oninput={updateEmail} onkeydown={updateEmail} />
+					<InputGroup.Input
+						value={customer.email}
+						type="email"
+						placeholder="Email"
+						oninput={updateEmail}
+						onkeydown={updateEmail}
+					/>
 					<InputGroup.Addon align="inline-end">
 						<InputGroup.Button>
 							<CopyIcon class="h-4 w-4" /> Kopieren
@@ -98,7 +103,13 @@
 					<InputGroup.Addon align="inline-start">
 						<PhoneIcon class="h-4 w-4" />
 					</InputGroup.Addon>
-					<InputGroup.Input value={customer.phone} type="tel" placeholder="Telefon" oninput={updatePhone} onkeydown={updatePhone} />
+					<InputGroup.Input
+						value={customer.phone}
+						type="tel"
+						placeholder="Telefon"
+						oninput={updatePhone}
+						onkeydown={updatePhone}
+					/>
 					<InputGroup.Addon align="inline-end">
 						<InputGroup.Button>
 							<CopyIcon class="h-4 w-4" /> Kopieren
@@ -134,13 +145,12 @@
 			<CardHeader>
 				<CardTitle class="flex items-center gap-3">
 					Notizen
-					<span class="text-xs text-gray-500">
-						Nur für Sie sichtbar.
-					</span>
+					<span class="text-xs text-gray-500"> Nur für Sie sichtbar. </span>
 				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<textarea class="w-full border-none outline-none field-sizing-content min-h-32"
+				<textarea
+					class="field-sizing-content min-h-32 w-full border-none outline-none"
 					value={customer.notes}
 					onchange={updateNotes}
 					onkeydown={updateNotes}

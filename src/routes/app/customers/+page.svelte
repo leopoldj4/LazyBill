@@ -100,7 +100,9 @@
 								{customer.invoiceStreet}<br />
 								{customer.invoiceZip}
 								{customer.invoiceCity}<br />
-								{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry} - {/if}{customer.invoiceCountry}
+								{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
+									-
+								{/if}{customer.invoiceCountry}
 							</div>
 						</TableCell>
 					</TableRow>

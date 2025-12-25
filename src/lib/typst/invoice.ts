@@ -1,20 +1,25 @@
-import type { CalendarDate } from "@internationalized/date";
-import type { Doc } from "../../convex/_generated/dataModel";
+import type { CalendarDate } from '@internationalized/date';
+import type { Doc } from '../../convex/_generated/dataModel';
 
 type Article = {
-    name: string;
-    price: number;
+	name: string;
+	price: number;
 };
 
 function encode(x: any): string {
-    return `json.decode("${JSON.stringify(x)
-        .replace(/\\/g, "\\\\")
-        .replace(/"/g, '\\"')
-        }")`
+	return `json.decode("${JSON.stringify(x).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")`;
 }
 
-export function invoiceTemplate(company: Doc<"companies">, customer: Doc<"customers">, articles: Article[], invoiceDate: CalendarDate, nr: string, due: number, notes: string) {
-    return `
+export function invoiceTemplate(
+	company: Doc<'companies'>,
+	customer: Doc<'customers'>,
+	articles: Article[],
+	invoiceDate: CalendarDate,
+	nr: string,
+	due: number,
+	notes: string,
+) {
+	return `
 #import "@preview/invoice-pro:0.1.0": *
 
 #let articles = ${encode(articles)}
@@ -23,10 +28,10 @@ export function invoiceTemplate(company: Doc<"companies">, customer: Doc<"custom
 #let nr = ${encode(nr)}
 #let due = ${encode(due)}
 #let date = datetime(..${encode({
-        "year": invoiceDate.year,
-        "month": invoiceDate.month,
-        "day": invoiceDate.day,
-    })})
+		year: invoiceDate.year,
+		month: invoiceDate.month,
+		day: invoiceDate.day,
+	})})
 #let notes = ${encode(notes)}
 
 #set text(lang: "de") 
