@@ -12,7 +12,7 @@
 		<div class="text-sm text-muted-foreground">&copy; 2025 leoj.de. All rights reserved.</div>
 	</div>
 	<div class="relative h-full w-full">
-		<div class="absolute inset-0 z-10 bg-gradient-to-r from-white to-transparent"></div>
+		<div class="absolute inset-0 z-10 bg-linear-to-r from-white to-transparent"></div>
 		<img src={HeroImage} alt="Hero" class="h-full w-full object-cover" />
 	</div>
 </div>

@@ -2,6 +2,8 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 const customers = defineTable({
+	userId: v.string(),
+
 	name: v.string(),
 	email: v.string(),
 	phone: v.string(),
@@ -14,10 +16,13 @@ const customers = defineTable({
 	invoiceCity: v.string(),
 	invoiceZip: v.string(),
 	invoiceStreet: v.string(),
-});
+}).index('by_userId', ['userId']);
 
 const invoices = defineTable({
+	userId: v.string(),
+
 	customerId: v.id('customers'),
+
 	number: v.number(),
 	date: v.string(), // yr-mon-day
 	dueInDays: v.number(),
@@ -31,6 +36,8 @@ const invoices = defineTable({
 });
 
 const companies = defineTable({
+	userId: v.string(),
+
 	name: v.string(),
 	phone: v.string(),
 
@@ -50,6 +57,6 @@ const companies = defineTable({
 
 	customerNumberCounter: v.number(),
 	invoiceNumberCounter: v.number(),
-});
+}).index('by_userId', ['userId']);
 
 export default defineSchema({ customers, invoices, companies });

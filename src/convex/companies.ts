@@ -1,10 +1,17 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { api } from './_generated/api';
+import { authComponent } from './auth';
 
 export const get = query({
 	args: {},
-	handler: async (ctx, _) => await ctx.db.query('companies').first(),
+	handler: async (ctx) => {
+		const user = await authComponent.getAuthUser(ctx);
+
+		return await ctx.db
+			.query('companies')
+			.withIndex('by_userId', (q) => q.eq('userId', user._id))
+			.first();
+	},
 });
 
 export const update = mutation({
@@ -13,11 +20,17 @@ export const update = mutation({
 		value: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const company = await ctx.db.query('companies').first();
+		const user = await authComponent.getAuthUser(ctx);
+
+		const company = await ctx.db
+			.query('companies')
+			.withIndex('by_userId', (q) => q.eq('userId', user._id))
+			.first();
+
 		if (!company) {
 			throw new Error('Company not found');
 		}
-		const id = company._id;
+
 		const allowed = [
 			'name',
 			'phone',
@@ -41,6 +54,8 @@ export const update = mutation({
 		if (args.key === 'smallBusiness') {
 			value = args.value === 'true';
 		}
+
+		const id = company._id;
 		await ctx.db.patch('companies', id, { [args.key]: value });
 	},
 });

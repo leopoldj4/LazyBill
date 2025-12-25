@@ -3,7 +3,7 @@
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { ButtonGroup } from '$lib/components/ui/button-group/index.js';
+	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
@@ -23,23 +23,12 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import TrashIcon from '@lucide/svelte/icons/trash';
+	import { goto } from '$app/navigation';
 	const client = useConvexClient();
 
 	let { data } = $props();
-
-	function formatCurrency(amount: number): string {
-		return new Intl.NumberFormat('de-DE', {
-			style: 'currency',
-			currency: 'EUR',
-		}).format(amount / 100);
-	}
-
-	function getTotalAmount(invoice: any): number {
-		return invoice.articles.reduce(
-			(acc: number, article: any) => acc + article.quantity * article.price,
-			0,
-		);
-	}
 
 	const query = useQuery(api.customers.getFull, () => ({
 		id: data.customerId as Id<'customers'>,
@@ -56,6 +45,12 @@
 	let updateNotes = debounce((event: Event) => updateValue('notes', event));
 	let updateEmail = debounce((event: Event) => updateValue('email', event));
 	let updatePhone = debounce((event: Event) => updateValue('phone', event));
+
+	async function remove() {
+		if (!confirm('Are you sure you want to remove this customer?')) return;
+		await client.mutation(api.customers.remove, { id: data.customerId as Id<'customers'> });
+		await goto('/app/customers');
+	}
 </script>
 
 {#if query.data}
@@ -74,6 +69,28 @@
 		{customer.name}
 		<div class="text-gray-500">###</div>
 	</SiteHeader>
+
+	<ButtonGroup.Root>
+		<ButtonGroup.Root>
+			<a
+				href={`/app/customers/${customer._id}/invoices/new`}
+				class={buttonVariants({ variant: 'outline' })}
+			>
+				<PlusIcon class="h-4 w-4" />
+				Rechnung hinzufügen
+			</a>
+		</ButtonGroup.Root>
+		<ButtonGroup.Root>
+			<Button variant="outline">
+				<ArchiveIcon class="h-4 w-4" />
+				Archivieren
+			</Button>
+			<Button variant="outline" onclick={remove}>
+				<TrashIcon class="h-4 w-4 text-destructive" />
+				Löschen
+			</Button>
+		</ButtonGroup.Root>
+	</ButtonGroup.Root>
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		<Card>
@@ -132,12 +149,12 @@
 				{/if}{customer.invoiceCountry}
 			</CardContent>
 			<CardFooter>
-				<ButtonGroup>
+				<ButtonGroup.Root>
 					<Button variant="outline">
 						<EditIcon class="h-4 w-4" />
 						Adresse bearbeiten
 					</Button>
-				</ButtonGroup>
+				</ButtonGroup.Root>
 			</CardFooter>
 		</Card>
 
@@ -157,73 +174,6 @@
 					placeholder="Notizen zum Kunden..."
 				></textarea>
 			</CardContent>
-		</Card>
-	</div>
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		<Card>
-			<CardHeader>
-				<CardTitle>Erfasste Zeit</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<p>Keine Zeit erfasst.</p>
-			</CardContent>
-		</Card>
-
-		<Card>
-			<CardHeader>
-				<CardTitle>Rechnungen</CardTitle>
-			</CardHeader>
-			<CardContent>
-				{#if query.data.invoices.length === 0}
-					<div class="py-8 text-center text-muted-foreground">
-						<p>Keine Rechnungen gefunden.</p>
-					</div>
-				{:else}
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Rechnungsnummer</TableHead>
-								<TableHead>Gestellt am</TableHead>
-								<TableHead>Fällig in</TableHead>
-								<TableHead>Betrag</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{#each query.data.invoices as invoice}
-								<TableRow>
-									<TableCell>
-										{invoice.number}
-									</TableCell>
-									<TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
-									<TableCell>TODO</TableCell>
-									<TableCell>{formatCurrency(getTotalAmount(invoice))}</TableCell>
-								</TableRow>
-							{/each}
-						</TableBody>
-					</Table>
-				{/if}
-			</CardContent>
-			<CardFooter>
-				<ButtonGroup>
-					<ButtonGroup>
-						<a
-							href="/app/customers/{customer._id}/invoices"
-							class={buttonVariants({ variant: 'outline' })}
-						>
-							Alle anzeigen
-						</a>
-					</ButtonGroup>
-					<ButtonGroup>
-						<a
-							href="/app/customers/{customer._id}/invoices/new"
-							class={buttonVariants({ variant: 'outline' })}
-						>
-							<PlusIcon />
-							Hinzufügen
-						</a>
-					</ButtonGroup>
-				</ButtonGroup>
-			</CardFooter>
 		</Card>
 	</div>
 {/if}
