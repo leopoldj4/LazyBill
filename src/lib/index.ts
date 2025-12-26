@@ -14,7 +14,7 @@ export function debounce<T>(fn: (value: T) => Promise<void>): (value: T) => void
 		}
 		debounceTimer = setTimeout(async () => {
 			await fn(value);
-		}, 1000);
+		}, 500);
 	};
 }
 

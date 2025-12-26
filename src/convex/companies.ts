@@ -25,41 +25,23 @@ export const get = query({
 
 export const update = mutation({
 	args: {
-		key: v.string(),
-		value: v.string(),
+		name: v.string(),
+		phone: v.string(),
+		street: v.string(),
+		zip: v.string(),
+		city: v.string(),
+		state: v.string(),
+		country: v.string(),
+		representative: v.string(),
+		bankName: v.string(),
+		bankIban: v.string(),
+		bankBic: v.string(),
+		smallBusiness: v.boolean(),
+		taxNumber: v.string(),
 	},
 	handler: async (ctx, args) => {
 		const company = await getCompany(ctx);
 
-		if (!company) {
-			throw new Error('Company not found');
-		}
-
-		const allowed = [
-			'name',
-			'phone',
-			'street',
-			'zip',
-			'city',
-			'state',
-			'country',
-			'representative',
-			'bankName',
-			'bankIban',
-			'bankBic',
-			'smallBusiness',
-			'taxNumber',
-		];
-		if (!allowed.includes(args.key)) {
-			throw new Error('Invalid key');
-		}
-
-		let value: boolean | string = args.value;
-		if (args.key === 'smallBusiness') {
-			value = args.value === 'true';
-		}
-
-		const id = company._id;
-		await ctx.db.patch('companies', id, { [args.key]: value });
+		await ctx.db.patch('companies', company._id, { ...args });
 	},
 });
