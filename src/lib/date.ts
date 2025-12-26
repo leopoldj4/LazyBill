@@ -14,3 +14,11 @@ export function parseDate(date: string): CalendarDate {
 export function today(): DateString {
 	return formatDate(todayFn(getLocalTimeZone()));
 }
+
+export function daysUntilDue(invoiceDate: string, dueInDays: number): number {
+	const dueDate = parseDate(invoiceDate).add({ days: dueInDays });
+	const today = todayFn(getLocalTimeZone());
+	const dueDateMs = dueDate.toDate(getLocalTimeZone()).getTime();
+	const todayMs = today.toDate(getLocalTimeZone()).getTime();
+	return Math.ceil((dueDateMs - todayMs) / (1000 * 60 * 60 * 24));
+}

@@ -25,6 +25,8 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
+	import { daysUntilDue } from '$lib/date';
+
 
 	const client = useConvexClient();
 
@@ -226,10 +228,7 @@
 													#{invoice.number}
 												</TableCell>
 												<TableCell>
-													{invoice.date}
-												</TableCell>
-												<TableCell>
-													{invoice.dueInDays} Tage
+													Fällig in {daysUntilDue(invoice.date, invoice.dueInDays)} Tagen
 												</TableCell>
 												<TableCell>
 													<span

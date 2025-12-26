@@ -84,6 +84,16 @@
 	  }
 	}
 
+	--animate-fade-out: fade-out 1.5s linear;
+	@keyframes fade-out {
+	  0%, 50% {
+		opacity: 1;
+	  }
+	  100% {
+		opacity: 0;
+	  }
+	}
+
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
