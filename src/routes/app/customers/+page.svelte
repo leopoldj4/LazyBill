@@ -73,7 +73,7 @@
 	</ButtonGroup>
 </ButtonGroup>
 
-<Suspense {query}>
+<Suspense {query} class="h-[60vh]">
 	{#snippet children(customers)}
 		<Table>
 			<TableHeader>

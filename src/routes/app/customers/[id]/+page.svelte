@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { debounce } from '$lib';
 	import SiteHeader from '$lib/components/site-header.svelte';
+	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
@@ -26,7 +27,6 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { goto } from '$app/navigation';
-	import Suspense from '$lib/components/Suspense.svelte';
 	import { toast } from 'svelte-sonner';
 	const client = useConvexClient();
 
@@ -62,7 +62,7 @@
 	}
 </script>
 
-<Suspense {query}>
+<Suspense {query} class="h-[60vh]">
 	{#snippet children(data)}
 		{#if !data}
 			<div class="flex items-center justify-center">

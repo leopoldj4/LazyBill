@@ -6,17 +6,18 @@
 	type Props = {
 		children: Snippet<[T]>;
 		query: QueryResult<T>;
+		class?: string;
 	};
 
-	let { children, query }: Props = $props();
+	let { children, query, class: className }: Props = $props();
 </script>
 
 {#if query.isLoading}
-	<div class="flex w-full items-center justify-center">
+	<div class="flex w-full items-center justify-center {className} animate-appear">
 		<Spinner />
 	</div>
 {:else if query.error}
-	<div class="flex items-center justify-center">
+	<div class="flex w-full items-center justify-center {className}">
 		<p>{query.error.message}</p>
 	</div>
 {:else}

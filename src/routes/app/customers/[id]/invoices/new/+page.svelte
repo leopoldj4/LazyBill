@@ -49,10 +49,10 @@
 	});
 </script>
 
-<Suspense {query}>
+<Suspense {query} class="h-[60vh]">
 	{#snippet children(data)}
 		{#if !data}
-			<div class="flex items-center justify-center">
+			<div class="flex items-center justify-center h-full">
 				<p>Kunde nicht gefunden</p>
 			</div>
 		{:else}
