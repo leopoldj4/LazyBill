@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left';
-	import HeroImage from './hero.jpg';
+	import HeroImage from './Hero.jpg';
 </script>
 
 <div class="grid h-screen grid-cols-[40%_60%]">
