@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
-	import { debounce } from '$lib';
+	import { debounce, invoiceID } from '$lib';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
@@ -11,6 +11,11 @@
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import TableBody from '$lib/components/ui/table/table-body.svelte';
+	import TableRow from '$lib/components/ui/table/table-row.svelte';
+	import TableCell from '$lib/components/ui/table/table-cell.svelte';
+	import Table from '$lib/components/ui/table/table.svelte';
+	import { InvoiceStateDetail } from '$lib/invoiceStatus';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import EditIcon from '@lucide/svelte/icons/edit';
@@ -195,6 +200,42 @@
 							onkeydown={updateNotes}
 							placeholder="Notizen zum Kunden..."
 						></textarea>
+					</CardContent>
+				</Card>
+			</div>
+
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+				<Card>
+					<CardHeader>
+						<CardTitle>Rechnungen</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Table>
+							<TableBody>
+								{#each invoices as invoice}
+								<a href="/app/customers/{data.customer._id}/invoices/{invoice._id}" class="contents">
+									<TableRow>
+										<TableCell>
+											#{invoice.number}
+										</TableCell>
+										<TableCell>
+											{invoice.date}
+										</TableCell>
+										<TableCell>
+											{invoice.dueInDays} Tage
+										</TableCell>
+										<TableCell>
+											<span
+												class="rounded-full px-2 py-0.5 text-xs text-white {InvoiceStateDetail[
+													invoice.state
+												].bgColor} text-{InvoiceStateDetail[invoice.state].textColor}"
+												>{InvoiceStateDetail[invoice.state].name}</span
+											>
+										</TableCell>
+									</TableRow></a>
+								{/each}
+							</TableBody>
+						</Table>
 					</CardContent>
 				</Card>
 			</div>
