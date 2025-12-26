@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import { BuildingIcon, ChevronDownIcon, LogOutIcon, SearchIcon } from '@lucide/svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
+	import { BuildingIcon, SearchIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
-	import { DropdownMenu } from 'bits-ui';
-	import { useConvexClient } from 'convex-svelte';
-	import { onMount } from 'svelte';
+	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
+	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
+	import { onMount } from 'svelte';
 	import { Toaster } from "$lib/components/ui/sonner/index.js";
 
 	const { children } = $props();
+	const auth = useAuth();
 
 	let isOpen = $state(false);
 	let signoutForm: HTMLFormElement;
@@ -41,10 +43,7 @@
 		return unsubscribe;
 	});
 
-	import { useQuery } from 'convex-svelte';
-	import { api } from '$convex/_generated/api.js';
-
-	const query = useQuery(api.customers.list, {});
+	const query = useQuery(api.customers.list, () => (auth.isAuthenticated ? {} : 'skip'));
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
@@ -79,54 +78,60 @@
 	</Command.List>
 </Command.Dialog>
 
-<div class="h-screen">
-	<div class="flex h-[52px] w-full flex-row items-center justify-between px-4">
-		<header class="flex items-center gap-2 pr-2">
-			<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
-				<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
-				<div class="font-display text-xl">Watchtower</div>
-			</a>
+{#if auth.isLoading}
+	<div class="flex h-screen w-full items-center justify-center">
+		<Spinner />
+	</div>
+{:else}
+	<div class="h-screen">
+		<div class="flex h-[52px] w-full flex-row items-center justify-between px-4">
+			<header class="flex items-center gap-2 pr-2">
+				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
+					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
+					<div class="font-display text-xl">Watchtower</div>
+				</a>
 
-			<button
-				onclick={() => (commandOpen = true)}
-				class="flex h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600"
-			>
-				Quick Switcher
-				<SearchIcon class="size-4" />
-			</button>
-		</header>
-		<div class="flex items-center justify-between">
-			{#if status.isWebSocketConnected}
-				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
-					<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
-					Connected
-				</div>
-			{:else if status.hasEverConnected}
-				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
-					<div class="size-2 rounded-full bg-red-500"></div>
-					Disconnected
-				</div>
-			{:else}
-				<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
-					<div
-						class="size-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
-					></div>
-					Connecting...
-				</div>
-			{/if}
-			<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>Einstellungen</a>
+				<button
+					onclick={() => (commandOpen = true)}
+					class="flex h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600"
+				>
+					Quick Switcher
+					<SearchIcon class="size-4" />
+				</button>
+			</header>
+			<div class="flex items-center justify-between">
+				{#if status.isWebSocketConnected}
+					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+						<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
+						Connected
+					</div>
+				{:else if status.hasEverConnected}
+					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+						<div class="size-2 rounded-full bg-red-500"></div>
+						Disconnected
+					</div>
+				{:else}
+					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+						<div
+							class="size-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
+						></div>
+						Connecting...
+					</div>
+				{/if}
+				<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>Einstellungen</a>
+			</div>
+		</div>
+		<div
+			class={[
+				'flex flex-col gap-6 border-l border-border p-8',
+				!isOpen && 'col-span-2',
+				isOpen && 'rounded-tl-md',
+			]}
+		>
+			{@render children?.()}
 		</div>
 	</div>
-	<div
-		class={[
-			'flex flex-col gap-6 border-l border-border p-8',
-			!isOpen && 'col-span-2',
-			isOpen && 'rounded-tl-md',
-		]}
-	>
-		{@render children?.()}
-	</div>
-</div>
+{/if}
 
 <form bind:this={signoutForm} method="POST" action="/app?/signout" class="hidden"></form>
 <Toaster position="top-center" />
