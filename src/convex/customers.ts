@@ -124,3 +124,23 @@ export const update = mutation({
 		});
 	},
 });
+
+export const getWithCompany = query({
+	args: {
+		id: v.id('customers'),
+	},
+	handler: async (ctx, args) => {
+		const user = await authComponent.getAuthUser(ctx);
+		const customer = await ctx.db.get('customers', args.id);
+		const company = await ctx.db.query('companies').withIndex('by_userId', (q) => q.eq('userId', user._id)).first();
+
+		if (!customer || customer.userId !== user._id || !company) {
+			return null;
+		}
+
+		return {
+			customer,
+			company,
+		};
+	},
+});

@@ -1,3 +1,10 @@
+export type QueryResult<T> = {
+	isLoading: boolean;
+	isStale: boolean;
+	error?: Error;
+	data?: T;
+};
+
 export function debounce<T>(fn: (value: T) => Promise<void>): (value: T) => void {
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 

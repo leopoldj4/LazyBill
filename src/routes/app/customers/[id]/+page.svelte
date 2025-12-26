@@ -26,6 +26,7 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { goto } from '$app/navigation';
+	import Suspense from '$lib/components/Suspense.svelte';
 	const client = useConvexClient();
 
 	let { data } = $props();
@@ -53,127 +54,135 @@
 	}
 </script>
 
-{#if query.data}
-	{@const customer = query.data.customer}
-	<Breadcrumb.Root>
-		<Breadcrumb.List>
-			<Breadcrumb.Item>
-				<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
-			</Breadcrumb.Item>
-			<Breadcrumb.Separator />
-			<Breadcrumb.Item>{customer.name}</Breadcrumb.Item>
-		</Breadcrumb.List>
-	</Breadcrumb.Root>
+<Suspense {query}>
+	{#snippet children(data)}
+		{#if !data}
+			<div class="flex items-center justify-center">
+				<p>Kunde nicht gefunden</p>
+			</div>
+		{:else}
+			{@const { customer, invoices } = data}
+			<Breadcrumb.Root>
+				<Breadcrumb.List>
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					<Breadcrumb.Separator />
+					<Breadcrumb.Item>{customer.name}</Breadcrumb.Item>
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
 
-	<SiteHeader>
-		{customer.name}
-		<div class="text-gray-500">###</div>
-	</SiteHeader>
+			<SiteHeader>
+				{customer.name}
+				<div class="text-gray-500">###</div>
+			</SiteHeader>
 
-	<ButtonGroup.Root>
-		<ButtonGroup.Root>
-			<a
-				href={`/app/customers/${customer._id}/invoices/new`}
-				class={buttonVariants({ variant: 'outline' })}
-			>
-				<PlusIcon class="h-4 w-4" />
-				Rechnung hinzufügen
-			</a>
-		</ButtonGroup.Root>
-		<ButtonGroup.Root>
-			<Button variant="outline">
-				<ArchiveIcon class="h-4 w-4" />
-				Archivieren
-			</Button>
-			<Button variant="outline" onclick={remove}>
-				<TrashIcon class="h-4 w-4 text-destructive" />
-				Löschen
-			</Button>
-		</ButtonGroup.Root>
-	</ButtonGroup.Root>
-
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-		<Card>
-			<CardHeader>
-				<CardTitle>Kontakt</CardTitle>
-			</CardHeader>
-
-			<CardContent class="flex flex-col gap-2">
-				<InputGroup.Root>
-					<InputGroup.Addon align="inline-start">
-						<MailIcon class="h-4 w-4" />
-					</InputGroup.Addon>
-					<InputGroup.Input
-						value={customer.email}
-						type="email"
-						placeholder="Email"
-						oninput={updateEmail}
-						onkeydown={updateEmail}
-					/>
-					<InputGroup.Addon align="inline-end">
-						<InputGroup.Button>
-							<CopyIcon class="h-4 w-4" /> Kopieren
-						</InputGroup.Button>
-					</InputGroup.Addon>
-				</InputGroup.Root>
-				<InputGroup.Root>
-					<InputGroup.Addon align="inline-start">
-						<PhoneIcon class="h-4 w-4" />
-					</InputGroup.Addon>
-					<InputGroup.Input
-						value={customer.phone}
-						type="tel"
-						placeholder="Telefon"
-						oninput={updatePhone}
-						onkeydown={updatePhone}
-					/>
-					<InputGroup.Addon align="inline-end">
-						<InputGroup.Button>
-							<CopyIcon class="h-4 w-4" /> Kopieren
-						</InputGroup.Button>
-					</InputGroup.Addon>
-				</InputGroup.Root>
-			</CardContent>
-		</Card>
-
-		<Card>
-			<CardHeader>
-				<CardTitle>Adresse</CardTitle>
-			</CardHeader>
-			<CardContent>
-				{customer.invoiceStreet}<br />
-				{customer.invoiceZip}
-				{query.data.customer.invoiceCity}<br />
-				{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-					-
-				{/if}{customer.invoiceCountry}
-			</CardContent>
-			<CardFooter>
+			<ButtonGroup.Root>
+				<ButtonGroup.Root>
+					<a
+						href={`/app/customers/${customer._id}/invoices/new`}
+						class={buttonVariants({ variant: 'outline' })}
+					>
+						<PlusIcon class="h-4 w-4" />
+						Rechnung hinzufügen
+					</a>
+				</ButtonGroup.Root>
 				<ButtonGroup.Root>
 					<Button variant="outline">
-						<EditIcon class="h-4 w-4" />
-						Adresse bearbeiten
+						<ArchiveIcon class="h-4 w-4" />
+						Archivieren
+					</Button>
+					<Button variant="outline" onclick={remove}>
+						<TrashIcon class="h-4 w-4 text-destructive" />
+						Löschen
 					</Button>
 				</ButtonGroup.Root>
-			</CardFooter>
-		</Card>
+			</ButtonGroup.Root>
 
-		<Card>
-			<CardHeader>
-				<CardTitle class="flex items-center gap-3">
-					Notizen
-					<span class="text-xs text-gray-500"> Nur für Sie sichtbar. </span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<textarea
-					class="field-sizing-content min-h-32 w-full border-none outline-none"
-					value={customer.notes}
-					onchange={updateNotes}
-					onkeydown={updateNotes}
-					placeholder="Notizen zum Kunden..."
-				></textarea>
-			</CardContent>
-		</Card>
-	</div>
-{/if}
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+				<Card>
+					<CardHeader>
+						<CardTitle>Kontakt</CardTitle>
+					</CardHeader>
+
+					<CardContent class="flex flex-col gap-2">
+						<InputGroup.Root>
+							<InputGroup.Addon align="inline-start">
+								<MailIcon class="h-4 w-4" />
+							</InputGroup.Addon>
+							<InputGroup.Input
+								value={customer.email}
+								type="email"
+								placeholder="Email"
+								oninput={updateEmail}
+								onkeydown={updateEmail}
+							/>
+							<InputGroup.Addon align="inline-end">
+								<InputGroup.Button>
+									<CopyIcon class="h-4 w-4" /> Kopieren
+								</InputGroup.Button>
+							</InputGroup.Addon>
+						</InputGroup.Root>
+						<InputGroup.Root>
+							<InputGroup.Addon align="inline-start">
+								<PhoneIcon class="h-4 w-4" />
+							</InputGroup.Addon>
+							<InputGroup.Input
+								value={customer.phone}
+								type="tel"
+								placeholder="Telefon"
+								oninput={updatePhone}
+								onkeydown={updatePhone}
+							/>
+							<InputGroup.Addon align="inline-end">
+								<InputGroup.Button>
+									<CopyIcon class="h-4 w-4" /> Kopieren
+								</InputGroup.Button>
+							</InputGroup.Addon>
+						</InputGroup.Root>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Adresse</CardTitle>
+					</CardHeader>
+					<CardContent>
+						{customer.invoiceStreet}<br />
+						{customer.invoiceZip}
+						{customer.invoiceCity}<br />
+						{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
+							-
+						{/if}{customer.invoiceCountry}
+					</CardContent>
+					<CardFooter>
+						<ButtonGroup.Root>
+							<Button variant="outline">
+								<EditIcon class="h-4 w-4" />
+								Adresse bearbeiten
+							</Button>
+						</ButtonGroup.Root>
+					</CardFooter>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle class="flex items-center gap-3">
+							Notizen
+							<span class="text-xs text-gray-500"> Nur für Sie sichtbar. </span>
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<textarea
+							class="field-sizing-content min-h-32 w-full border-none outline-none"
+							value={customer.notes}
+							onchange={updateNotes}
+							onkeydown={updateNotes}
+							placeholder="Notizen zum Kunden..."
+						></textarea>
+					</CardContent>
+				</Card>
+			</div>
+		{/if}
+	{/snippet}
+</Suspense>

@@ -20,6 +20,7 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { api } from '$convex/_generated/api.js';
 	import { goto } from '$app/navigation';
+	import Suspense from '$lib/components/Suspense.svelte';
 
 	let search = $state('');
 
@@ -72,45 +73,41 @@
 	</ButtonGroup>
 </ButtonGroup>
 
-{#if query.isLoading}
-	<div class="grid h-[60vh] w-full place-items-center">
-		<div class="flex flex-row items-center gap-3"><Spinner /> Loading ..</div>
-	</div>
-{:else if query.error}
-	Error: {query.error.name}
-{:else}
-	<Table>
-		<TableHeader>
-			<TableRow>
-				<TableHead>Name</TableHead>
-				<TableHead>Email</TableHead>
-				<TableHead>Invoice Address</TableHead>
-			</TableRow>
-		</TableHeader>
-		<TableBody>
-			{#each query.data as customer}
-				<a href={`/app/customers/${customer._id}`} class="contents">
-					<TableRow>
-						<TableCell>
-							{customer.name}
-						</TableCell>
-						<TableCell>{customer.email}</TableCell>
-						<TableCell>
-							<div class="text-sm">
-								{customer.invoiceStreet}<br />
-								{customer.invoiceZip}
-								{customer.invoiceCity}<br />
-								{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-									-
-								{/if}{customer.invoiceCountry}
-							</div>
-						</TableCell>
-					</TableRow>
-				</a>
-			{/each}
-		</TableBody>
-	</Table>
-{/if}
+<Suspense {query}>
+	{#snippet children(customers)}
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Name</TableHead>
+					<TableHead>Email</TableHead>
+					<TableHead>Invoice Address</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{#each customers as customer}
+					<a href={`/app/customers/${customer._id}`} class="contents">
+						<TableRow>
+							<TableCell>
+								{customer.name}
+							</TableCell>
+							<TableCell>{customer.email}</TableCell>
+							<TableCell>
+								<div class="text-sm">
+									{customer.invoiceStreet}<br />
+									{customer.invoiceZip}
+									{customer.invoiceCity}<br />
+									{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
+										-
+									{/if}{customer.invoiceCountry}
+								</div>
+							</TableCell>
+						</TableRow>
+					</a>
+				{/each}
+			</TableBody>
+		</Table>
+	{/snippet}
+</Suspense>
 
 <Dialog.Root
 	open={newCustomerOpen}
