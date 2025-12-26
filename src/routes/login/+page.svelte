@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left';
 	import MailIcon from '@lucide/svelte/icons/mail';
-	import HeroImage from './hero.jpg';
+	import HeroImage from './Hero.jpg';
 	import { authClient } from '$lib/auth-client.js';
 
 	import { Button } from '$lib/components/ui/button/index.js';
