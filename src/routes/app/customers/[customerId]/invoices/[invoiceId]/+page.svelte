@@ -10,7 +10,7 @@
 	import { invoiceTemplate } from '$lib/typst/invoice.js';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import { useQuery } from 'convex-svelte';
+	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
@@ -25,6 +25,10 @@
 	import FileDownIcon from '@lucide/svelte/icons/file-down';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import { ButtonGroup } from '$lib/components/ui/button-group';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
+
+	const client = useConvexClient();
 
 	let { data } = $props();
 
@@ -84,6 +88,17 @@
 
 	function exporter() {
 		exportPDF(typstDocument());
+	}
+
+	async function deleteInvoice() {
+		if (!confirm('Sind Sie sicher, dass Sie diese Rechnung löschen möchten?')) {
+			return;
+		}
+		await client.mutation(api.invoices.deleteInvoice, {
+			id: data.invoiceId as Id<'invoices'>,
+		});
+		toast.success('Rechnung erfolgreich gelöscht');
+		await goto(`/app/customers/${data.customerId}`);
 	}
 </script>
 
@@ -175,33 +190,50 @@
 						<Button class="block items-start" onclick={() => (editing = false)}>Weiter</Button>
 					{:else}
 						<ButtonGroup>
-							<Select.Root type="single" bind:value={invoiceState}>
-								<Select.Trigger>
-									<span class="font-bold mr-2">Status:</span>
-									{@const Icon = invoiceStateIcons[invoiceState]}
-									<Icon class="size-4 {invoiceStateColors[invoiceState]}" />
-									{invoiceStates[invoiceState]}
-								</Select.Trigger>
-								<Select.Content>
-									{#each Object.keys(invoiceStates) as state}
-										<Select.Item value={state}>
-											{@const Icon = invoiceStateIcons[state as keyof typeof invoiceStateIcons]}
-											<Icon class="size-4 {invoiceStateColors[state as keyof typeof invoiceStateColors]}" />
-											{invoiceStates[state as keyof typeof invoiceStates]}
-										</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							{#if invoiceState === 'draft'}
-								<Button variant="outline" class="text-gray-600" onclick={() => (invoiceState = 'sent')}>
-									<ArrowRightIcon/> Gesendet
-								</Button>
-							{/if}
-							{#if invoiceState === 'sent'}
-								<Button variant="outline" class="text-gray-600" onclick={() => (invoiceState = 'paid')}>
-									<ArrowRightIcon/> Bezahlt
-								</Button>
-							{/if}
+							<ButtonGroup>
+								<Select.Root type="single" bind:value={invoiceState}>
+									<Select.Trigger>
+										<span class="mr-2 font-bold">Status:</span>
+										{@const Icon = invoiceStateIcons[invoiceState]}
+										<Icon class="size-4 {invoiceStateColors[invoiceState]}" />
+										{invoiceStates[invoiceState]}
+									</Select.Trigger>
+									<Select.Content>
+										{#each Object.keys(invoiceStates) as state}
+											<Select.Item value={state}>
+												{@const Icon = invoiceStateIcons[state as keyof typeof invoiceStateIcons]}
+												<Icon
+													class="size-4 {invoiceStateColors[
+														state as keyof typeof invoiceStateColors
+													]}"
+												/>
+												{invoiceStates[state as keyof typeof invoiceStates]}
+											</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+								{#if invoiceState === 'draft'}
+									<Button
+										variant="outline"
+										class="text-gray-600"
+										onclick={() => (invoiceState = 'sent')}
+									>
+										<ArrowRightIcon /> Gesendet
+									</Button>
+								{/if}
+								{#if invoiceState === 'sent'}
+									<Button
+										variant="outline"
+										class="text-gray-600"
+										onclick={() => (invoiceState = 'paid')}
+									>
+										<ArrowRightIcon /> Bezahlt
+									</Button>
+								{/if}
+							</ButtonGroup>
+							<ButtonGroup>
+								<Button variant="outline" onclick={deleteInvoice}><TrashIcon class="size-4 text-destructive" /> Löschen</Button>
+							</ButtonGroup>
 						</ButtonGroup>
 
 						<h2 class="text-xl">Zusammenfassung</h2>

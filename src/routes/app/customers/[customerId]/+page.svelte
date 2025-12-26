@@ -57,6 +57,7 @@
 		if (!confirm('Are you sure you want to remove this customer?')) return;
 		await client.mutation(api.customers.remove, { id: data.customerId as Id<'customers'> });
 		await goto('/app/customers');
+		toast.success('Kunde erfolgreich gelöscht');
 	}
 
 	let isCreatingInvoice = $state(false);
@@ -210,32 +211,40 @@
 						<CardTitle>Rechnungen</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<Table>
-							<TableBody>
-								{#each invoices as invoice}
-								<a href="/app/customers/{data.customer._id}/invoices/{invoice._id}" class="contents">
-									<TableRow>
-										<TableCell>
-											#{invoice.number}
-										</TableCell>
-										<TableCell>
-											{invoice.date}
-										</TableCell>
-										<TableCell>
-											{invoice.dueInDays} Tage
-										</TableCell>
-										<TableCell>
-											<span
-												class="rounded-full px-2 py-0.5 text-xs text-white {InvoiceStateDetail[
-													invoice.state
-												].bgColor} text-{InvoiceStateDetail[invoice.state].textColor}"
-												>{InvoiceStateDetail[invoice.state].name}</span
-											>
-										</TableCell>
-									</TableRow></a>
-								{/each}
-							</TableBody>
-						</Table>
+						{#if invoices.length === 0}
+							<p class="text-center text-gray-500 py-8">Keine Rechnungen vorhanden</p>
+						{:else}
+							<Table>
+								<TableBody>
+									{#each invoices as invoice}
+										<a
+											href="/app/customers/{data.customer._id}/invoices/{invoice._id}"
+											class="contents"
+										>
+											<TableRow>
+												<TableCell>
+													#{invoice.number}
+												</TableCell>
+												<TableCell>
+													{invoice.date}
+												</TableCell>
+												<TableCell>
+													{invoice.dueInDays} Tage
+												</TableCell>
+												<TableCell>
+													<span
+														class="rounded-full px-2 py-0.5 text-xs text-white {InvoiceStateDetail[
+															invoice.state
+														].bgColor} text-{InvoiceStateDetail[invoice.state].textColor}"
+														>{InvoiceStateDetail[invoice.state].name}</span
+													>
+												</TableCell>
+											</TableRow></a
+										>
+									{/each}
+								</TableBody>
+							</Table>
+						{/if}
 					</CardContent>
 				</Card>
 			</div>

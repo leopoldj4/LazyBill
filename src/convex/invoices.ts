@@ -1,9 +1,27 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
 import { today } from "$lib/date";
 import { invoiceID } from "$lib";
+import type { Id } from "./_generated/dataModel";
+import { authComponent } from "./auth";
+
+async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
+	const user = await authComponent.getAuthUser(ctx);
+	if (!user) {
+		return null;
+	}
+	return await ctx.db.get(id);
+}
+
+async function getInvoice(ctx: QueryCtx, id: Id<'invoices'>) {
+	const invoice = await getInvoiceSafe(ctx, id);
+	if (!invoice) {
+		throw new Error('Invoice not found');
+	}
+	return invoice;
+}
 
 export const getFull = query({
 	args: {
@@ -56,5 +74,15 @@ export const createInvoice = mutation({
 		});
 
 		return invoice;
+	}
+})
+
+export const deleteInvoice = mutation({
+	args: {
+		id: v.id('invoices'),
+	},
+	handler: async (ctx, args) => {
+		const invoice = await getInvoice(ctx, args.id);
+		await ctx.db.delete('invoices', args.id);
 	}
 })
