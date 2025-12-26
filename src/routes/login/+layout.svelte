@@ -1,5 +1,4 @@
 <script lang="ts">
-	import ChevronLeftIcon from '@lucide/svelte/icons/chevron-left';
 	import HeroImage from './Hero.jpg';
 </script>
 

@@ -15,8 +15,8 @@
 	import type { Id } from '$convex/_generated/dataModel.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import Suspense from '$lib/components/Suspense.svelte';
-	import { invoiceID } from '$lib';
 	import { parseDate } from '$lib/date';
+	import { exportPDF } from '$lib/typst/export';
 
 	let { data } = $props();
 
@@ -48,6 +48,10 @@
 			notes,
 		);
 	});
+
+	function exporter() {
+		exportPDF(typstDocument());
+	}
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -133,6 +137,9 @@
 						<h2 class="text-xl">Anmerkungen</h2>
 						<Textarea bind:value={notes} placeholder="Notizen zur Rechnung" />
 					</div>
+					<Button onclick={exporter}>
+						Export
+					</Button>
 				</div>
 
 				<Preview typstDocument={typstDocument()} />

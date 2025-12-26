@@ -11,10 +11,5 @@ $typst.setCompilerInitOptions({
 	getModule: () => typstCompilerWasm,
 });
 
-export const render = async (document: string) => {
-	return await $typst.svg({
-		mainContent: document,
-	});
-};
-
-export const typst = $typst;
+const typst = $typst;
+export default typst;
