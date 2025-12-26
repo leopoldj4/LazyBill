@@ -55,13 +55,13 @@
 			syncFromCompany();
 		} else {
 			if (syncTimer) clearTimeout(syncTimer);
-			syncTimer = setTimeout(syncFromCompany, 5000);
+			syncTimer = setTimeout(syncFromCompany, 3000);
 		}
 	});
 
 	const debounce = debounceFn(async (values: typeof api.companies.update._args) => {
 		await client.mutation(api.companies.update, values);
-	});
+	}, () => syncTimer && clearTimeout(syncTimer));
 
 	$effect(() => {
 		debounce({

@@ -5,10 +5,11 @@ export type QueryResult<T> = {
 	data?: T;
 };
 
-export function debounce<T>(fn: (value: T) => Promise<void>): (value: T) => void {
+export function debounce<T>(fn: (value: T) => Promise<void>, onrun?: () => void): (value: T) => void {
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	return (value: T) => {
+		onrun();
 		if (debounceTimer) {
 			clearTimeout(debounceTimer);
 		}
