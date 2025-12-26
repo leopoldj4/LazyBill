@@ -74,11 +74,12 @@
 }
 
 @theme inline {
-	--animate-appear: appear 1s linear;
+	--animate-appear: appear 0.2s linear;
 	@keyframes appear {
-	  0%, 15% {
+	  0%, 75% {
 		opacity: 0;
 	  }
+
 	  100% {
 		opacity: 1;
 	  }
