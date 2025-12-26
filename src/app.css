@@ -76,7 +76,7 @@
 @theme inline {
 	--animate-appear: appear 1s linear;
 	@keyframes appear {
-	  0%, 80% {
+	  0%, 15% {
 		opacity: 0;
 	  }
 	  100% {
