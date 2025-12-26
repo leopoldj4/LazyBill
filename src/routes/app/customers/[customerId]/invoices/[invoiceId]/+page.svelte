@@ -17,6 +17,14 @@
 	import Suspense from '$lib/components/Suspense.svelte';
 	import { parseDate } from '$lib/date';
 	import { exportPDF } from '$lib/typst/export';
+	import * as Select from '$lib/components/ui/select';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import TrashIcon from '@lucide/svelte/icons/trash';
+	import FileDownIcon from '@lucide/svelte/icons/file-down';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import { ButtonGroup } from '$lib/components/ui/button-group';
 
 	let { data } = $props();
 
@@ -34,6 +42,31 @@
 	};
 
 	let invoiceDate = $derived(query.data ? parseDate(query.data.invoice.date) : undefined);
+
+	let invoiceState = $state<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
+
+	const invoiceStates = {
+		draft: 'Entwurf',
+		sent: 'Gesendet',
+		paid: 'Bezahlt',
+		cancelled: 'Storniert',
+	};
+
+	const invoiceStateIcons = {
+		draft: PencilIcon,
+		sent: MailIcon,
+		paid: CheckIcon,
+		cancelled: TrashIcon,
+	};
+
+	const invoiceStateColors = {
+		draft: 'text-yellow-500',
+		sent: 'text-blue-500',
+		paid: 'text-green-500',
+		cancelled: 'text-gray-500',
+	};
+
+	let editing = $state(false);
 
 	let typstDocument = $derived(() => {
 		if (!query.data) return '';
@@ -57,7 +90,7 @@
 <Suspense {query} class="h-[60vh]">
 	{#snippet children(data)}
 		{#if !data}
-			<div class="flex items-center justify-center h-full">
+			<div class="flex h-full items-center justify-center">
 				<p>Kunde nicht gefunden</p>
 			</div>
 		{:else}
@@ -82,64 +115,105 @@
 
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoiceNumber}</span></SiteHeader>
 
-					<div class="grid grid-cols-2 gap-6">
-						<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
-						<div class="flex flex-col gap-3">
-							<Label>Fällig in</Label>
-							<InputGroup.Root>
-								<InputGroup.Input
-									class="text-right"
-									bind:value={due}
-									type="number"
-									min="1"
-									max="600"
-								></InputGroup.Input>
-								<InputGroup.Addon align="inline-end">
-									<InputGroup.Text>Tagen</InputGroup.Text>
-								</InputGroup.Addon>
-							</InputGroup.Root>
+					{#if editing}
+						<div class="grid grid-cols-2 gap-6">
+							<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
+							<div class="flex flex-col gap-3">
+								<Label>Fällig in</Label>
+								<InputGroup.Root>
+									<InputGroup.Input
+										class="text-right"
+										bind:value={due}
+										type="number"
+										min="1"
+										max="600"
+									></InputGroup.Input>
+									<InputGroup.Addon align="inline-end">
+										<InputGroup.Text>Tagen</InputGroup.Text>
+									</InputGroup.Addon>
+								</InputGroup.Root>
+							</div>
 						</div>
-					</div>
 
-					<h2 class="text-xl">Artikel</h2>
+						<h2 class="text-xl">Artikel</h2>
 
-					<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
-						<div></div>
-						<p>Name</p>
-						<p>Preis</p>
+						<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
+							<div></div>
+							<p>Name</p>
+							<p>Preis</p>
 
-						{#each articles as article}
+							{#each articles as article}
+								<Button
+									variant="ghost"
+									onclick={() => {
+										articles.splice(articles.indexOf(article), 1);
+									}}
+								>
+									<CircleMinusIcon color="gray" />
+								</Button>
+								<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
+								<Input type="number" bind:value={article.price} />
+							{/each}
+
 							<Button
-								variant="ghost"
+								variant="outline"
+								class="col-span-3"
 								onclick={() => {
-									articles.splice(articles.indexOf(article), 1);
+									articles.push({ name: '', price: 0 });
 								}}
 							>
-								<CircleMinusIcon color="gray" />
+								<PlusIcon />
+								Neuer Artikel
 							</Button>
-							<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
-							<Input type="number" bind:value={article.price} />
-						{/each}
+						</div>
 
-						<Button
-							variant="outline"
-							class="col-span-3"
-							onclick={() => {
-								articles.push({ name: '', price: 0 });
-							}}
-						>
-							<PlusIcon />
-							Neuer Artikel
-						</Button>
-					</div>
+						<div class="flex flex-col gap-3">
+							<h2 class="text-xl">Anmerkungen</h2>
+							<Textarea bind:value={notes} placeholder="Notizen zur Rechnung" />
+						</div>
 
-					<div class="flex flex-col gap-3">
-						<h2 class="text-xl">Anmerkungen</h2>
-						<Textarea bind:value={notes} placeholder="Notizen zur Rechnung" />
-					</div>
-					<Button onclick={exporter}>
-						Export
-					</Button>
+						<Button class="block items-start" onclick={() => (editing = false)}>Weiter</Button>
+					{:else}
+						<ButtonGroup>
+							<Select.Root type="single" bind:value={invoiceState}>
+								<Select.Trigger>
+									<span class="font-bold mr-2">Status:</span>
+									{@const Icon = invoiceStateIcons[invoiceState]}
+									<Icon class="size-4 {invoiceStateColors[invoiceState]}" />
+									{invoiceStates[invoiceState]}
+								</Select.Trigger>
+								<Select.Content>
+									{#each Object.keys(invoiceStates) as state}
+										<Select.Item value={state}>
+											{@const Icon = invoiceStateIcons[state as keyof typeof invoiceStateIcons]}
+											<Icon class="size-4 {invoiceStateColors[state as keyof typeof invoiceStateColors]}" />
+											{invoiceStates[state as keyof typeof invoiceStates]}
+										</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+							{#if invoiceState === 'draft'}
+								<Button variant="outline" class="text-gray-600" onclick={() => (invoiceState = 'sent')}>
+									<ArrowRightIcon/> Gesendet
+								</Button>
+							{/if}
+							{#if invoiceState === 'sent'}
+								<Button variant="outline" class="text-gray-600" onclick={() => (invoiceState = 'paid')}>
+									<ArrowRightIcon/> Bezahlt
+								</Button>
+							{/if}
+						</ButtonGroup>
+
+						<h2 class="text-xl">Zusammenfassung</h2>
+						<p>Gesamtbetrag: {articles.reduce((acc, article) => acc + article.price, 0)} €</p>
+
+						<div class="flex flex-row gap-2">
+							<Button variant="outline" onclick={() => (editing = true)}>
+								<PencilIcon class="size-4" /> Bearbeiten</Button
+							>
+							<Button onclick={exporter}><FileDownIcon class="size-4" /> Exportieren</Button>
+						</div>
+					{/if}
 				</div>
 
 				<Preview typstDocument={typstDocument()} />
