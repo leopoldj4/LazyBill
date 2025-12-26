@@ -22,9 +22,10 @@ const customers = defineTable({
 }).index('by_userId', ['userId']);
 
 const invoices = defineTable({
-	userId: v.string(),
-
 	customerId: v.id('customers'),
+	companyId: v.id('companies'),
+
+	state: v.union(v.literal('draft'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
 
 	number: v.number(),
 	date: v.string(), // yr-mon-day

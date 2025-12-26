@@ -8,7 +8,6 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { invoiceTemplate } from '$lib/typst/invoice.js';
-	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useQuery } from 'convex-svelte';
@@ -16,14 +15,14 @@
 	import type { Id } from '$convex/_generated/dataModel.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import Suspense from '$lib/components/Suspense.svelte';
+	import { invoiceID } from '$lib';
+	import { parseDate } from '$lib/date';
 
 	let { data } = $props();
 
-	const query = useQuery(api.invoices.getInvoiceContext, () => ({
-		id: data.customerId as Id<'customers'>,
+	const query = useQuery(api.invoices.getFull, () => ({
+		id: data.invoiceId as Id<'invoices'>,
 	}));
-
-	let invoiceDate = $state<CalendarDate>(today(getLocalTimeZone()));
 
 	let due = $state<number | null>(30);
 	let articles = $state<Article[]>([{ name: '', price: 0 }]);
@@ -34,6 +33,8 @@
 		price: number;
 	};
 
+	let invoiceDate = $derived(query.data ? parseDate(query.data.invoice.date) : undefined);
+
 	let typstDocument = $derived(() => {
 		if (!query.data) return '';
 
@@ -41,8 +42,8 @@
 			query.data.company,
 			query.data.customer,
 			articles,
-			invoiceDate,
-			'###',
+			invoiceDate!,
+			query.data.invoiceNumber,
 			due || 0,
 			notes,
 		);
@@ -71,11 +72,11 @@
 								>
 							</Breadcrumb.Item>
 							<Breadcrumb.Separator />
-							<Breadcrumb.Item>Neue Rechnung</Breadcrumb.Item>
+							<Breadcrumb.Item>Rechnung #{data.invoiceNumber}</Breadcrumb.Item>
 						</Breadcrumb.List>
 					</Breadcrumb.Root>
 
-					<SiteHeader>Neue Rechnung</SiteHeader>
+					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoiceNumber}</span></SiteHeader>
 
 					<div class="grid grid-cols-2 gap-6">
 						<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />

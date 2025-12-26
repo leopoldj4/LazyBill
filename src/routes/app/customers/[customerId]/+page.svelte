@@ -6,17 +6,17 @@
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import { buttonVariants } from '$lib/components/ui/button';
 	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
-	import PlusIcon from '@lucide/svelte/icons/plus';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import EditIcon from '@lucide/svelte/icons/edit';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
+	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
@@ -53,6 +53,19 @@
 		await client.mutation(api.customers.remove, { id: data.customerId as Id<'customers'> });
 		await goto('/app/customers');
 	}
+
+	let isCreatingInvoice = $state(false);
+	async function newInvoice() {
+		isCreatingInvoice = true;
+		try {
+			const invoiceId = await client.mutation(api.invoices.createInvoice, {
+				customerId: data.customerId as Id<'customers'>,
+			});
+			await goto(`/app/customers/${data.customerId}/invoices/${invoiceId}`);
+		} finally {
+			isCreatingInvoice = false;
+		}
+	}
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -80,13 +93,14 @@
 
 			<ButtonGroup.Root>
 				<ButtonGroup.Root>
-					<a
-						href={`/app/customers/${customer._id}/invoices/new`}
-						class={buttonVariants({ variant: 'outline' })}
-					>
-						<PlusIcon class="h-4 w-4" />
-						Rechnung hinzufügen
-					</a>
+					<Button variant="outline" onclick={newInvoice}>
+						{#if isCreatingInvoice}
+							<Spinner />
+						{:else}
+							<PlusIcon class="h-4 w-4" />
+						{/if}
+						Rechnung erstellen
+					</Button>
 				</ButtonGroup.Root>
 				<ButtonGroup.Root>
 					<Button variant="outline">

@@ -56,7 +56,7 @@
 <ButtonGroup>
 	<ButtonGroup>
 		<InputGroup.Root class="w-sm">
-			<InputGroup.Input placeholder="Search..." bind:value={search} />
+			<InputGroup.Input disabled placeholder="Search..." bind:value={search} />
 			<InputGroup.Addon>
 				<SearchIcon />
 			</InputGroup.Addon>

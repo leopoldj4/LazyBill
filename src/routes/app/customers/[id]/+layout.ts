@@ -1,1 +1,0 @@
-export const load = ({ params }) => ({ customerId: params.id });

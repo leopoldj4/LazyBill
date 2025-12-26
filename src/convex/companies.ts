@@ -3,6 +3,14 @@ import { mutation, query, type QueryCtx } from './_generated/server';
 import { authComponent } from './auth';
 
 export async function getCompany(ctx: QueryCtx) {
+	const company = await getCompanySafe(ctx);
+	if (!company) {
+		throw new Error('Company not found');
+	}
+	return company;
+}
+
+export async function getCompanySafe(ctx: QueryCtx) {
 	const user = await authComponent.getAuthUser(ctx);
 	return await ctx.db
 		.query('companies')

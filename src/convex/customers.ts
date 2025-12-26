@@ -6,6 +6,14 @@ import type { Id } from './_generated/dataModel';
 import { getCompany } from './companies';
 
 export async function getCustomer(ctx: QueryCtx, id: Id<'customers'>) {
+	const customer = await getCustomerSafe(ctx, id);
+	if (!customer) {
+		throw new Error('Customer not found');
+	}
+	return customer;
+}
+
+export async function getCustomerSafe(ctx: QueryCtx, id: Id<'customers'>) {
 	const user = await authComponent.getAuthUser(ctx);
 	const customer = await ctx.db.get(id);
 	if (!customer || customer.userId !== user._id) {
@@ -38,10 +46,8 @@ export const getFull = query({
 		id: v.id('customers'),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-		const customer = await ctx.db.get('customers', args.id);
-
-		if (!customer || customer.userId !== user._id) {
+		const customer = await getCustomerSafe(ctx, args.id);
+		if (!customer) {
 			return null;
 		}
 
@@ -63,9 +69,6 @@ export const create = mutation({
 		const user = await authComponent.getAuthUser(ctx);
 
 		const company = await getCompany(ctx);
-		if (!company) {
-			throw new Error('Company not found');
-		}
 
 		const _id = await ctx.db.insert('customers', {
 			name: args.name,
@@ -96,14 +99,9 @@ export const remove = mutation({
 		id: v.id('customers'),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-		const customer = await ctx.db.get('customers', args.id);
+		const customer = await getCustomer(ctx, args.id);
 
-		if (!customer || customer.userId !== user._id) {
-			throw new Error('Customer not found');
-		}
-
-		await ctx.db.delete('customers', args.id);
+		await ctx.db.delete('customers', customer._id);
 
 		const invoices = await ctx.db
 			.query('invoices')
@@ -124,9 +122,6 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const customer = await getCustomer(ctx, args.id);
-		if (!customer) {
-			throw new Error('Customer not found');
-		}
 
 		if (!['email', 'phone', 'notes'].includes(args.key)) {
 			throw new Error('Invalid key');
