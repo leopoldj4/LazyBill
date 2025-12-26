@@ -1,9 +1,14 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api.js';
 	import SiteHeader from '$lib/components/site-header.svelte';
+	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import {
 		Table,
 		TableBody,
@@ -13,14 +18,8 @@
 		TableRow,
 	} from '$lib/components/ui/table';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import SearchIcon from '@lucide/svelte/icons/search';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { api } from '$convex/_generated/api.js';
-	import { goto } from '$app/navigation';
-	import Suspense from '$lib/components/Suspense.svelte';
 
 	let search = $state('');
 

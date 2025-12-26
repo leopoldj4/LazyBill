@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api.js';
+	import type { Id } from '$convex/_generated/dataModel.js';
 	import { debounce } from '$lib';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
@@ -8,26 +11,16 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
-	import {
-		Table,
-		TableBody,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow,
-	} from '$lib/components/ui/table/index.js';
-	import { PlusIcon } from '@lucide/svelte';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import EditIcon from '@lucide/svelte/icons/edit';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
-	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { api } from '$convex/_generated/api.js';
-	import type { Id } from '$convex/_generated/dataModel.js';
-	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import TrashIcon from '@lucide/svelte/icons/trash';
-	import { goto } from '$app/navigation';
+	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
+
 	const client = useConvexClient();
 
 	let { data } = $props();

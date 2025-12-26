@@ -16,12 +16,8 @@
 	const auth = useAuth();
 
 	let isOpen = $state(false);
-	let signoutForm: HTMLFormElement;
 	let commandOpen = $state(false);
 
-	function handleSignOut() {
-		signoutForm.requestSubmit();
-	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -133,5 +129,4 @@
 	</div>
 {/if}
 
-<form bind:this={signoutForm} method="POST" action="/app?/signout" class="hidden"></form>
 <Toaster position="top-center" />
