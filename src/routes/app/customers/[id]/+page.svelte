@@ -27,6 +27,7 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { goto } from '$app/navigation';
 	import Suspense from '$lib/components/Suspense.svelte';
+	import { toast } from 'svelte-sonner';
 	const client = useConvexClient();
 
 	let { data } = $props();
@@ -46,6 +47,13 @@
 	let updateNotes = debounce((event: Event) => updateValue('notes', event));
 	let updateEmail = debounce((event: Event) => updateValue('email', event));
 	let updatePhone = debounce((event: Event) => updateValue('phone', event));
+
+	function copyToast(value: string, description: string) {
+		navigator.clipboard.writeText(value);
+		toast(`${description} kopiert`, {
+			description: value,
+		});
+	}
 
 	async function remove() {
 		if (!confirm('Are you sure you want to remove this customer?')) return;
@@ -118,7 +126,7 @@
 								onkeydown={updateEmail}
 							/>
 							<InputGroup.Addon align="inline-end">
-								<InputGroup.Button>
+								<InputGroup.Button onclick={() => copyToast(customer.email, 'Email')}>
 									<CopyIcon class="h-4 w-4" /> Kopieren
 								</InputGroup.Button>
 							</InputGroup.Addon>
@@ -135,7 +143,7 @@
 								onkeydown={updatePhone}
 							/>
 							<InputGroup.Addon align="inline-end">
-								<InputGroup.Button>
+								<InputGroup.Button onclick={() => copyToast(customer.phone, `Telefon`)}>
 									<CopyIcon class="h-4 w-4" /> Kopieren
 								</InputGroup.Button>
 							</InputGroup.Addon>

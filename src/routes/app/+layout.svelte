@@ -9,6 +9,7 @@
 	import { useConvexClient } from 'convex-svelte';
 	import { onMount } from 'svelte';
 	import type { ConnectionState } from 'convex/browser';
+	import { Toaster } from "$lib/components/ui/sonner/index.js";
 
 	const { children } = $props();
 
@@ -128,3 +129,4 @@
 </div>
 
 <form bind:this={signoutForm} method="POST" action="/app?/signout" class="hidden"></form>
+<Toaster position="top-center" />
