@@ -1,6 +1,18 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { mutation, query, type QueryCtx } from './_generated/server';
 import { authComponent } from './auth';
+import { api } from './_generated/api';
+import type { Id } from './_generated/dataModel';
+import { getCompany } from './companies';
+
+export async function getCustomer(ctx: QueryCtx, id: Id<'customers'>) {
+	const user = await authComponent.getAuthUser(ctx);
+	const customer = await ctx.db.get(id);
+	if (!customer || customer.userId !== user._id) {
+		return null;
+	}
+	return customer;
+}
 
 export const list = query({
 	args: {},
@@ -18,17 +30,7 @@ export const get = query({
 	args: {
 		id: v.id('customers'),
 	},
-	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-
-		const customer = await ctx.db.get(args.id);
-
-		if (!customer || customer.userId !== user._id) {
-			return null;
-		}
-
-		return customer;
-	},
+	handler: async (ctx, args) => await getCustomer(ctx, args.id),
 });
 
 export const getFull = query({
@@ -60,19 +62,31 @@ export const create = mutation({
 	handler: async (ctx, args) => {
 		const user = await authComponent.getAuthUser(ctx);
 
+		const company = await getCompany(ctx);
+		if (!company) {
+			throw new Error('Company not found');
+		}
+
 		const _id = await ctx.db.insert('customers', {
 			name: args.name,
 			email: '',
 			phone: '',
 			notes: '',
 			isArchived: false,
+			invoiceNumberCounter: 0,
 			invoiceCountry: '',
 			invoiceState: '',
 			invoiceCity: '',
 			invoiceZip: '',
 			invoiceStreet: '',
 			userId: user._id,
+			number: company.customerNumberCounter + 1,
 		});
+		
+		await ctx.db.patch('companies', company._id, {
+			customerNumberCounter: company.customerNumberCounter + 1,
+		});
+
 		return { _id };
 	},
 });
@@ -109,10 +123,8 @@ export const update = mutation({
 		value: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-
-		const customer = await ctx.db.get('customers', args.id);
-		if (!customer || customer.userId !== user._id) {
+		const customer = await getCustomer(ctx, args.id);
+		if (!customer) {
 			throw new Error('Customer not found');
 		}
 
@@ -125,22 +137,3 @@ export const update = mutation({
 	},
 });
 
-export const getWithCompany = query({
-	args: {
-		id: v.id('customers'),
-	},
-	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-		const customer = await ctx.db.get('customers', args.id);
-		const company = await ctx.db.query('companies').withIndex('by_userId', (q) => q.eq('userId', user._id)).first();
-
-		if (!customer || customer.userId !== user._id || !company) {
-			return null;
-		}
-
-		return {
-			customer,
-			company,
-		};
-	},
-});

@@ -82,7 +82,7 @@
 
 			<SiteHeader>
 				{customer.name}
-				<div class="text-gray-500">###</div>
+				<div class="text-gray-500">#{customer.number}</div>
 			</SiteHeader>
 
 			<ButtonGroup.Root>

@@ -4,6 +4,8 @@ import { v } from 'convex/values';
 const customers = defineTable({
 	userId: v.string(),
 
+	number: v.number(),
+
 	name: v.string(),
 	email: v.string(),
 	phone: v.string(),
@@ -11,6 +13,7 @@ const customers = defineTable({
 
 	isArchived: v.boolean(),
 
+	invoiceNumberCounter: v.number(),
 	invoiceCountry: v.string(),
 	invoiceState: v.string(),
 	invoiceCity: v.string(),
@@ -56,7 +59,6 @@ const companies = defineTable({
 	taxNumber: v.string(),
 
 	customerNumberCounter: v.number(),
-	invoiceNumberCounter: v.number(),
 }).index('by_userId', ['userId']);
 
 export default defineSchema({ customers, invoices, companies });

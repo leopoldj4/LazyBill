@@ -19,7 +19,7 @@
 
 	let { data } = $props();
 
-	const query = useQuery(api.customers.getWithCompany, () => ({
+	const query = useQuery(api.invoices.getInvoiceContext, () => ({
 		id: data.customerId as Id<'customers'>,
 	}));
 

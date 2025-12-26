@@ -1,17 +1,18 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { mutation, query, type QueryCtx } from './_generated/server';
 import { authComponent } from './auth';
+
+export async function getCompany(ctx: QueryCtx) {
+	const user = await authComponent.getAuthUser(ctx);
+	return await ctx.db
+		.query('companies')
+		.withIndex('by_userId', (q) => q.eq('userId', user._id))
+		.first();
+}
 
 export const get = query({
 	args: {},
-	handler: async (ctx) => {
-		const user = await authComponent.getAuthUser(ctx);
-
-		return await ctx.db
-			.query('companies')
-			.withIndex('by_userId', (q) => q.eq('userId', user._id))
-			.first();
-	},
+	handler: getCompany,
 });
 
 export const update = mutation({
@@ -20,12 +21,7 @@ export const update = mutation({
 		value: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
-
-		const company = await ctx.db
-			.query('companies')
-			.withIndex('by_userId', (q) => q.eq('userId', user._id))
-			.first();
+		const company = await getCompany(ctx);
 
 		if (!company) {
 			throw new Error('Company not found');
