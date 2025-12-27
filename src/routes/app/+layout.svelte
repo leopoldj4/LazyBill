@@ -10,9 +10,9 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
 	import { onMount } from 'svelte';
-	import { Toaster } from "$lib/components/ui/sonner/index.js";
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { authClient } from '$lib/auth-client';
-	import { goto } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 
 	const { children } = $props();
 	const auth = useAuth();
@@ -20,6 +20,7 @@
 	let isOpen = $state(false);
 	let commandOpen = $state(false);
 
+	beforeNavigate(() => (commandOpen = false));
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -27,8 +28,6 @@
 			commandOpen = !commandOpen;
 		}
 	}
-
-	const closeCommand = () => (commandOpen = false);
 
 	const client = useConvexClient();
 	let status: ConnectionState = $state(client.connectionState());
@@ -51,27 +50,21 @@
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Seiten">
-			<Command.LinkItem href="/app/customers" onclick={closeCommand}
-				><UsersIcon /> Kunden</Command.LinkItem
-			>
-			<Command.LinkItem href="/app/settings" onclick={closeCommand}
-				><BuildingIcon /> Einstellungen</Command.LinkItem
-			>
+			<Command.LinkItem href="/app/customers"><UsersIcon /> Kunden</Command.LinkItem>
+			<Command.LinkItem href="/app/settings"><BuildingIcon /> Einstellungen</Command.LinkItem>
 		</Command.Group>
 		<Command.Separator />
 		{#if query.data}
 			<Command.Group heading="Kunden">
 				{#each query.data as customer}
-					<Command.LinkItem href={`/app/customers/${customer._id}`} onclick={closeCommand}
+					<Command.LinkItem href={`/app/customers/${customer._id}`}
 						><UsersIcon /> {customer.name}</Command.LinkItem
 					>
 				{/each}
 			</Command.Group>
 		{/if}
 		<Command.Group heading="Einstellungen">
-			<Command.LinkItem href="/app/settings/company" onclick={closeCommand}
-				><BuildingIcon /> Meine Firma</Command.LinkItem
-			>
+			<Command.LinkItem href="/app/settings/company"><BuildingIcon /> Meine Firma</Command.LinkItem>
 		</Command.Group>
 	</Command.List>
 </Command.Dialog>
@@ -99,7 +92,9 @@
 			</header>
 			<div class="flex items-center justify-between">
 				{#if status.isWebSocketConnected}
-					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600 animate-fade-out ease-in fill-mode-forwards">
+					<div
+						class="mr-4 flex animate-fade-out items-center gap-2 text-sm text-gray-600 ease-in fill-mode-forwards"
+					>
 						<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
 						Verbunden
 					</div>
@@ -117,7 +112,13 @@
 					</div>
 				{/if}
 				<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>Einstellungen</a>
-				<Button variant="ghost" onclick={async () => {authClient.signOut(); await goto('/login')}}>Abmelden</Button>
+				<Button
+					variant="ghost"
+					onclick={async () => {
+						authClient.signOut();
+						await goto('/login');
+					}}>Abmelden</Button
+				>
 			</div>
 		</div>
 		<div

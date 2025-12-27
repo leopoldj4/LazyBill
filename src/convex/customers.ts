@@ -1,7 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query, type QueryCtx } from './_generated/server';
 import { authComponent } from './auth';
-import { api } from './_generated/api';
 import type { Id } from './_generated/dataModel';
 import { getCompany } from './companies';
 
