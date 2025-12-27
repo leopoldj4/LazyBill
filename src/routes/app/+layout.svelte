@@ -5,9 +5,10 @@
 	import Prompt from '$lib/components/Prompt.svelte';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
+	import * as Kbd from '$lib/components/ui/kbd';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import { BuildingIcon, SearchIcon, SettingsIcon } from '@lucide/svelte';
+	import { BuildingIcon, Code, SearchIcon, SettingsIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
@@ -79,8 +80,10 @@
 		<Spinner />
 	</div>
 {:else}
-	<div class="min-h-screen h-full">
-		<div class="flex h-[52px] fixed top-0 z-30 bg-white w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
+	<div class="h-full min-h-screen">
+		<div
+			class="fixed top-0 z-30 flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 bg-white px-8"
+		>
 			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
@@ -89,10 +92,19 @@
 			</header>
 			<button
 				onclick={() => (commandOpen = true)}
-				class="flex h-9 w-[90%] cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw]"
+				class="flex h-9 w-[90%] cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw] px-4"
 			>
-				Quick Switcher
-				<SearchIcon class="size-4" />
+				<div class="w-[57px]"></div>
+
+				<div class="flex items-center gap-2">
+					<SearchIcon class="size-4" />
+					Schnellsuche
+				</div>
+
+				<Kbd.Group class="max-lg:hidden">
+					<Kbd.Root class="border">⌘</Kbd.Root>+
+					<Kbd.Root class="border">K</Kbd.Root>
+				</Kbd.Group>
 			</button>
 			<div class="flex shrink-0 items-center justify-between">
 				<div class="hidden lg:block">
@@ -123,7 +135,7 @@
 				</a>
 			</div>
 		</div>
-		<div class="flex flex-col gap-6 p-8 mt-[52px]">
+		<div class="mt-[52px] flex flex-col gap-6 p-8">
 			{@render children?.()}
 		</div>
 	</div>
