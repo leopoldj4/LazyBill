@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
 	import Prompt from '$lib/components/Prompt.svelte';
@@ -16,6 +16,12 @@
 
 	const { children } = $props();
 	const auth = useAuth();
+
+	$effect(() => {
+		if (!auth.isLoading && !auth.isAuthenticated) {
+			goto('/login');
+		}
+	});
 
 	let commandOpen = $state(false);
 

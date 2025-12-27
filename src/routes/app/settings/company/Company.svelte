@@ -82,7 +82,6 @@
 	class="mt-12"
 	onclick={async () => {
 		authClient.signOut();
-		await goto('/login');
 	}}
 >
 	<LogOutIcon class="size-4" />
