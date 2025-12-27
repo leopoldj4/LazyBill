@@ -4,9 +4,10 @@
 	import type { Id } from '$convex/_generated/dataModel.js';
 	import { debounce } from '$lib';
 	import { action } from '$lib/action.svelte';
+	import { fromCustomer } from '$lib/address';
 	import { ask } from '$lib/ask.svelte.js';
-	import AddressModal from '$lib/components/AddressModal.svelte';
 	import Address from '$lib/components/Address.svelte';
+	import AddressModal from '$lib/components/AddressModal.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -31,7 +32,6 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
-	import { fromCustomer } from '$lib/address';
 
 	const client = useConvexClient();
 

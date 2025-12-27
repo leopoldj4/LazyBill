@@ -48,4 +48,9 @@
 	{/if}
 
 	<Button type="submit" class="mt-4 w-full">Login</Button>
+
+	<div class="mt-4 text-center">
+		Don't have an account?
+		<a href="/sign-up" class="text-cyan-600 underline"> Sign up </a>
+	</div>
 </form>

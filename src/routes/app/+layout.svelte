@@ -2,6 +2,7 @@
 	import { beforeNavigate } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
+	import Prompt from '$lib/components/Prompt.svelte';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
@@ -12,7 +13,6 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
 	import { onMount } from 'svelte';
-	import Prompt from '$lib/components/Prompt.svelte';
 
 	const { children } = $props();
 	const auth = useAuth();

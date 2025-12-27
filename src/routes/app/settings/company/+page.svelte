@@ -1,9 +1,9 @@
 <script lang="ts">
-	import SiteHeader from '$lib/components/site-header.svelte';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { api } from '$convex/_generated/api.js';
+	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import { useQuery } from 'convex-svelte';
 	import Company from './Company.svelte';
 	const query = useQuery(api.companies.get, {});
 </script>

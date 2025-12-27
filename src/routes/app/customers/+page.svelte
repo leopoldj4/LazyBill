@@ -1,14 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
+	import { action } from '$lib/action.svelte';
+	import { fromCustomer } from '$lib/address';
+	import Address from '$lib/components/Address.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { Spinner } from '$lib/components/ui/spinner';
 	import {
 		Table,
 		TableBody,
@@ -17,15 +22,10 @@
 		TableHeader,
 		TableRow,
 	} from '$lib/components/ui/table';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import ArchiveIcon from '@lucide/svelte/icons/archive';
-	import { action } from '$lib/action.svelte';
-	import { Spinner } from '$lib/components/ui/spinner';
-	import * as Card from '$lib/components/ui/card';
-	import { fromCustomer } from '$lib/address';
-	import Address from '$lib/components/Address.svelte';
 	
 	let search = $state('');
 

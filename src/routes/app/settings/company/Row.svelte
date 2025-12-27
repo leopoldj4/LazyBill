@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Label from '$lib/components/ui/label/label.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { Checkbox } from '$lib/components/ui/checkbox';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import Label from '$lib/components/ui/label/label.svelte';
 
 	type Props = {
 		label: string;
