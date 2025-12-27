@@ -9,7 +9,7 @@ export function debounce<T>(fn: (value: T) => Promise<void>, onrun?: () => void)
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	return (value: T) => {
-		onrun();
+		onrun?.();
 		if (debounceTimer) {
 			clearTimeout(debounceTimer);
 		}

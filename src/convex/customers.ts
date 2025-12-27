@@ -132,3 +132,15 @@ export const update = mutation({
 	},
 });
 
+export const setArchived = mutation({
+	args: {
+		id: v.id('customers'),
+		archived: v.boolean(),
+	},
+	handler: async (ctx, args) => {
+		const customer = await getCustomer(ctx, args.id);
+		await ctx.db.patch('customers', customer._id, {
+			isArchived: args.archived,
+		});
+	},
+});

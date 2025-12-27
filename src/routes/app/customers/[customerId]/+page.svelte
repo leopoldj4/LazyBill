@@ -26,7 +26,7 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
 	import { daysUntilDue } from '$lib/date';
-
+	import { action } from '$lib/action.svelte';
 
 	const client = useConvexClient();
 
@@ -62,18 +62,20 @@
 		toast.success('Kunde erfolgreich gelöscht');
 	}
 
-	let isCreatingInvoice = $state(false);
-	async function newInvoice() {
-		isCreatingInvoice = true;
-		try {
-			const invoiceId = await client.mutation(api.invoices.createInvoice, {
-				customerId: data.customerId as Id<'customers'>,
-			});
-			await goto(`/app/customers/${data.customerId}/invoices/${invoiceId}`);
-		} finally {
-			isCreatingInvoice = false;
-		}
-	}
+	let newInvoice = action(async () => {
+		const invoiceId = await client.mutation(api.invoices.createInvoice, {
+			customerId: data.customerId as Id<'customers'>,
+		});
+		await goto(`/app/customers/${data.customerId}/invoices/${invoiceId}`);
+	}, 'Fehler beim Erstellen der Rechnung');
+
+	let archive = action(async () => {
+		if (!query.data?.customer) return;
+		await client.mutation(api.customers.setArchived, {
+			id: data.customerId as Id<'customers'>,
+			archived: !query.data.customer.isArchived,
+		});
+	}, 'Fehler beim Archivieren des Kunden');
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -101,8 +103,8 @@
 
 			<ButtonGroup.Root>
 				<ButtonGroup.Root>
-					<Button variant="outline" onclick={newInvoice}>
-						{#if isCreatingInvoice}
+					<Button variant="outline" onclick={newInvoice.run}>
+						{#if newInvoice.isLoading}
 							<Spinner />
 						{:else}
 							<PlusIcon class="h-4 w-4" />
@@ -111,9 +113,17 @@
 					</Button>
 				</ButtonGroup.Root>
 				<ButtonGroup.Root>
-					<Button variant="outline">
-						<ArchiveIcon class="h-4 w-4" />
-						Archivieren
+					<Button variant="outline" onclick={archive.run}>
+						{#if archive.isLoading}
+							<Spinner />
+						{:else}
+							<ArchiveIcon class="h-4 w-4" />
+						{/if}
+						{#if customer.isArchived}
+							Archiv entfernen
+						{:else}
+							Archivieren
+						{/if}
 					</Button>
 					<Button variant="outline" onclick={remove}>
 						<TrashIcon class="h-4 w-4 text-destructive" />
@@ -214,7 +224,7 @@
 					</CardHeader>
 					<CardContent>
 						{#if invoices.length === 0}
-							<p class="text-center text-gray-500 py-8">Keine Rechnungen vorhanden</p>
+							<p class="py-8 text-center text-gray-500">Keine Rechnungen vorhanden</p>
 						{:else}
 							<Table>
 								<TableBody>
