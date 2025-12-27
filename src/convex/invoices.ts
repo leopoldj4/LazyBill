@@ -39,7 +39,7 @@ export const getFull = query({
 			return null;
 		}
 
-		const invoiceNumber = invoiceID(invoice.number, customer.number);
+		const invoiceNumber = invoiceID(invoice.number as number, customer.number);
 
 		return {
 			invoiceNumber,

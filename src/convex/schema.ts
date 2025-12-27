@@ -25,9 +25,9 @@ const invoices = defineTable({
 	customerId: v.id('customers'),
 	companyId: v.id('companies'),
 
-	state: v.union(v.literal('draft'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
+	state: v.union(v.literal('draft'), v.literal('finalized'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
 
-	number: v.number(),
+	number: v.union(v.number(), v.string()),
 	date: v.string(), // yr-mon-day
 	dueInDays: v.number(),
 	articles: v.array(
@@ -37,6 +37,8 @@ const invoices = defineTable({
 		}),
 	),
 	notes: v.string(),
+
+	file: v.optional(v.id('_storage')),
 });
 
 const companies = defineTable({
