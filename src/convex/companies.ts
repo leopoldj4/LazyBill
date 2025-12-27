@@ -57,11 +57,11 @@ export const updateAddress = mutation({
 	handler: async (ctx, args) => {
 		const company = await getCompany(ctx);
 		await ctx.db.patch('companies', company._id, {
-			street: args.address.street,
-			zip: args.address.zip,
-			city: args.address.city,
-			state: args.address.state,
-			country: args.address.country,
+			street: args.street,
+			zip: args.zip,
+			city: args.city,
+			state: args.state,
+			country: args.country,
 		});
 	},
 });
