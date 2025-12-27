@@ -6,6 +6,8 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { api } from '$convex/_generated/api.js';
 	import { useConvexClient } from 'convex-svelte';
+	import Row from './Row.svelte';
+	import Section from './Section.svelte';
 
 	const client = useConvexClient();
 
@@ -59,9 +61,12 @@
 		}
 	});
 
-	const debounce = debounceFn(async (values: typeof api.companies.update._args) => {
-		await client.mutation(api.companies.update, values);
-	}, () => syncTimer && clearTimeout(syncTimer));
+	const debounce = debounceFn(
+		async (values: typeof api.companies.update._args) => {
+			await client.mutation(api.companies.update, values);
+		},
+		() => syncTimer && clearTimeout(syncTimer),
+	);
 
 	$effect(() => {
 		debounce({
@@ -83,87 +88,35 @@
 </script>
 
 <div class="my-12 flex flex-col gap-20">
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-[16rem_1fr]">
-		<h2 class="text-right text-xl">Basisdaten</h2>
-		<div class="grid grid-cols-[24rem_24rem] gap-x-16 gap-y-8">
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="name" class="justify-self-end">Name</Label>
-				<Input type="text" id="name" bind:value={name} />
-			</div>
+	<Section title="Basisdaten">
+		<Row label="Name" bind:value={name} />
+		<Row label="Telefon" bind:value={phone} />
+	</Section>
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="phone" class="justify-self-end">Telefon</Label>
-				<Input type="text" id="phone" bind:value={phone} />
-			</div>
-		</div>
-	</div>
+	<Section title="Adresse">
+			<Row label="Straße" bind:value={street} />
 
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-[16rem_1fr]">
-		<h2 class="text-right text-xl">Adresse</h2>
-		<div class="grid grid-cols-[24rem_24rem] gap-x-16 gap-y-8">
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="street" class="justify-self-end">Straße</Label>
-				<Input type="text" id="street" bind:value={street} />
-			</div>
+			<Row label="PLZ" bind:value={zip} />
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="zip" class="justify-self-end">PLZ</Label>
-				<Input type="text" id="zip" bind:value={zip} />
-			</div>
+			<Row label="Stadt" bind:value={city} />
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="city" class="justify-self-end">Stadt</Label>
-				<Input type="text" id="city" bind:value={city} />
-			</div>
+			<Row label="Bundesland" bind:value={stateValue} />
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="state" class="justify-self-end">Bundesland</Label>
-				<Input type="text" id="state" bind:value={stateValue} />
-			</div>
+			<Row label="Land" bind:value={country} />
+	</Section>
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="country" class="justify-self-end">Land</Label>
-				<Input type="text" id="country" bind:value={country} />
-			</div>
-		</div>
-	</div>
+	<Section title="Bankdaten">
+			<Row label="Vertreter" bind:value={representative} />
 
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-[16rem_1fr]">
-		<h2 class="text-right text-xl">Bankdaten</h2>
-		<div class="grid grid-cols-[24rem_24rem] gap-x-16 gap-y-8">
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="representative" class="justify-self-end">Vertreter</Label>
-				<Input type="text" id="representative" bind:value={representative} />
-			</div>
+			<Row label="Bankname" bind:value={bankName} />
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="bankName" class="justify-self-end">Bankname</Label>
-				<Input type="text" id="bankName" bind:value={bankName} />
-			</div>
+			<Row label="IBAN" bind:value={bankIban} />
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="bankIban" class="justify-self-end">IBAN</Label>
-				<Input type="text" id="bankIban" bind:value={bankIban} />
-			</div>
+			<Row label="BIC" bind:value={bankBic} />
+	</Section>
 
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="bankBic" class="justify-self-end">BIC</Label>
-				<Input type="text" id="bankBic" bind:value={bankBic} />
-			</div>
-		</div>
-	</div>
-
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-[16rem_1fr]">
-		<h2 class="text-right text-xl">Steuerliche Angaben</h2>
-		<div class="grid grid-cols-[24rem_24rem] gap-x-16 gap-y-8">
-			<div class="grid grid-cols-[6rem_14rem] gap-4">
-				<Label for="taxNumber" class="justify-self-end">Steuer-Nr.</Label>
-				<Input type="text" id="taxNumber" bind:value={taxNumber} />
-			</div>
-			<div class="grid grid-cols-[6rem_14rem] items-center gap-4">
-				<Label for="smallBusiness" class="justify-self-end">Kleinunternehmer</Label>
-				<Checkbox id="smallBusiness" bind:checked={smallBusiness} />
-			</div>
-		</div>
-	</div>
+	<Section title="Steuerliche Angaben">
+			<Row label="Steuer-Nr." bind:value={taxNumber} />
+			<Row label="Kleinunternehmer" bind:value={smallBusiness} checkbox />
+	</Section>
 </div>

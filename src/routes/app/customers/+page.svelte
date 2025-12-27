@@ -75,7 +75,7 @@
 	>
 </ButtonGroup>
 
-<InputGroup.Root class="hidden w-sm lg:block">
+<InputGroup.Root class="w-sm max-lg:hidden">
 	<InputGroup.Input disabled placeholder="Search..." bind:value={search} />
 	<InputGroup.Addon>
 		<SearchIcon />
@@ -102,7 +102,7 @@
 					</a>
 				{/each}
 			</div>
-			<Table class="hidden lg:table">
+			<Table class="max-lg:hidden">
 				<TableHeader>
 					<TableRow>
 						<TableHead>Name</TableHead>
