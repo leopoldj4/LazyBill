@@ -23,14 +23,18 @@ export async function getCustomerSafe(ctx: QueryCtx, id: Id<'customers'>) {
 }
 
 export const list = query({
-	args: {},
-	handler: async (ctx) => {
+	args: {
+		archived: v.optional(v.boolean()),
+	},
+	handler: async (ctx, args) => {
 		const user = await authComponent.getAuthUser(ctx);
 
-		return await ctx.db
-			.query('customers')
-			.withIndex('by_userId', (q) => q.eq('userId', user._id))
-			.collect();
+		let query = ctx.db.query('customers').withIndex('by_userId', (q) => q.eq('userId', user._id));
+		if (args.archived !== undefined) {
+			query = query.filter((q) => q.eq(q.field('isArchived'), args.archived));
+		}
+
+		return await query.collect();
 	},
 });
 

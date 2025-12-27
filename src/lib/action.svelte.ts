@@ -1,21 +1,23 @@
 import { toast } from "svelte-sonner";
 
-export function action(action: () => Promise<void>, errorMessage: string) {
-	let isLoading = $state(false);
+export function action<T>(action: (args: T) => Promise<void>, errorMessage: string) {
+    let isLoading = $state(false);
 
-	async function run() {
-		isLoading = true;
-		try {
-			await action();
-		} catch (error) {
-			toast.error(errorMessage);
-		} finally {
-			isLoading = false;
-		}
-	}
+    async function run(args: T) {
+        if (isLoading) return;
+        
+        isLoading = true;
+        try {
+            await action(args);
+        } catch (error) {
+            toast.error(errorMessage);
+        } finally {
+            isLoading = false;
+        }
+    }
 
-	return {
-		get isLoading() { return isLoading; },
-		run,
-	};
+    return {
+        get isLoading() { return isLoading; },
+        run,
+    };
 }

@@ -20,6 +20,9 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import { useConvexClient, useQuery } from 'convex-svelte';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import { action } from '$lib/action.svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	let search = $state('');
 
@@ -27,7 +30,7 @@
 
 	let newCustomerOpen = $state(false);
 
-	async function handleNewCustomerSubmit(event: Event) {
+	let newCustomer = action(async (event: Event) => {
 		event.preventDefault();
 		const form = event.target as HTMLFormElement;
 		const formData = new FormData(form);
@@ -40,9 +43,18 @@
 		newCustomerOpen = false;
 
 		await goto(`/app/customers/${_id}`);
-	}
+	}, 'Fehler beim Hinzufügen des Kunden');
 
-	const query = useQuery(api.customers.list, {});
+	let showArchived = $state(false);
+
+	const query = useQuery(api.customers.list, () => ({
+		archived: showArchived,
+	}));
+
+	function resetFilters() {
+		search = '';
+		showArchived = false;
+	}
 </script>
 
 <Breadcrumb.Root>
@@ -52,6 +64,15 @@
 </Breadcrumb.Root>
 
 <SiteHeader>Kunden</SiteHeader>
+
+<ButtonGroup>
+	<Button
+		variant="outline"
+		onclick={() => {
+			newCustomerOpen = true;
+		}}><PlusIcon /> Kunde hinzufügen</Button
+	>
+</ButtonGroup>
 
 <ButtonGroup>
 	<ButtonGroup>
@@ -64,47 +85,57 @@
 	</ButtonGroup>
 	<ButtonGroup>
 		<Button
-			variant="outline"
+			variant={showArchived ? 'default' : 'outline'}
 			onclick={() => {
-				newCustomerOpen = true;
-			}}><PlusIcon /> Kunde hinzufügen</Button
+				showArchived = !showArchived;
+			}}
 		>
+			<ArchiveIcon />
+			Archivierte anzeigen
+		</Button>
 	</ButtonGroup>
 </ButtonGroup>
 
 <Suspense {query} class="h-[60vh]">
 	{#snippet children(customers)}
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Name</TableHead>
-					<TableHead>Email</TableHead>
-					<TableHead>Invoice Address</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{#each customers as customer}
-					<a href={`/app/customers/${customer._id}`} class="contents">
-						<TableRow>
-							<TableCell>
-								{customer.name}
-							</TableCell>
-							<TableCell>{customer.email}</TableCell>
-							<TableCell>
-								<div class="text-sm">
-									{customer.invoiceStreet}<br />
-									{customer.invoiceZip}
-									{customer.invoiceCity}<br />
-									{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-										-
-									{/if}{customer.invoiceCountry}
-								</div>
-							</TableCell>
-						</TableRow>
-					</a>
-				{/each}
-			</TableBody>
-		</Table>
+		{#if customers.length === 0}
+			<div class="flex min-h-[40vh] flex-col items-center justify-center gap-4">
+				<p>Keine Kunden gefunden</p>
+				<Button onclick={resetFilters}>Filter zurücksetzen</Button>
+			</div>
+		{:else}
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Name</TableHead>
+						<TableHead>Email</TableHead>
+						<TableHead>Invoice Address</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{#each customers as customer}
+						<a href={`/app/customers/${customer._id}`} class="contents">
+							<TableRow>
+								<TableCell>
+									{customer.name}
+								</TableCell>
+								<TableCell>{customer.email}</TableCell>
+								<TableCell>
+									<div class="text-sm">
+										{customer.invoiceStreet}<br />
+										{customer.invoiceZip}
+										{customer.invoiceCity}<br />
+										{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
+											-
+										{/if}{customer.invoiceCountry}
+									</div>
+								</TableCell>
+							</TableRow>
+						</a>
+					{/each}
+				</TableBody>
+			</Table>
+		{/if}
 	{/snippet}
 </Suspense>
 
@@ -121,7 +152,7 @@
 				<Dialog.Title>Kunde hinzufügen</Dialog.Title>
 				<Dialog.Description>Bitte geben Sie den Namen des Kunden ein.</Dialog.Description>
 			</Dialog.Header>
-			<form onsubmit={handleNewCustomerSubmit} class="flex flex-col gap-4">
+			<form onsubmit={newCustomer.run} class="flex flex-col gap-4">
 				<Input type="text" placeholder="Name" name="name" />
 				<Dialog.Footer>
 					<Button
@@ -130,7 +161,14 @@
 							newCustomerOpen = false;
 						}}>Abbrechen</Button
 					>
-					<Button type="submit">Hinzufügen</Button>
+					<Button type="submit">
+						{#if newCustomer.isLoading}
+							<Spinner />
+						{:else}
+							<PlusIcon />
+						{/if}
+						Hinzufügen
+					</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
