@@ -10,6 +10,9 @@
 	import Row from './Row.svelte';
 	import Section from './Section.svelte';
 	import { extractCompanyData, type CompanyData } from './company';
+	import AddressModal from '$lib/components/AddressModal.svelte';
+	import { fromCompany } from '$lib/address';
+	import Address from '$lib/components/Address.svelte';
 	const client = useConvexClient();
 
 	type Props = {
@@ -47,15 +50,15 @@
 	</Section>
 
 	<Section title="Adresse">
-		<Row label="Straße" bind:value={store.value.street} />
-
-		<Row label="PLZ" bind:value={store.value.zip} />
-
-		<Row label="Stadt" bind:value={store.value.city} />
-
-		<Row label="Bundesland" bind:value={store.value.state} />
-
-		<Row label="Land" bind:value={store.value.country} />
+		<div class="flex flex-col gap-2">
+			<Address address={fromCompany(company)} />
+			<AddressModal
+				address={fromCompany(company)}
+				onSave={async (address) => {
+					await client.mutation(api.companies.updateAddress, address);
+				}}
+			/>
+		</div>
 	</Section>
 
 	<Section title="Bankdaten">

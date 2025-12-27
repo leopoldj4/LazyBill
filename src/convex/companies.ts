@@ -45,3 +45,23 @@ export const update = mutation({
 		await ctx.db.patch('companies', company._id, { ...args });
 	},
 });
+
+export const updateAddress = mutation({
+	args: {
+		street: v.string(),
+		zip: v.string(),
+		city: v.string(),
+		state: v.string(),
+		country: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const company = await getCompany(ctx);
+		await ctx.db.patch('companies', company._id, {
+			street: args.address.street,
+			zip: args.address.zip,
+			city: args.address.city,
+			state: args.address.state,
+			country: args.address.country,
+		});
+	},
+});

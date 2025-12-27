@@ -24,7 +24,9 @@
 	import { action } from '$lib/action.svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import * as Card from '$lib/components/ui/card';
-
+	import { fromCustomer } from '$lib/address';
+	import Address from '$lib/components/Address.svelte';
+	
 	let search = $state('');
 
 	const client = useConvexClient();
@@ -120,12 +122,7 @@
 								<TableCell>{customer.email}</TableCell>
 								<TableCell>
 									<div class="text-sm">
-										{customer.invoiceStreet}<br />
-										{customer.invoiceZip}
-										{customer.invoiceCity}<br />
-										{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-											-
-										{/if}{customer.invoiceCountry}
+										<Address address={fromCustomer(customer)} />
 									</div>
 								</TableCell>
 							</TableRow>
