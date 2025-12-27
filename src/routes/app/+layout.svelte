@@ -123,5 +123,5 @@
 	</div>
 {/if}
 
-<Toaster position="top-center" />
+<Toaster position="top-right" />
 <Prompt />

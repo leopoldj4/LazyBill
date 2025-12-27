@@ -32,7 +32,7 @@
 	import { ask } from '$lib/ask.svelte.js';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 
-	export type Article = {
+	type Article = {
 		name: string;
 		price: number;
 	};
