@@ -6,9 +6,6 @@
 	import { PlaceAutocomplete } from 'places-autocomplete-svelte';
 	import type { ComponentOptions, PlaceResult } from 'places-autocomplete-svelte/interfaces';
 	import { PUBLIC_GOOGLE_MAPS_API_KEY } from '$env/static/public';
-	import { useConvexClient } from 'convex-svelte';
-	import { api } from '$convex/_generated/api';
-	import type { Doc, Id } from '$convex/_generated/dataModel';
 	import { action } from '$lib/action.svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import * as InputGroup from '$lib/components/ui/input-group';
@@ -18,6 +15,7 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import type { Address } from '$lib/address';
 
 	let open = $state(false);
 
@@ -28,10 +26,11 @@
 	let country = $state('');
 
 	type Props = {
-		customer: Doc<'customers'>;
+		address: Address;
+		onSave: (address: Address) => Promise<void>;
 	};
 
-	let { customer }: Props = $props();
+	let { address, onSave }: Props = $props();
 
 	const requestParams = {
 		region: 'DE',
@@ -73,14 +72,12 @@
 	};
 
 	$effect(() => {
-		street = customer.invoiceStreet ?? '';
-		zip = customer.invoiceZip ?? '';
-		city = customer.invoiceCity ?? '';
-		stateName = customer.invoiceState ?? '';
-		country = customer.invoiceCountry ?? '';
+		street = address.street ?? '';
+		zip = address.zip ?? '';
+		city = address.city ?? '';
+		stateName = address.state ?? '';
+		country = address.country ?? '';
 	});
-
-	const client = useConvexClient();
 
 	let autocomplete: PlaceAutocomplete | null = $state(null);
 
@@ -105,8 +102,7 @@
 			);
 		}
 
-		await client.mutation(api.customers.updateAddress, {
-			id: customer._id,
+		await onSave({
 			country: component('country'),
 			state: component('administrative_area_level_1'),
 			city: component('locality'),
@@ -120,13 +116,12 @@
 	const updateManual = action(async (event: Event) => {
 		event.preventDefault();
 
-		await client.mutation(api.customers.updateAddress, {
-			id: customer._id,
-			country: country,
+		await onSave({
+			country,
 			state: stateName,
-			city: city,
-			zip: zip,
-			street: street,
+			city,
+			zip,
+			street,
 		});
 
 		open = false;

@@ -3,8 +3,13 @@
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
 	import { debounce } from '$lib';
+	import { action } from '$lib/action.svelte';
+	import { ask } from '$lib/ask.svelte.js';
+	import AddressModal from '$lib/components/AddressModal.svelte';
+	import Address from '$lib/components/Address.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -12,25 +17,21 @@
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import TableBody from '$lib/components/ui/table/table-body.svelte';
-	import TableRow from '$lib/components/ui/table/table-row.svelte';
 	import TableCell from '$lib/components/ui/table/table-cell.svelte';
+	import TableRow from '$lib/components/ui/table/table-row.svelte';
 	import Table from '$lib/components/ui/table/table.svelte';
+	import { daysUntilDue } from '$lib/date';
 	import { InvoiceStateDetail } from '$lib/invoiceStatus';
+	import { ClockIcon } from '@lucide/svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
-	import EditIcon from '@lucide/svelte/icons/edit';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
-	import { daysUntilDue } from '$lib/date';
-	import { action } from '$lib/action.svelte';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { ClockIcon } from '@lucide/svelte';
-	import Address from '$lib/components/AddressModal.svelte';
-	import { ask } from '$lib/ask.svelte.js';
+	import { fromCustomer } from '$lib/address';
 
 	const client = useConvexClient();
 
@@ -213,15 +214,18 @@
 						<CardTitle>Adresse</CardTitle>
 					</CardHeader>
 					<CardContent>
-						{customer.invoiceStreet}<br />
-						{customer.invoiceZip}
-						{customer.invoiceCity}<br />
-						{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-							{", "}
-						{/if}{customer.invoiceCountry}
+						<Address address={fromCustomer(customer)} />
 					</CardContent>
 					<CardFooter>
-						<Address customer={data.customer} />
+						<AddressModal
+							address={fromCustomer(customer)}
+							onSave={async (address) => {
+								await client.mutation(api.customers.updateAddress, {
+									id: customer._id,
+									...address,
+								});
+							}}
+						/>
 					</CardFooter>
 				</Card>
 
