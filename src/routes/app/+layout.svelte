@@ -51,7 +51,7 @@
 <svelte:document onkeydown={handleKeydown} />
 
 <Command.Dialog bind:open={commandOpen}>
-	<Command.Input placeholder="Type a command or search..." />
+	<Command.Input placeholder="Gib einen Befehl ein oder suche..." />
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Seiten">
@@ -80,7 +80,7 @@
 	</div>
 {:else}
 	<div class="h-screen">
-		<div class="flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
+		<div class="flex h-[52px] sticky top-0 z-30 bg-white w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
 			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
