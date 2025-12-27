@@ -74,22 +74,21 @@
 	</div>
 {:else}
 	<div class="h-screen">
-		<div class="flex h-[52px] w-full flex-row items-center justify-between px-4">
-			<header class="flex items-center gap-2 pr-2">
+		<div class="flex h-[52px] w-full gap-4 max-w-screen flex-row items-center justify-between px-8">
+			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
-					<div class="font-display text-xl">Watchtower</div>
+					<div class="font-display text-xl max-lg:hidden">Watchtower</div>
 				</a>
-
-				<button
-					onclick={() => (commandOpen = true)}
-					class=" hidden h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:flex"
-				>
-					Quick Switcher
-					<SearchIcon class="size-4" />
-				</button>
 			</header>
-			<div class="flex items-center justify-between">
+			<button
+				onclick={() => (commandOpen = true)}
+				class="flex h-9 w-[90%] cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw]"
+			>
+				Quick Switcher
+				<SearchIcon class="size-4" />
+			</button>
+			<div class="flex shrink-0 items-center justify-between">
 				<div class="hidden lg:block">
 					{#if status.isWebSocketConnected}
 						<div

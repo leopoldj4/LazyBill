@@ -85,7 +85,7 @@
 <Suspense {query} class="h-[60vh]">
 	{#snippet children(customers)}
 		{#if customers.length === 0}
-			<div class="flex min-h-[40vh] flex-col items-center justify-center gap-4">
+			<div class="flex min-h-[30vh] flex-col items-center justify-center gap-4">
 				<p>Keine Kunden gefunden</p>
 				<Button onclick={resetFilters}>Filter zurücksetzen</Button>
 			</div>
