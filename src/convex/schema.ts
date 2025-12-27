@@ -27,7 +27,7 @@ const invoices = defineTable({
 
 	state: v.union(v.literal('draft'), v.literal('finalized'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
 
-	number: v.union(v.number(), v.string()),
+	number: v.string(),
 	date: v.string(), // yr-mon-day
 	dueInDays: v.number(),
 	articles: v.array(

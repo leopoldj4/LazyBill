@@ -3,7 +3,6 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
 import { today } from "$lib/date";
-import { invoiceID } from "$lib";
 import type { Id } from "./_generated/dataModel";
 import { authComponent } from "./auth";
 
@@ -39,10 +38,8 @@ export const getFull = query({
 			return null;
 		}
 
-		const invoiceNumber = invoiceID(invoice.number as number, customer.number);
-
 		return {
-			invoiceNumber,
+			invoiceNumber: invoice.number,
 			invoice,
 			customer,
 			company,
@@ -61,7 +58,7 @@ export const createInvoice = mutation({
 		const invoice = await ctx.db.insert('invoices', {
 			customerId: customer._id,
 			companyId: company._id,
-			number: customer.invoiceNumberCounter + 1,
+			number: (customer.invoiceNumberCounter + 1).toString(),
 			date: today(),
 			dueInDays: 30,
 			articles: [],

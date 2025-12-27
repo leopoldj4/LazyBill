@@ -18,7 +18,3 @@ export function debounce<T>(fn: (value: T) => Promise<void>, onrun?: () => void)
 		}, 500);
 	};
 }
-
-export function invoiceID(invoiceNr: number, customerId: number): string {
-	return `${customerId.toString().padStart(4, '0')}-${invoiceNr.toString().padStart(4, '0')}`;
-}
