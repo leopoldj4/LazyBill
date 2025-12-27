@@ -27,6 +27,8 @@
 	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import { action } from '$lib/action.svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	const client = useConvexClient();
 
@@ -35,6 +37,12 @@
 	const query = useQuery(api.invoices.getFull, () => ({
 		id: data.invoiceId as Id<'invoices'>,
 	}));
+
+	$effect(() => {
+		if (query.data && query.data.customer._id !== data.customerId) {
+			goto(`/app/customers/${query.data.customer._id}/invoices/${data.invoiceId}`);
+		}
+	});
 
 	let due = $state<number | null>(30);
 	let articles = $state<Article[]>([{ name: '', price: 0 }]);
@@ -90,16 +98,15 @@
 		exportPDF(typstDocument());
 	}
 
-	async function deleteInvoice() {
-		if (!confirm('Sind Sie sicher, dass Sie diese Rechnung löschen möchten?')) {
-			return;
-		}
+	let deleteInvoice = action(async () => {
+		if (!confirm('Sind Sie sicher, dass Sie diese Rechnung löschen möchten?')) return;
+		const invoiceNumber = query.data!.invoiceNumber;
 		await client.mutation(api.invoices.deleteInvoice, {
 			id: data.invoiceId as Id<'invoices'>,
 		});
-		toast.success('Rechnung erfolgreich gelöscht');
+		toast.success(`Rechnung #${invoiceNumber} gelöscht`);
 		await goto(`/app/customers/${data.customerId}`);
-	}
+	}, 'Fehler beim Löschen der Rechnung');
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -232,7 +239,14 @@
 								{/if}
 							</ButtonGroup>
 							<ButtonGroup>
-								<Button variant="outline" onclick={deleteInvoice}><TrashIcon class="size-4 text-destructive" /> Löschen</Button>
+								<Button variant="outline" onclick={deleteInvoice.run}>
+									{#if deleteInvoice.isLoading}
+										<Spinner />
+									{:else}
+										<TrashIcon class="size-4 text-destructive" />
+									{/if}
+									Löschen
+								</Button>
 							</ButtonGroup>
 						</ButtonGroup>
 

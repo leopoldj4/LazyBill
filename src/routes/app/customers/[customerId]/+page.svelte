@@ -28,6 +28,7 @@
 	import { daysUntilDue } from '$lib/date';
 	import { action } from '$lib/action.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { ClockIcon } from '@lucide/svelte';
 
 	const client = useConvexClient();
 
@@ -56,12 +57,12 @@
 		});
 	}
 
-	async function remove() {
+	let remove = action(async () => {
 		if (!confirm('Are you sure you want to remove this customer?')) return;
 		await client.mutation(api.customers.remove, { id: data.customerId as Id<'customers'> });
 		await goto('/app/customers');
 		toast.success('Kunde erfolgreich gelöscht');
-	}
+	}, 'Fehler beim Löschen des Kunden');
 
 	let newInvoice = action(async () => {
 		const invoiceId = await client.mutation(api.invoices.createInvoice, {
@@ -72,6 +73,15 @@
 
 	let archive = action(async () => {
 		if (!query.data?.customer) return;
+		if (
+			!query.data.customer.isArchived &&
+			query.data.invoices.some(
+				(invoice) => invoice.state != 'paid' && invoice.state != 'cancelled',
+			) &&
+			!confirm('Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?')
+		) {
+			return;
+		}
 		await client.mutation(api.customers.setArchived, {
 			id: data.customerId as Id<'customers'>,
 			archived: !query.data.customer.isArchived,
@@ -104,9 +114,15 @@
 
 			<div class="flex gap-2">
 				{#if customer.isArchived}
-				<Badge variant="outline">
+					<Badge variant="outline">
 						<ArchiveIcon class="h-4 w-4" />
 						Archiviert
+					</Badge>
+				{/if}
+				{#if data.invoices.some((invoice) => invoice.state != 'paid' && invoice.state != 'cancelled')}
+					<Badge variant="outline">
+						<ClockIcon class="h-4 w-4" />
+						Offene Rechnungen
 					</Badge>
 				{/if}
 			</div>
@@ -135,8 +151,12 @@
 							Archivieren
 						{/if}
 					</Button>
-					<Button variant="outline" onclick={remove}>
-						<TrashIcon class="h-4 w-4 text-destructive" />
+					<Button variant="outline" onclick={remove.run}>
+						{#if remove.isLoading}
+							<Spinner />
+						{:else}
+							<TrashIcon class="h-4 w-4 text-destructive" />
+						{/if}
 						Löschen
 					</Button>
 				</ButtonGroup.Root>
