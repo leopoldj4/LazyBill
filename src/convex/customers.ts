@@ -135,6 +135,27 @@ export const update = mutation({
 	},
 });
 
+export const updateAddress = mutation({
+	args: {
+		id: v.id('customers'),
+		country: v.string(),
+		state: v.string(),
+		city: v.string(),
+		zip: v.string(),
+		street: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const customer = await getCustomer(ctx, args.id);
+		await ctx.db.patch('customers', customer._id, {
+			invoiceCountry: args.country,
+			invoiceState: args.state,
+			invoiceCity: args.city,
+			invoiceZip: args.zip,
+			invoiceStreet: args.street,
+		});
+	},
+});
+
 export const setArchived = mutation({
 	args: {
 		id: v.id('customers'),

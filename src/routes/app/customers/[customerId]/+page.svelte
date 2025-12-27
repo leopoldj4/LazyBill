@@ -29,6 +29,7 @@
 	import { action } from '$lib/action.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { ClockIcon } from '@lucide/svelte';
+	import Address from '$lib/components/AddressModal.svelte';
 
 	const client = useConvexClient();
 
@@ -215,16 +216,11 @@
 						{customer.invoiceZip}
 						{customer.invoiceCity}<br />
 						{customer.invoiceState}{#if customer.invoiceState && customer.invoiceCountry}
-							-
+							{", "}
 						{/if}{customer.invoiceCountry}
 					</CardContent>
 					<CardFooter>
-						<ButtonGroup.Root>
-							<Button variant="outline">
-								<EditIcon class="h-4 w-4" />
-								Adresse bearbeiten
-							</Button>
-						</ButtonGroup.Root>
+						<Address customerId={data.customer._id} />
 					</CardFooter>
 				</Card>
 
