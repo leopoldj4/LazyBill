@@ -27,6 +27,7 @@
 	import { toast } from 'svelte-sonner';
 	import { daysUntilDue } from '$lib/date';
 	import { action } from '$lib/action.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	const client = useConvexClient();
 
@@ -100,6 +101,15 @@
 				{customer.name}
 				<div class="text-gray-500">#{customer.number}</div>
 			</SiteHeader>
+
+			<div class="flex gap-2">
+				{#if customer.isArchived}
+				<Badge variant="outline">
+						<ArchiveIcon class="h-4 w-4" />
+						Archiviert
+					</Badge>
+				{/if}
+			</div>
 
 			<ButtonGroup.Root>
 				<ButtonGroup.Root>
