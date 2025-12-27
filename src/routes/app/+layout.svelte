@@ -16,7 +16,6 @@
 	const { children } = $props();
 	const auth = useAuth();
 
-	let isOpen = $state(false);
 	let commandOpen = $state(false);
 
 	beforeNavigate(() => (commandOpen = false));
@@ -74,7 +73,7 @@
 	</div>
 {:else}
 	<div class="h-screen">
-		<div class="flex h-[52px] w-full gap-4 max-w-screen flex-row items-center justify-between px-8">
+		<div class="flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
 			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
@@ -117,13 +116,7 @@
 				</a>
 			</div>
 		</div>
-		<div
-			class={[
-				'flex flex-col gap-6 border-l border-border p-8',
-				!isOpen && 'col-span-2',
-				isOpen && 'rounded-tl-md',
-			]}
-		>
+		<div class="flex flex-col gap-6 p-8">
 			{@render children?.()}
 		</div>
 	</div>
