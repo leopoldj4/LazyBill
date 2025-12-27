@@ -39,7 +39,6 @@ export const getFull = query({
 		}
 
 		return {
-			invoiceNumber: invoice.number,
 			invoice,
 			customer,
 			company,
@@ -61,7 +60,7 @@ export const createInvoice = mutation({
 			number: (customer.invoiceNumberCounter + 1).toString(),
 			date: today(),
 			dueInDays: 30,
-			articles: [],
+			articles: [{ name: '', price: 0 }],
 			notes: '',
 			state: 'draft',
 		});

@@ -23,7 +23,7 @@
 	import Table from '$lib/components/ui/table/table.svelte';
 	import { daysUntilDue } from '$lib/date';
 	import { InvoiceStateDetail } from '$lib/invoiceStatus';
-	import { ClockIcon } from '@lucide/svelte';
+	import { ClockIcon, EyeIcon, PencilIcon } from '@lucide/svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import MailIcon from '@lucide/svelte/icons/mail';
@@ -32,6 +32,9 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
+	import * as DropDownMenu from '$lib/components/ui/dropdown-menu';
+	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
+	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 
 	const client = useConvexClient();
 
@@ -81,7 +84,10 @@
 			query.data.invoices.some(
 				(invoice) => invoice.state != 'paid' && invoice.state != 'cancelled',
 			) &&
-			!(await ask('Archivieren', 'Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?'))
+			!(await ask(
+				'Archivieren',
+				'Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?',
+			))
 		) {
 			return;
 		}
@@ -279,8 +285,47 @@
 														>{InvoiceStateDetail[invoice.state].name}</span
 													>
 												</TableCell>
-											</TableRow></a
-										>
+												<TableCell>
+													<DropDownMenu.Root>
+														<DropDownMenu.Trigger
+															class={buttonVariants({ variant: 'ghost', size: 'icon' })}
+														>
+															<EllipsisVerticalIcon class="size-4" />
+														</DropDownMenu.Trigger>
+
+														<DropDownMenu.Content>
+															<DropDownMenu.Item
+																onSelect={() =>
+																	goto(
+																		`/app/customers/${data.customer._id}/invoices/${invoice._id}`,
+																	)}
+															>
+																<EyeIcon class="size-4" /> Anzeigen
+															</DropDownMenu.Item>
+															<DropDownMenu.Separator />
+															{@const deleteInvoice = action(async () => {
+																if (
+																	!(await ask(
+																		'Löschen',
+																		'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?',
+																	))
+																)
+																	return;
+																const invoiceNumber = invoice.number;
+																await client.mutation(api.invoices.deleteInvoice, {
+																	id: invoice._id,
+																});
+																toast.success(`Rechnung #${invoiceNumber} gelöscht`);
+															}, 'Fehler beim Löschen der Rechnung')}
+															<DropDownMenu.Item onclick={deleteInvoice.run}>
+																<TrashIcon class="size-4" />
+																Löschen
+															</DropDownMenu.Item>
+														</DropDownMenu.Content>
+													</DropDownMenu.Root>
+												</TableCell>
+											</TableRow>
+										</a>
 									{/each}
 								</TableBody>
 							</Table>

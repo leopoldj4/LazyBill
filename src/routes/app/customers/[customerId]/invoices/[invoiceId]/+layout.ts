@@ -1,0 +1,1 @@
+export const load = ({ params }) => ({ invoiceId: params.invoiceId });

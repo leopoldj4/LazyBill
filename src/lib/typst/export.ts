@@ -1,4 +1,4 @@
-export async function exportPDF(mainContent: string) {
+export async function exportPDF(mainContent: string, filename: string) {
     const { default: typst } = await import('$lib/typst');
     
     const pdfData = await typst.pdf({ mainContent });
@@ -12,8 +12,9 @@ export async function exportPDF(mainContent: string) {
     const link = document.createElement('a');
     link.href = blobUrl;
     link.target = '_blank';
-    link.download = 'invoice.pdf';
+    link.download = filename;
     link.click();
+    link.remove();
 
     URL.revokeObjectURL(blobUrl);
 }
