@@ -53,7 +53,7 @@
 	});
 </script>
 
-<div bind:this={preview} class="relative w-full border">
+<div bind:this={preview} class="relative w-full min-w-0 overflow-hidden border">
 	<div class="grid aspect-[1/1.414] w-full place-items-center">
 		<Spinner />
 	</div>

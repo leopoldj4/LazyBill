@@ -30,6 +30,12 @@
 	import { action } from '$lib/action.svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { ask } from '$lib/ask.svelte.js';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
+
+	export type Article = {
+		name: string;
+		price: number;
+	};
 
 	const client = useConvexClient();
 
@@ -48,11 +54,6 @@
 	let due = $state<number | null>(30);
 	let articles = $state<Article[]>([{ name: '', price: 0 }]);
 	let notes = $state<string>('');
-
-	type Article = {
-		name: string;
-		price: number;
-	};
 
 	let invoiceDate = $derived(query.data ? parseDate(query.data.invoice.date) : undefined);
 
@@ -79,7 +80,7 @@
 		cancelled: 'text-gray-500',
 	};
 
-	let editing = $state(false);
+	let editing = $state(true);
 
 	let typstDocument = $derived(() => {
 		if (!query.data) return '';
@@ -100,7 +101,8 @@
 	}
 
 	let deleteInvoice = action(async () => {
-		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?'))) return;
+		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?')))
+			return;
 		const invoiceNumber = query.data!.invoiceNumber;
 		await client.mutation(api.invoices.deleteInvoice, {
 			id: data.invoiceId as Id<'invoices'>,
@@ -118,7 +120,7 @@
 			</div>
 		{:else}
 			{@const { customer } = data}
-			<div class="grid grid-cols-2 gap-12">
+			<div class="grid gap-12 lg:grid-cols-2">
 				<div class="flex flex-col gap-8">
 					<Breadcrumb.Root>
 						<Breadcrumb.List>
@@ -139,7 +141,7 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoiceNumber}</span></SiteHeader>
 
 					{#if editing}
-						<div class="grid grid-cols-2 gap-6">
+						<div class="grid gap-6 lg:grid-cols-2">
 							<DatePicker label="Rechnungsdatum" bind:value={invoiceDate} />
 							<div class="flex flex-col gap-3">
 								<Label>Fällig in</Label>
@@ -160,27 +162,44 @@
 
 						<h2 class="text-xl">Artikel</h2>
 
-						<div class="grid grid-cols-[min-content_1fr_100px] gap-4">
-							<div></div>
-							<p>Name</p>
-							<p>Preis</p>
-
+						<div class="flex flex-col gap-4">
 							{#each articles as article}
-								<Button
-									variant="ghost"
-									onclick={() => {
-										articles.splice(articles.indexOf(article), 1);
-									}}
+								<div
+									class="grid grid-cols-[min-content_1fr] gap-4 lg:grid-cols-[min-content_1fr_100px]"
 								>
-									<CircleMinusIcon color="gray" />
-								</Button>
-								<Input type="text" bind:value={article.name} placeholder="Artikelbeschreibung" />
-								<Input type="number" bind:value={article.price} />
+									<Button
+										variant="ghost"
+										onclick={() => {
+											articles.splice(articles.indexOf(article), 1);
+										}}
+									>
+										<CircleMinusIcon color="gray" />
+									</Button>
+									<Input
+										type="text"
+										bind:value={article.name}
+										placeholder="Artikelbeschreibung"
+										class="max-lg:hidden"
+									/>
+									<InputGroup.Root>
+										<InputGroup.Input type="number" bind:value={article.price} />
+										<InputGroup.Addon align="inline-end">
+											<InputGroup.Text>€</InputGroup.Text>
+										</InputGroup.Addon>
+									</InputGroup.Root>
+									<Input
+										type="text"
+										bind:value={article.name}
+										placeholder="Artikelbeschreibung"
+										class="col-span-2 lg:hidden"
+									/>
+								</div>
+								<Separator orientation="horizontal" class="col-span-2 lg:col-span-3" />
 							{/each}
 
 							<Button
 								variant="outline"
-								class="col-span-3"
+								class="col-span-2 lg:col-span-3"
 								onclick={() => {
 									articles.push({ name: '', price: 0 });
 								}}
