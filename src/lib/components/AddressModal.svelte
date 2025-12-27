@@ -8,17 +8,30 @@
 	import { PUBLIC_GOOGLE_MAPS_API_KEY } from '$env/static/public';
 	import { useConvexClient } from 'convex-svelte';
 	import { api } from '$convex/_generated/api';
-	import type { Id } from '$convex/_generated/dataModel';
+	import type { Doc, Id } from '$convex/_generated/dataModel';
 	import { action } from '$lib/action.svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import * as InputGroup from '$lib/components/ui/input-group';
+	import MapPinIcon from '@lucide/svelte/icons/map-pin';
+	import HouseIcon from '@lucide/svelte/icons/house';
+	import Building2Icon from '@lucide/svelte/icons/building-2';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import SearchIcon from '@lucide/svelte/icons/search';
+	import CheckIcon from '@lucide/svelte/icons/check';
 
 	let open = $state(false);
 
+	let street = $state('');
+	let zip = $state('');
+	let city = $state('');
+	let stateName = $state('');
+	let country = $state('');
+
 	type Props = {
-		customerId: Id<'customers'>;
+		customer: Doc<'customers'>;
 	};
 
-	let { customerId }: Props = $props();
+	let { customer }: Props = $props();
 
 	const requestParams = {
 		region: 'DE',
@@ -59,20 +72,32 @@
 		},
 	};
 
+	$effect(() => {
+		street = customer.invoiceStreet ?? '';
+		zip = customer.invoiceZip ?? '';
+		city = customer.invoiceCity ?? '';
+		stateName = customer.invoiceState ?? '';
+		country = customer.invoiceCountry ?? '';
+	});
+
 	const client = useConvexClient();
 
 	let autocomplete: PlaceAutocomplete | null = $state(null);
-	
+
 	$effect(() => {
 		if (autocomplete && open) {
 			const timeout = setTimeout(() => {
 				autocomplete?.focus();
 			}, 150);
 			return () => clearTimeout(timeout);
+		} else if (!open) {
+			enterManually = false;
 		}
 	});
-	
-	const update = action(async (response: PlaceResult) => {
+
+	const errorMessage = 'Fehler beim Aktualisieren der Adresse';
+
+	const updateAuto = action(async (response: PlaceResult) => {
 		function component(name: string) {
 			return (
 				response.addressComponents.find((component) => component.types.includes(name))?.longText ||
@@ -81,7 +106,7 @@
 		}
 
 		await client.mutation(api.customers.updateAddress, {
-			id: customerId,
+			id: customer._id,
 			country: component('country'),
 			state: component('administrative_area_level_1'),
 			city: component('locality'),
@@ -90,14 +115,31 @@
 		});
 
 		open = false;
-	}, 'Fehler beim Aktualisieren der Adresse');
+	}, errorMessage);
+
+	const updateManual = action(async (event: Event) => {
+		event.preventDefault();
+
+		await client.mutation(api.customers.updateAddress, {
+			id: customer._id,
+			country: country,
+			state: stateName,
+			city: city,
+			zip: zip,
+			street: street,
+		});
+
+		open = false;
+	}, errorMessage);
 
 	function onError(error: string) {
 		console.error(error);
 	}
+
+	let enterManually = $state(false);
 </script>
 
-<Dialog.Root {open} onOpenChange={(value) => (!update.isLoading && (open = value))}>
+<Dialog.Root {open} onOpenChange={(value) => !updateAuto.isLoading && (open = value)}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
 		<EditIcon class="h-4 w-4" />
 		Adresse bearbeiten
@@ -109,22 +151,67 @@
 				<Dialog.Title>Adresse bearbeiten</Dialog.Title>
 				<Dialog.Description>Bitte geben Sie die Adresse des Kunden ein.</Dialog.Description>
 			</Dialog.Header>
-			{#if update.isLoading}
+			{#if updateAuto.isLoading}
 				<div class="flex h-64 items-center justify-center">
-					<Spinner class="h-4 w-4 animate-spin" />
+					<Spinner />
 				</div>
+			{:else if enterManually}
+				<form onsubmit={updateManual.run} class="flex flex-col gap-4">
+					<InputGroup.Root>
+						<InputGroup.Addon>
+							<HouseIcon class="size-4" />
+						</InputGroup.Addon>
+						<InputGroup.Input type="text" placeholder="Straße" name="street" bind:value={street} disabled={updateManual.isLoading}/>
+					</InputGroup.Root>
+					<InputGroup.Root class="grid grid-cols-[min-content_0.3fr_min-content_1fr]">
+						<InputGroup.Addon>
+							<Building2Icon class="size-4" />
+						</InputGroup.Addon>
+						<InputGroup.Input type="text" placeholder="PLZ" name="zip" bind:value={zip} disabled={updateManual.isLoading}/>
+						<Separator orientation="vertical" />
+						<InputGroup.Input type="text" placeholder="Stadt" name="city" bind:value={city} disabled={updateManual.isLoading}/>
+					</InputGroup.Root>
+
+					<InputGroup.Root>
+						<InputGroup.Addon>
+							<MapPinIcon class="h-4 w-4" />
+						</InputGroup.Addon>
+						<InputGroup.Input
+							type="text"
+							placeholder="Bundesland"
+							name="state"
+							bind:value={stateName}
+							disabled={updateManual.isLoading}
+						/>
+						<Separator orientation="vertical" />
+						<InputGroup.Input type="text" placeholder="Land" name="country" bind:value={country} disabled={updateManual.isLoading}/>
+					</InputGroup.Root>
+					<div class="flex justify-end gap-2">
+						<Button variant="outline" onclick={() => (enterManually = false)} disabled={updateManual.isLoading}
+							><SearchIcon />Adresse suchen</Button
+						>
+						<Button type="submit">
+							{#if updateManual.isLoading}
+								<Spinner />
+							{:else}
+								<CheckIcon />
+							{/if}
+							Fertig
+						</Button>
+					</div>
+				</form>
 			{:else}
 				<PlaceAutocomplete
 					bind:this={autocomplete}
-					onResponse={update.run}
+					onResponse={updateAuto.run}
 					{onError}
 					{options}
 					{requestParams}
 					{PUBLIC_GOOGLE_MAPS_API_KEY}
 				/>
-				<Dialog.Footer>
-					<Button variant="outline" onclick={() => (open = false)}>Abbrechen</Button>
-				</Dialog.Footer>
+				<Button class="justify-self-start" onclick={() => (enterManually = true)}
+					>Manuelle Eingabe</Button
+				>
 			{/if}
 		</Dialog.Content>
 	</Dialog.Portal>

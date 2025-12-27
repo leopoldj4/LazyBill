@@ -83,6 +83,6 @@ export const deleteInvoice = mutation({
 	},
 	handler: async (ctx, args) => {
 		const invoice = await getInvoice(ctx, args.id);
-		await ctx.db.delete('invoices', args.id);
+		await ctx.db.delete('invoices', invoice._id);
 	}
 })

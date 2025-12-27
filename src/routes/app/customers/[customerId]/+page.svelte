@@ -220,7 +220,7 @@
 						{/if}{customer.invoiceCountry}
 					</CardContent>
 					<CardFooter>
-						<Address customerId={data.customer._id} />
+						<Address customer={data.customer} />
 					</CardFooter>
 				</Card>
 
