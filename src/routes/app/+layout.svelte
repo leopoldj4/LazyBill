@@ -94,7 +94,7 @@
 				onclick={() => (commandOpen = true)}
 				class="flex h-9 w-[90%] cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw] px-4"
 			>
-				<div class="w-[57px]"></div>
+				<div class="w-[57px] max-lg:hidden"></div>
 
 				<div class="flex items-center gap-2">
 					<SearchIcon class="size-4" />
