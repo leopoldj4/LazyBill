@@ -12,6 +12,7 @@
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
 	import { onMount } from 'svelte';
+	import Prompt from '$lib/components/Prompt.svelte';
 
 	const { children } = $props();
 	const auth = useAuth();
@@ -123,3 +124,4 @@
 {/if}
 
 <Toaster position="top-center" />
+<Prompt />

@@ -29,6 +29,7 @@
 	import { goto } from '$app/navigation';
 	import { action } from '$lib/action.svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
+	import { ask } from '$lib/ask.svelte.js';
 
 	const client = useConvexClient();
 
@@ -99,7 +100,7 @@
 	}
 
 	let deleteInvoice = action(async () => {
-		if (!confirm('Sind Sie sicher, dass Sie diese Rechnung löschen möchten?')) return;
+		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?'))) return;
 		const invoiceNumber = query.data!.invoiceNumber;
 		await client.mutation(api.invoices.deleteInvoice, {
 			id: data.invoiceId as Id<'invoices'>,

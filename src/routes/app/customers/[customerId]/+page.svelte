@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
-	import { debounce, invoiceID } from '$lib';
+	import { debounce } from '$lib';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
@@ -30,6 +30,7 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { ClockIcon } from '@lucide/svelte';
 	import Address from '$lib/components/AddressModal.svelte';
+	import { ask } from '$lib/ask.svelte.js';
 
 	const client = useConvexClient();
 
@@ -59,7 +60,7 @@
 	}
 
 	let remove = action(async () => {
-		if (!confirm('Are you sure you want to remove this customer?')) return;
+		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?'))) return;
 		await client.mutation(api.customers.remove, { id: data.customerId as Id<'customers'> });
 		await goto('/app/customers');
 		toast.success('Kunde erfolgreich gelöscht');
@@ -79,7 +80,7 @@
 			query.data.invoices.some(
 				(invoice) => invoice.state != 'paid' && invoice.state != 'cancelled',
 			) &&
-			!confirm('Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?')
+			!(await ask('Archivieren', 'Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?'))
 		) {
 			return;
 		}
