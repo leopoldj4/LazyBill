@@ -79,8 +79,8 @@
 		<Spinner />
 	</div>
 {:else}
-	<div class="h-screen">
-		<div class="flex h-[52px] sticky top-0 z-30 bg-white w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
+	<div class="min-h-screen h-full">
+		<div class="flex h-[52px] fixed top-0 z-30 bg-white w-full max-w-screen flex-row items-center justify-between gap-4 px-8">
 			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
@@ -123,7 +123,7 @@
 				</a>
 			</div>
 		</div>
-		<div class="flex flex-col gap-6 p-8">
+		<div class="flex flex-col gap-6 p-8 mt-[52px]">
 			{@render children?.()}
 		</div>
 	</div>
