@@ -128,7 +128,7 @@
 				{/if}
 			</div>
 
-			<ButtonGroup.Root>
+			<ButtonGroup.Root class="flex-wrap">
 				<ButtonGroup.Root>
 					<Button variant="outline" onclick={newInvoice.run}>
 						{#if newInvoice.isLoading}

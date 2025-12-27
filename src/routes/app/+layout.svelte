@@ -4,7 +4,7 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import { BuildingIcon, SearchIcon } from '@lucide/svelte';
+	import { BuildingIcon, LogOutIcon, SearchIcon, SettingsIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
@@ -84,41 +84,49 @@
 
 				<button
 					onclick={() => (commandOpen = true)}
-					class="flex h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600"
+					class=" hidden h-9 w-full max-w-lg min-w-[15vw] shrink-0 cursor-text items-center justify-center gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:flex"
 				>
 					Quick Switcher
 					<SearchIcon class="size-4" />
 				</button>
 			</header>
 			<div class="flex items-center justify-between">
-				{#if status.isWebSocketConnected}
-					<div
-						class="mr-4 flex animate-fade-out items-center gap-2 text-sm text-gray-600 ease-in fill-mode-forwards"
-					>
-						<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
-						Verbunden
-					</div>
-				{:else if status.hasEverConnected}
-					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
-						<div class="size-2 rounded-full bg-red-500"></div>
-						Getrennt
-					</div>
-				{:else}
-					<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+				<div class="hidden lg:block">
+					{#if status.isWebSocketConnected}
 						<div
-							class="size-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
-						></div>
-						Verbinden...
-					</div>
-				{/if}
-				<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>Einstellungen</a>
+							class="mr-4 flex animate-fade-out items-center gap-2 text-sm text-gray-600 ease-in fill-mode-forwards"
+						>
+							<div class="size-2 animate-pulse rounded-full bg-green-500"></div>
+							Verbunden
+						</div>
+					{:else if status.hasEverConnected}
+						<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+							<div class="size-2 rounded-full bg-red-500"></div>
+							Getrennt
+						</div>
+					{:else}
+						<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">
+							<div
+								class="size-2 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
+							></div>
+							Verbinden...
+						</div>
+					{/if}
+				</div>
+				<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>
+					<SettingsIcon class="size-4" />
+					<span class="hidden lg:block">Einstellungen</span>
+				</a>
 				<Button
 					variant="ghost"
 					onclick={async () => {
 						authClient.signOut();
 						await goto('/login');
-					}}>Abmelden</Button
+					}}
 				>
+					<LogOutIcon class="size-4" />
+					<span class="hidden lg:block">Abmelden</span>
+				</Button>
 			</div>
 		</div>
 		<div

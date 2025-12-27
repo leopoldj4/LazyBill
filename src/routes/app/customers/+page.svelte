@@ -23,6 +23,7 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import { action } from '$lib/action.svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
+	import * as Card from '$lib/components/ui/card';
 
 	let search = $state('');
 
@@ -74,27 +75,12 @@
 	>
 </ButtonGroup>
 
-<ButtonGroup>
-	<ButtonGroup>
-		<InputGroup.Root class="w-sm">
-			<InputGroup.Input disabled placeholder="Search..." bind:value={search} />
-			<InputGroup.Addon>
-				<SearchIcon />
-			</InputGroup.Addon>
-		</InputGroup.Root>
-	</ButtonGroup>
-	<ButtonGroup>
-		<Button
-			variant={showArchived ? 'default' : 'outline'}
-			onclick={() => {
-				showArchived = !showArchived;
-			}}
-		>
-			<ArchiveIcon />
-			Archivierte anzeigen
-		</Button>
-	</ButtonGroup>
-</ButtonGroup>
+<InputGroup.Root class="hidden w-sm lg:block">
+	<InputGroup.Input disabled placeholder="Search..." bind:value={search} />
+	<InputGroup.Addon>
+		<SearchIcon />
+	</InputGroup.Addon>
+</InputGroup.Root>
 
 <Suspense {query} class="h-[60vh]">
 	{#snippet children(customers)}
@@ -104,7 +90,19 @@
 				<Button onclick={resetFilters}>Filter zurücksetzen</Button>
 			</div>
 		{:else}
-			<Table>
+			<div class="flex flex-col gap-2 lg:hidden">
+				{#each customers as customer}
+					<a href={`/app/customers/${customer._id}`} class="contents">
+						<Card.Root>
+							<Card.Header>
+								<Card.Title>{customer.name}</Card.Title>
+							</Card.Header>
+
+						</Card.Root>
+					</a>
+				{/each}
+			</div>
+			<Table class="hidden lg:table">
 				<TableHeader>
 					<TableRow>
 						<TableHead>Name</TableHead>
@@ -138,6 +136,16 @@
 		{/if}
 	{/snippet}
 </Suspense>
+
+<Button
+	variant={showArchived ? 'default' : 'outline'}
+	onclick={() => {
+		showArchived = !showArchived;
+	}}
+>
+	<ArchiveIcon />
+	Archivierte anzeigen
+</Button>
 
 <Dialog.Root
 	open={newCustomerOpen}
