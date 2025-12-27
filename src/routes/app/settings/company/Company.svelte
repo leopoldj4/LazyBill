@@ -1,14 +1,14 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api.js';
 	import type { Doc } from '$convex/_generated/dataModel';
 	import { debounce as debounceFn } from '$lib';
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import { api } from '$convex/_generated/api.js';
+	import { authClient } from '$lib/auth-client';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import { useConvexClient } from 'convex-svelte';
 	import Row from './Row.svelte';
 	import Section from './Section.svelte';
-
 	const client = useConvexClient();
 
 	type Props = {
@@ -94,29 +94,41 @@
 	</Section>
 
 	<Section title="Adresse">
-			<Row label="Straße" bind:value={street} />
+		<Row label="Straße" bind:value={street} />
 
-			<Row label="PLZ" bind:value={zip} />
+		<Row label="PLZ" bind:value={zip} />
 
-			<Row label="Stadt" bind:value={city} />
+		<Row label="Stadt" bind:value={city} />
 
-			<Row label="Bundesland" bind:value={stateValue} />
+		<Row label="Bundesland" bind:value={stateValue} />
 
-			<Row label="Land" bind:value={country} />
+		<Row label="Land" bind:value={country} />
 	</Section>
 
 	<Section title="Bankdaten">
-			<Row label="Vertreter" bind:value={representative} />
+		<Row label="Vertreter" bind:value={representative} />
 
-			<Row label="Bankname" bind:value={bankName} />
+		<Row label="Bankname" bind:value={bankName} />
 
-			<Row label="IBAN" bind:value={bankIban} />
+		<Row label="IBAN" bind:value={bankIban} />
 
-			<Row label="BIC" bind:value={bankBic} />
+		<Row label="BIC" bind:value={bankBic} />
 	</Section>
 
 	<Section title="Steuerliche Angaben">
-			<Row label="Steuer-Nr." bind:value={taxNumber} />
-			<Row label="Kleinunternehmer" bind:value={smallBusiness} checkbox />
+		<Row label="Steuer-Nr." bind:value={taxNumber} />
+		<Row label="Kleinunternehmer" bind:value={smallBusiness} checkbox />
 	</Section>
 </div>
+
+<Button
+	variant="link"
+	class="mt-12"
+	onclick={async () => {
+		authClient.signOut();
+		await goto('/login');
+	}}
+>
+	<LogOutIcon class="size-4" />
+	Abmelden
+</Button>

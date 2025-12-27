@@ -1,18 +1,17 @@
 <script lang="ts">
+	import { beforeNavigate } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
-	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import { BuildingIcon, LogOutIcon, SearchIcon, SettingsIcon } from '@lucide/svelte';
+	import { BuildingIcon, SearchIcon, SettingsIcon } from '@lucide/svelte';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
 	import { onMount } from 'svelte';
-	import { Toaster } from '$lib/components/ui/sonner/index.js';
-	import { authClient } from '$lib/auth-client';
-	import { beforeNavigate, goto } from '$app/navigation';
 
 	const { children } = $props();
 	const auth = useAuth();
@@ -117,16 +116,6 @@
 					<SettingsIcon class="size-4" />
 					<span class="hidden lg:block">Einstellungen</span>
 				</a>
-				<Button
-					variant="ghost"
-					onclick={async () => {
-						authClient.signOut();
-						await goto('/login');
-					}}
-				>
-					<LogOutIcon class="size-4" />
-					<span class="hidden lg:block">Abmelden</span>
-				</Button>
 			</div>
 		</div>
 		<div
