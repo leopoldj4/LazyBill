@@ -49,7 +49,9 @@
 		return unsubscribe;
 	});
 
-	const query = useQuery(api.customers.list, () => (auth.isAuthenticated ? {} : 'skip'));
+	const query = useQuery(api.customers.list, () =>
+		auth.isAuthenticated ? { archived: false } : 'skip',
+	);
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
