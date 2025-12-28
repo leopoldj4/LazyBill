@@ -2,6 +2,7 @@
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
+	import BetaBadge from '$lib/components/BetaBadge.svelte';
 	import Prompt from '$lib/components/Prompt.svelte';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Command from '$lib/components/ui/command';
@@ -88,7 +89,7 @@
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="LazyBill Logo" class="-mt-3 size-8" />
 					<div class="font-display text-xl max-lg:hidden">LazyBill</div>
-					<div class="rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-primary-foreground ml-2">Beta</div>
+					<BetaBadge />
 				</a>
 			</header>
 			<button
