@@ -83,54 +83,18 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoice.number}</span></SiteHeader
 					>
 
-					<div class="flex flex-row flex-wrap gap-2">
-						<Button variant="outline" onclick={downloadPdf.run}>
-							{#if downloadPdf.isLoading}
-								<Spinner class="size-4" />
-							{:else}
-								<FileDownIcon class="size-4" />
-							{/if}
-							PDF herunterladen
+					<div class="flex flex-row gap-2">
+						<Button
+							variant="outline"
+							href="/app/customers/{data.customer._id}/invoices/{data.invoice._id}/edit"
+						>
+							<LeftArrowIcon class="size-4" />
+							Bearbeiten
 						</Button>
-						<Popover.Root>
-							<Popover.Trigger class={buttonVariants({ variant: 'default' })}>
-								<MailIcon class="size-4" />
-								E-Mail versenden
-							</Popover.Trigger>
-							<Popover.Content class="flex flex-col gap-3" align="start">
-								<h2 class="text-lg">E-Mail versenden</h2>
-								<p class="text-sm text-gray-500">
-									LazyBill wird die Rechnung in ihrem Namen an die folgende E-Mail-Adresse senden:
-								</p>
-								<Label for="email">E-Mail-Adresse</Label>
-								<InputGroup.Root>
-									<InputGroup.Input
-										type="email"
-										id="email"
-										placeholder="E-Mail-Adresse"
-										bind:value={enteredEmail}
-									/>
-									{#if enteredEmail !== data.customer.email}
-										<InputGroup.Addon align="inline-end">
-											<InputGroup.Button
-												variant="outline"
-												onclick={() => {
-													enteredEmail = data.customer.email;
-												}}
-											>
-												<UserStarIcon class="size-4" />
-											</InputGroup.Button>
-										</InputGroup.Addon>
-									{/if}
-								</InputGroup.Root>
-								<div class="flex flex-row gap-2">
-									<Button variant="default">
-										<SendIcon class="size-4" />
-										Für mich senden
-									</Button>
-								</div>
-							</Popover.Content>
-						</Popover.Root>
+						<Button>
+							<RightArrowIcon class="size-4" />
+							Versendet
+						</Button>
 					</div>
 
 					<h2>Zusammenfassung</h2>
@@ -182,18 +146,54 @@
 						</Table.Body>
 					</Table.Root>
 
-					<div class="flex flex-row gap-2">
-						<Button
-							variant="outline"
-							href="/app/customers/{data.customer._id}/invoices/{data.invoice._id}/edit"
-						>
-							<LeftArrowIcon class="size-4" />
-							Bearbeiten
+					<div class="flex flex-row flex-wrap gap-2">
+						<Button variant="outline" onclick={downloadPdf.run}>
+							{#if downloadPdf.isLoading}
+								<Spinner class="size-4" />
+							{:else}
+								<FileDownIcon class="size-4" />
+							{/if}
+							PDF herunterladen
 						</Button>
-						<Button>
-							<RightArrowIcon class="size-4" />
-							Versendet
-						</Button>
+						<Popover.Root>
+							<Popover.Trigger class={buttonVariants({ variant: 'default' })}>
+								<MailIcon class="size-4" />
+								E-Mail versenden
+							</Popover.Trigger>
+							<Popover.Content class="flex flex-col gap-3" align="start">
+								<h2 class="text-lg">E-Mail versenden</h2>
+								<p class="text-sm text-gray-500">
+									LazyBill wird die Rechnung in ihrem Namen an die folgende E-Mail-Adresse senden:
+								</p>
+								<Label for="email">E-Mail-Adresse</Label>
+								<InputGroup.Root>
+									<InputGroup.Input
+										type="email"
+										id="email"
+										placeholder="E-Mail-Adresse"
+										bind:value={enteredEmail}
+									/>
+									{#if enteredEmail !== data.customer.email}
+										<InputGroup.Addon align="inline-end">
+											<InputGroup.Button
+												variant="outline"
+												onclick={() => {
+													enteredEmail = data.customer.email;
+												}}
+											>
+												<UserStarIcon class="size-4" />
+											</InputGroup.Button>
+										</InputGroup.Addon>
+									{/if}
+								</InputGroup.Root>
+								<div class="flex flex-row gap-2">
+									<Button variant="default">
+										<SendIcon class="size-4" />
+										Für mich senden
+									</Button>
+								</div>
+							</Popover.Content>
+						</Popover.Root>
 					</div>
 				</div>
 				<Preview
