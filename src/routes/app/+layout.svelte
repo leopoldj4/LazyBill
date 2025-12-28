@@ -88,11 +88,12 @@
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
 					<img src={Logo} alt="LazyBill Logo" class="-mt-3 size-8" />
 					<div class="font-display text-xl max-lg:hidden">LazyBill</div>
+					<div class="rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-primary-foreground ml-2">Beta</div>
 				</a>
 			</header>
 			<button
 				onclick={() => (commandOpen = true)}
-				class="flex h-9 w-[90%] cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw] px-4"
+				class="flex h-9 w-[90%] cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 px-4 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw]"
 			>
 				<div class="w-[57px] max-lg:hidden"></div>
 
