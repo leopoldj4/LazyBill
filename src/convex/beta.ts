@@ -14,12 +14,3 @@ export const isBetaUser = query({
         return betaUser !== null;
     }
 });
-
-export const addBetaUser = mutation({
-    args: {
-        email: v.string(),
-    },
-    handler: async (ctx, args) => {
-        await ctx.db.insert('betaUsers', { email: args.email });
-    }
-});

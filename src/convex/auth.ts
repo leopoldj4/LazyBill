@@ -88,3 +88,11 @@ export const getCurrentUser = query({
 		}
 	},
 });
+
+export async function getUserId(ctx: GenericCtx<DataModel>) {
+	const identity = await ctx.auth.getUserIdentity();
+	if (!identity) {
+		throw new Error('User not authenticated');
+	}
+	return identity.subject;
+}

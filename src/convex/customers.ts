@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query, type QueryCtx } from './_generated/server';
-import { authComponent } from './auth';
+import { getUserId } from './auth';
 import type { Id } from './_generated/dataModel';
 import { getCompany } from './companies';
 
@@ -13,9 +13,9 @@ export async function getCustomer(ctx: QueryCtx, id: Id<'customers'>) {
 }
 
 export async function getCustomerSafe(ctx: QueryCtx, id: Id<'customers'>) {
-	const user = await authComponent.getAuthUser(ctx);
+	const userId = await getUserId(ctx);
 	const customer = await ctx.db.get(id);
-	if (!customer || customer.userId !== user._id) {
+	if (!customer || customer.userId !== userId) {
 		return null;
 	}
 	return customer;
@@ -26,9 +26,9 @@ export const list = query({
 		archived: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
+		const userId = await getUserId(ctx);
 
-		let query = ctx.db.query('customers').withIndex('by_userId', (q) => q.eq('userId', user._id));
+		let query = ctx.db.query('customers').withIndex('by_userId', (q) => q.eq('userId', userId));
 		if (args.archived !== undefined) {
 			query = query.filter((q) => q.eq(q.field('isArchived'), args.archived));
 		}
@@ -69,7 +69,7 @@ export const create = mutation({
 		name: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const user = await authComponent.getAuthUser(ctx);
+		const userId = await getUserId(ctx);
 
 		const company = await getCompany(ctx);
 
@@ -85,7 +85,7 @@ export const create = mutation({
 			invoiceCity: '',
 			invoiceZip: '',
 			invoiceStreet: '',
-			userId: user._id,
+			userId: userId,
 			number: company.customerNumberCounter + 1,
 		});
 		

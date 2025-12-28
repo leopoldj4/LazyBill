@@ -1,5 +1,9 @@
 <script lang="ts">
 	import HeroImage from './Hero.jpg';
+	import { createSvelteAuthClient } from '@mmailaender/convex-better-auth-svelte/svelte';
+	import { authClient } from '$lib/auth-client';
+
+	createSvelteAuthClient({ authClient });
 </script>
 
 <div class="grid h-screen lg:grid-cols-[40%_60%]">

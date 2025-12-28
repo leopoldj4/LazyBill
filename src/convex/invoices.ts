@@ -4,14 +4,14 @@ import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
 import { today } from "$lib/date";
 import type { Id } from "./_generated/dataModel";
-import { authComponent } from "./auth";
 
 async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
-	const user = await authComponent.getAuthUser(ctx);
-	if (!user) {
+	const company = await getCompanySafe(ctx);
+	const invoice = await ctx.db.get(id);
+	if (!invoice || invoice.companyId !== company?._id) {
 		return null;
 	}
-	return await ctx.db.get(id);
+	return invoice;
 }
 
 async function getInvoice(ctx: QueryCtx, id: Id<'invoices'>) {

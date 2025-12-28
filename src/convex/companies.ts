@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query, type QueryCtx } from './_generated/server';
-import { authComponent } from './auth';
+import { getUserId } from './auth';
 
 export async function getCompany(ctx: QueryCtx) {
 	const company = await getCompanySafe(ctx);
@@ -11,10 +11,11 @@ export async function getCompany(ctx: QueryCtx) {
 }
 
 export async function getCompanySafe(ctx: QueryCtx) {
-	const user = await authComponent.getAuthUser(ctx);
+	const userId = await getUserId(ctx);
+
 	return await ctx.db
 		.query('companies')
-		.withIndex('by_userId', (q) => q.eq('userId', user._id))
+		.withIndex('by_userId', (q) => q.eq('userId', userId))
 		.first();
 }
 
