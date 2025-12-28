@@ -9,7 +9,9 @@
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import { BuildingIcon, Code, SearchIcon, SettingsIcon } from '@lucide/svelte';
+	import BuildingIcon from '@lucide/svelte/icons/building';
+	import SearchIcon from '@lucide/svelte/icons/search';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';

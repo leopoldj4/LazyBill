@@ -14,14 +14,7 @@
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
-	import {
-		Table,
-		TableBody,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow,
-	} from '$lib/components/ui/table';
+	import * as Table from '$lib/components/ui/table';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import SearchIcon from '@lucide/svelte/icons/search';
@@ -104,32 +97,32 @@
 					</a>
 				{/each}
 			</div>
-			<Table class="max-lg:hidden">
-				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Email</TableHead>
-						<TableHead>Invoice Address</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
+			<Table.Root class="max-lg:hidden">
+				<Table.TableHeader>
+					<Table.Row>
+						<Table.Head>Name</Table.Head>
+						<Table.Head>Email</Table.Head>
+						<Table.Head>Invoice Address</Table.Head>
+					</Table.Row>
+				</Table.TableHeader>
+				<Table.TableBody>
 					{#each customers as customer}
 						<a href={`/app/customers/${customer._id}`} class="contents">
-							<TableRow>
-								<TableCell>
+							<Table.TableRow>
+								<Table.TableCell>
 									{customer.name}
-								</TableCell>
-								<TableCell>{customer.email}</TableCell>
-								<TableCell>
+								</Table.TableCell>
+								<Table.TableCell>{customer.email}</Table.TableCell>
+								<Table.TableCell>
 									<div class="text-sm">
 										<Address address={fromCustomer(customer)} />
 									</div>
-								</TableCell>
-							</TableRow>
+								</Table.TableCell>
+							</Table.TableRow>
 						</a>
 					{/each}
-				</TableBody>
-			</Table>
+				</Table.TableBody>
+			</Table.Root>
 		{/if}
 	{/snippet}
 </Suspense>

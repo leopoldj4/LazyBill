@@ -23,7 +23,8 @@
 	import Table from '$lib/components/ui/table/table.svelte';
 	import { daysUntilDue } from '$lib/date';
 	import { InvoiceStateDetail } from '$lib/invoiceStatus';
-	import { ClockIcon, EyeIcon, PencilIcon } from '@lucide/svelte';
+	import ClockIcon from '@lucide/svelte/icons/clock';
+	import EyeIcon from '@lucide/svelte/icons/eye';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import MailIcon from '@lucide/svelte/icons/mail';

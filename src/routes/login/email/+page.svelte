@@ -4,14 +4,18 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import { authClient } from '$lib/auth-client';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	let email = $state('');
 	let password = $state('');
 
 	let error = $state('');
+	let loading = $state(false);
 
 	async function login(e: Event) {
 		e.preventDefault();
+
+		loading = true;
 
 		const { error: loginError } = await authClient.signIn.email({
 			email: email,
@@ -22,6 +26,8 @@
 		if (loginError) {
 			error = loginError.message || 'An unknown error occurred';
 		}
+
+		loading = false;
 	}
 </script>
 
@@ -47,7 +53,13 @@
 		<p class="text-red-500">{error}</p>
 	{/if}
 
-	<Button type="submit" class="mt-4 w-full">Login</Button>
+	<Button type="submit" class="mt-4 w-full" disabled={loading}>
+		{#if loading}
+			<Spinner class="size-4" />
+		{:else}
+			Login
+		{/if}
+	</Button>
 
 	<div class="mt-4 text-center">
 		Don't have an account?

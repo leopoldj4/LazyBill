@@ -8,7 +8,6 @@
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import * as Card from '$lib/components/ui/card';
 	import * as InputGroup from '$lib/components/ui/input-group';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Popover from '$lib/components/ui/popover';
@@ -17,9 +16,12 @@
 	import { parseDate } from '$lib/date';
 	import { exportPDF } from '$lib/typst/export';
 	import { invoiceTemplate } from '$lib/typst/invoice.js';
-	import { FileDownIcon, MailIcon, SendIcon, UserStarIcon } from '@lucide/svelte';
 	import LeftArrowIcon from '@lucide/svelte/icons/arrow-left';
 	import RightArrowIcon from '@lucide/svelte/icons/arrow-right';
+	import FileDownIcon from '@lucide/svelte/icons/file-down';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import SendIcon from '@lucide/svelte/icons/send';
+	import UserStarIcon from '@lucide/svelte/icons/user-star';
 	import { useQuery } from 'convex-svelte';
 
 	let { data } = $props();
