@@ -64,4 +64,8 @@ const companies = defineTable({
 	customerNumberCounter: v.number(),
 }).index('by_userId', ['userId']);
 
-export default defineSchema({ customers, invoices, companies });
+const betaUsers = defineTable({
+	email: v.string(),
+});
+
+export default defineSchema({ customers, invoices, companies, betaUsers });

@@ -1,7 +1,7 @@
 import { createClient, type GenericCtx } from '@convex-dev/better-auth';
 import { convex } from '@convex-dev/better-auth/plugins';
 import { v } from 'convex/values';
-import { components, internal } from './_generated/api';
+import { api, components, internal } from './_generated/api';
 import type { DataModel } from './_generated/dataModel';
 import { internalMutation, query } from './_generated/server';
 import { betterAuth } from 'better-auth/minimal';
@@ -55,6 +55,14 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 		databaseHooks: {
 			user: {
 				create: {
+					before: async (user) => {
+						const isBetaUser = await ctx.runQuery(api.beta.isBetaUser, {
+							email: user.email,
+						});
+						if (!isBetaUser) {
+							throw new Error('You are not a beta user. Please contact us to get access.');
+						}
+					},
 					after: async (user) => {
 						if ('runMutation' in ctx) {
 							await ctx.runMutation(internal.auth.createCompanyForUser, {
