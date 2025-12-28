@@ -86,8 +86,8 @@
 		>
 			<header class="flex shrink-0 items-center gap-2">
 				<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
-					<img src={Logo} alt="Watchtower Logo" class="-mt-3 size-8" />
-					<div class="font-display text-xl max-lg:hidden">Watchtower</div>
+					<img src={Logo} alt="LazyBill Logo" class="-mt-3 size-8" />
+					<div class="font-display text-xl max-lg:hidden">LazyBill</div>
 				</a>
 			</header>
 			<button

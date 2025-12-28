@@ -1,6 +1,6 @@
 {
-    "name": "Watchtower",
-    "short_name": "Watchtower",
+    "name": "LazyBill",
+    "short_name": "LazyBill",
     "description": "Manage your business with ease",
     "start_url": "/",
     "display": "minimal-ui",

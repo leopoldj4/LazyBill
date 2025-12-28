@@ -4,7 +4,7 @@
 	import { authClient } from '$lib/auth-client';
 </script>
 
-<h1 class="font-display text-5xl">Watchtower</h1>
+<h1 class="font-display text-5xl">LazyBill</h1>
 
 <div class="flex w-full max-w-xs flex-col gap-4">
 	<a
