@@ -98,7 +98,7 @@
 							<Popover.Content class="flex flex-col gap-3" align="start">
 								<h2 class="text-lg">E-Mail versenden</h2>
 								<p class="text-sm text-gray-500">
-									Watchtower wird die Rechnung in ihrem Namen an die folgende E-Mail-Adresse senden:
+									LazyBill wird die Rechnung in ihrem Namen an die folgende E-Mail-Adresse senden:
 								</p>
 								<Label for="email">E-Mail-Adresse</Label>
 								<InputGroup.Root>

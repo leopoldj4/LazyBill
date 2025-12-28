@@ -14,7 +14,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Watchtower</title>
+	<title>LazyBill</title>
 	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
