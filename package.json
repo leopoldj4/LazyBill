@@ -52,6 +52,7 @@
 		"mode-watcher": "^1.1.0",
 		"places-autocomplete-svelte": "^2.2.20",
 		"posthog-js": "^1.310.1",
+		"resend": "^6.6.0",
 		"svelte-check": "^4.3.5",
 		"zod": "^4.1.5"
 	}
