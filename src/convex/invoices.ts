@@ -82,3 +82,16 @@ export const deleteInvoice = mutation({
 		await ctx.db.delete('invoices', invoice._id);
 	}
 })
+
+export const updateInvoiceState = mutation({
+	args: {
+		id: v.id('invoices'),
+		state: v.union(v.literal('draft'), v.literal('finalized'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
+	},
+	handler: async (ctx, args) => {
+		const invoice = await getInvoice(ctx, args.id);
+		await ctx.db.patch('invoices', invoice._id, {
+			state: args.state,
+		});
+	}
+})

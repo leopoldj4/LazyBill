@@ -12,6 +12,7 @@
 	let { typstDocument, rerender = $bindable() }: Props = $props();
 
 	let preview: HTMLDivElement | null = $state(null);
+	let error: Error | null = $state(null);
 	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	if (rerender) {
@@ -19,9 +20,14 @@
 	}
 
 	async function render(doc: string) {
-		const svg = await typst.svg({ mainContent: doc });
-		preview!.innerHTML = svg;
-		resize();
+		try {
+			const svg = await typst.svg({ mainContent: doc });
+			preview!.innerHTML = svg;
+			resize();
+		} catch (e) {
+			console.log(doc);
+			error = e as Error;
+		}
 	}
 
 	function resize() {
@@ -53,8 +59,14 @@
 	});
 </script>
 
-<div bind:this={preview} class="relative w-full min-w-0 overflow-hidden border">
-	<div class="grid aspect-[1/1.414] w-full place-items-center">
-		<Spinner />
+{#if error}
+	<div class="relative w-full min-w-0 overflow-hidden border">
+		<p>{error.toString()}</p>
 	</div>
-</div>
+{:else}
+	<div bind:this={preview} class="relative w-full min-w-0 overflow-hidden border">
+		<div class="grid aspect-[1/1.414] w-full place-items-center">
+			<Spinner />
+		</div>
+	</div>
+{/if}

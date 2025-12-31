@@ -47,6 +47,20 @@ export const update = mutation({
 	},
 });
 
+export const updateField = mutation({
+	args: {
+		field: v.string(),
+		value: v.union(v.string(), v.boolean()),
+	},
+	handler: async (ctx, args) => {
+		const company = await getCompany(ctx);
+		if (!['name', 'phone', 'street', 'zip', 'city', 'state', 'country', 'representative', 'bankName', 'bankIban', 'bankBic', 'smallBusiness', 'taxNumber'].includes(args.field)) {
+			throw new Error('Invalid field');
+		}
+		await ctx.db.patch('companies', company._id, { [args.field]: args.value });
+	},
+});
+
 export const updateAddress = mutation({
 	args: {
 		street: v.string(),

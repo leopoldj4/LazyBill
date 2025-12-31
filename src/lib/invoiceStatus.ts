@@ -4,7 +4,7 @@ import TrashIcon from "@lucide/svelte/icons/trash";
 import PencilIcon from "@lucide/svelte/icons/pencil";
 import FileCheckIcon from "@lucide/svelte/icons/file-check";
 
-enum InvoiceState {
+export enum InvoiceState {
     DRAFT = 'draft',
     FINALIZED = 'finalized',
     SENT = 'sent',

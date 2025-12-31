@@ -20,33 +20,12 @@
 	};
 
 	let { company }: Props = $props();
-
-	const store = createDebouncedStore<CompanyData>(
-		extractCompanyData(company),
-		async (values) => {
-			await client.mutation(api.companies.update, values);
-		},
-		() => {
-			// Reload from the company prop
-			store.setWithoutSave(extractCompanyData(company));
-		},
-	);
-
-	let isInitialMount = true;
-	$effect(() => {
-		company;
-		if (isInitialMount) {
-			isInitialMount = false;
-			return;
-		}
-		store.reload();
-	});
 </script>
 
 <div class="my-12 flex flex-col gap-20">
 	<Section title="Basisdaten">
-		<Row label="Name" bind:value={store.value.name} />
-		<Row label="Telefon" bind:value={store.value.phone} />
+		<Row label="Name" key="name" value={company.name} placeholder="Test GmbH" />
+		<Row label="Telefon" key="phone" value={company.phone} placeholder="+49 123 4567890" />
 	</Section>
 
 	<Section title="Adresse">
@@ -62,18 +41,28 @@
 	</Section>
 
 	<Section title="Bankdaten">
-		<Row label="Vertreter" bind:value={store.value.representative} />
+		<Row
+			label="Vertreter"
+			key="representative"
+			value={company.representative}
+			placeholder="Max Mustermann"
+		/>
 
-		<Row label="Bankname" bind:value={store.value.bankName} />
+		<Row label="Bankname" key="bankName" value={company.bankName} placeholder="Deutsche Bank" />
 
-		<Row label="IBAN" bind:value={store.value.bankIban} />
+		<Row
+			label="IBAN"
+			key="bankIban"
+			value={company.bankIban}
+			placeholder="DE12345678901234567890"
+		/>
 
-		<Row label="BIC" bind:value={store.value.bankBic} />
+		<Row label="BIC" key="bankBic" value={company.bankBic} placeholder="DEUTDEDB123" />
 	</Section>
 
 	<Section title="Steuerliche Angaben">
-		<Row label="Steuer-Nr." bind:value={store.value.taxNumber} />
-		<Row label="Kleinunternehmer" bind:value={store.value.smallBusiness} checkbox />
+		<Row label="Steuer-Nr." key="taxNumber" value={company.taxNumber} placeholder="1234567890" />
+		<Row label="Kleinunternehmer" key="smallBusiness" value={company.smallBusiness} checkbox />
 	</Section>
 </div>
 

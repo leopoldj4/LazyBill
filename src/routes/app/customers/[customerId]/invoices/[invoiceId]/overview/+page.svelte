@@ -11,6 +11,7 @@
 	import * as InputGroup from '$lib/components/ui/input-group';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Popover from '$lib/components/ui/popover';
+	import * as Select from '$lib/components/ui/select';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import * as Table from '$lib/components/ui/table';
 	import { parseDate } from '$lib/date';
@@ -22,8 +23,8 @@
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import SendIcon from '@lucide/svelte/icons/send';
 	import UserStarIcon from '@lucide/svelte/icons/user-star';
-	import { useQuery } from 'convex-svelte';
-
+	import { useConvexClient, useQuery } from 'convex-svelte';
+	import { InvoiceState, InvoiceStateDetail } from '$lib/invoiceStatus';
 	let { data } = $props();
 
 	const query = useQuery(api.invoices.getFull, () => ({
@@ -53,6 +54,16 @@
 	}, 'Fehler beim Herunterladen der Rechnung');
 
 	let enteredEmail = $derived(query.data?.customer.email || '');
+
+	const client = useConvexClient();
+
+	const updateInvoiceState = action(async (state: InvoiceState) => {
+		if (!query.data) return;
+		await client.mutation(api.invoices.updateInvoiceState, {
+			id: data.invoiceId as Id<'invoices'>,
+			state,
+		});
+	}, 'Fehler beim Aktualisieren des Status');
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -83,21 +94,32 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoice.number}</span></SiteHeader
 					>
 
-					<div class="flex flex-row gap-2">
-						<Button
-							variant="outline"
-							href="/app/customers/{data.customer._id}/invoices/{data.invoice._id}/edit"
-						>
-							<LeftArrowIcon class="size-4" />
-							Bearbeiten
-						</Button>
-						<Button>
-							<RightArrowIcon class="size-4" />
-							Versendet
-						</Button>
-					</div>
+					<Select.Root
+						type="single"
+						bind:value={data.invoice.state as InvoiceState}
+						onValueChange={(value) => updateInvoiceState.run(value as InvoiceState)}
+					>
+						<Select.Trigger>
+							{#if updateInvoiceState.isLoading}
+								<Spinner class="size-4" />
+							{:else}
+								{@const Icon = InvoiceStateDetail[data.invoice.state].icon}
+								<Icon class="size-4 {InvoiceStateDetail[data.invoice.state].textColor}" />
+							{/if}
+							{InvoiceStateDetail[data.invoice.state].name}
+						</Select.Trigger>
+						<Select.Content align="start">
+							{#each Object.values(InvoiceState) as state}
+								<Select.Item value={state}>
+									{@const Icon = InvoiceStateDetail[state].icon}
+									<Icon class="size-4 {InvoiceStateDetail[state].textColor}" />
+									{InvoiceStateDetail[state].name}
+								</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 
-					<h2>Zusammenfassung</h2>
+					<h3 class="text-xl">Zusammenfassung</h3>
 					<Table.Root>
 						<Table.Body>
 							<Table.Row>
@@ -119,7 +141,7 @@
 						</Table.Body>
 					</Table.Root>
 
-					<h3>Artikel</h3>
+					<h3 class="text-xl">Artikel</h3>
 					<Table.Root>
 						<Table.Header>
 							<Table.Row>
@@ -146,6 +168,7 @@
 						</Table.Body>
 					</Table.Root>
 
+					<h3 class="text-xl">Senden</h3>
 					<div class="flex flex-row flex-wrap gap-2">
 						<Button variant="outline" onclick={downloadPdf.run}>
 							{#if downloadPdf.isLoading}
@@ -153,12 +176,12 @@
 							{:else}
 								<FileDownIcon class="size-4" />
 							{/if}
-							PDF herunterladen
+							PDF
 						</Button>
 						<Popover.Root>
 							<Popover.Trigger class={buttonVariants({ variant: 'default' })}>
 								<MailIcon class="size-4" />
-								E-Mail versenden
+								E-Mail Senden
 							</Popover.Trigger>
 							<Popover.Content class="flex flex-col gap-3" align="start">
 								<h2 class="text-lg">E-Mail versenden</h2>

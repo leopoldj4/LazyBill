@@ -9,8 +9,7 @@
 </script>
 
 <Suspense {query}>
-	{#snippet children(data)}
-		{@const company = query.data!}
+	{#snippet children(company)}
 		<Breadcrumb.Root>
 			<Breadcrumb.List>
 				<Breadcrumb.Item>

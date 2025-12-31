@@ -22,3 +22,5 @@ export function action<T>(action: (args: T) => Promise<void>, errorMessage: stri
         run,
     };
 }
+
+export type Action<T> = ReturnType<typeof action<T>>;
