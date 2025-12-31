@@ -1,14 +1,15 @@
-import { createConvexHttpClient } from '@mmailaender/convex-better-auth-svelte/sveltekit';
-import { api } from '$convex/_generated/api';
+import { getAuthState } from '@mmailaender/convex-better-auth-svelte/sveltekit';
 import { redirect } from '@sveltejs/kit';
+import { createAuth } from '$convex/auth';
 
-export const load = async ({ locals }) => {
-	const client = createConvexHttpClient({ token: locals.token });
-	const currentUser = await client.query(api.auth.getCurrentUser, {});
-	if (!currentUser) {
-		throw redirect(307, '/login');
+export const load = async ({ cookies }) => {
+	const authState = await getAuthState(createAuth, cookies);
+
+	if (!authState.isAuthenticated) {
+		throw redirect(307, '/');
 	}
 	return {
-		currentUser,
+		authState,
 	};
 };
+
