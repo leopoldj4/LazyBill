@@ -1,0 +1,379 @@
+<script lang="ts">
+	import type { Doc } from '$convex/_generated/dataModel';
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api.js';
+	import type { Id } from '$convex/_generated/dataModel.js';
+	import { debounce } from '$lib';
+	import { action } from '$lib/action.svelte';
+	import { fromCustomer } from '$lib/address';
+	import { ask } from '$lib/ask.svelte.js';
+	import Address from '$lib/components/Address.svelte';
+	import AddressModal from '$lib/components/AddressModal.svelte';
+	import SiteHeader from '$lib/components/site-header.svelte';
+	import Suspense from '$lib/components/Suspense.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import TableBody from '$lib/components/ui/table/table-body.svelte';
+	import TableCell from '$lib/components/ui/table/table-cell.svelte';
+	import TableRow from '$lib/components/ui/table/table-row.svelte';
+	import Table from '$lib/components/ui/table/table.svelte';
+	import { daysUntilDue } from '$lib/date';
+	import { InvoiceStateDetail } from '$lib/invoiceStatus';
+	import ClockIcon from '@lucide/svelte/icons/clock';
+	import EyeIcon from '@lucide/svelte/icons/eye';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import CopyIcon from '@lucide/svelte/icons/copy';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import PhoneIcon from '@lucide/svelte/icons/phone';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import TrashIcon from '@lucide/svelte/icons/trash';
+	import { useConvexClient, useQuery } from 'convex-svelte';
+	import { toast } from 'svelte-sonner';
+	import * as DropDownMenu from '$lib/components/ui/dropdown-menu';
+	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
+	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import { CheckIcon } from '@lucide/svelte';
+
+	const client = useConvexClient();
+
+	type Props = {
+		customer: Doc<'customers'>;
+		invoices: Doc<'invoices'>[];
+	};
+
+	let { customer, invoices }: Props = $props();
+
+	async function updateValue(key: string, value: string) {
+		await client.mutation(api.customers.update, {
+			id: customer._id,
+			key,
+			value,
+		});
+	}
+
+	const updateEmail = action(
+		async (value: string) => updateValue('email', value),
+		'Fehler beim Aktualisieren der Email',
+	);
+	const updateNotes = action(
+		async (value: string) => updateValue('notes', value),
+		'Fehler beim Aktualisieren der Notizen',
+	);
+	const updatePhone = action(
+		async (value: string) => updateValue('phone', value),
+		'Fehler beim Aktualisieren des Telefons',
+	);
+
+	let email = $derived(customer.email);
+	let notes = $derived(customer.notes);
+	let phone = $derived(customer.phone);
+
+	function copyToast(value: string, description: string) {
+		navigator.clipboard.writeText(value);
+		toast(`${description} kopiert`, {
+			description: value,
+		});
+	}
+
+	let remove = action(async () => {
+		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?'))) return;
+		await client.mutation(api.customers.remove, { id: customer._id });
+		await goto('/app/customers');
+		toast.success('Kunde erfolgreich gelöscht');
+	}, 'Fehler beim Löschen des Kunden');
+
+	let newInvoice = action(async () => {
+		const invoiceId = await client.mutation(api.invoices.createInvoice, {
+			customerId: customer._id,
+		});
+		await goto(`/app/customers/${customer._id}/invoices/${invoiceId}`);
+	}, 'Fehler beim Erstellen der Rechnung');
+
+	let archive = action(async () => {
+		if (!customer.isArchived) return;
+		if (
+			invoices.some((invoice) => invoice.state != 'paid' && invoice.state != 'cancelled') &&
+			!(await ask(
+				'Archivieren',
+				'Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?',
+			))
+		) {
+			return;
+		}
+		await client.mutation(api.customers.setArchived, {
+			id: customer._id,
+			archived: !customer.isArchived,
+		});
+	}, 'Fehler beim Archivieren des Kunden');
+</script>
+
+<Breadcrumb.Root>
+	<Breadcrumb.List>
+		<Breadcrumb.Item>
+			<Breadcrumb.Link href="/app/customers">Kunden</Breadcrumb.Link>
+		</Breadcrumb.Item>
+		<Breadcrumb.Separator />
+		<Breadcrumb.Item>{customer.name}</Breadcrumb.Item>
+	</Breadcrumb.List>
+</Breadcrumb.Root>
+
+<SiteHeader>
+	{customer.name}
+	<div class="text-gray-500">#{customer.number}</div>
+</SiteHeader>
+
+<div class="flex gap-2">
+	{#if customer.isArchived}
+		<Badge variant="outline">
+			<ArchiveIcon class="size-4" />
+			Archiviert
+		</Badge>
+	{/if}
+	{#if invoices.some((invoice) => invoice.state != 'paid' && invoice.state != 'cancelled')}
+		<Badge variant="outline">
+			<ClockIcon class="size-4" />
+			Offene Rechnungen
+		</Badge>
+	{/if}
+</div>
+
+<ButtonGroup.Root class="flex-wrap">
+	<ButtonGroup.Root>
+		<Button variant="outline" onclick={newInvoice.run}>
+			{#if newInvoice.isLoading}
+				<Spinner />
+			{:else}
+				<PlusIcon class="size-4" />
+			{/if}
+			Rechnung erstellen
+		</Button>
+	</ButtonGroup.Root>
+	<ButtonGroup.Root>
+		<Button variant="outline" onclick={archive.run}>
+			{#if archive.isLoading}
+				<Spinner />
+			{:else}
+				<ArchiveIcon class="size-4" />
+			{/if}
+			{#if customer.isArchived}
+				Archiv entfernen
+			{:else}
+				Archivieren
+			{/if}
+		</Button>
+		<Button variant="outline" onclick={remove.run}>
+			{#if remove.isLoading}
+				<Spinner />
+			{:else}
+				<TrashIcon class="size-4 text-destructive" />
+			{/if}
+			Löschen
+		</Button>
+	</ButtonGroup.Root>
+</ButtonGroup.Root>
+
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+	<Card>
+		<CardHeader>
+			<CardTitle>Kontakt</CardTitle>
+		</CardHeader>
+
+		<CardContent class="flex flex-col gap-2">
+			<form
+				onsubmit={(ev) => {
+					ev.preventDefault();
+					updateEmail.run(email);
+				}}
+			>
+				<InputGroup.Root>
+					<InputGroup.Addon align="inline-start">
+						<MailIcon class="size-4" />
+					</InputGroup.Addon>
+					<InputGroup.Input bind:value={email} type="email" placeholder="Email" />
+					{#if email !== customer.email}
+						<InputGroup.Addon align="inline-end">
+							<InputGroup.Button variant="default" type="submit">
+								{#if updateEmail.isLoading}
+									<Spinner />
+								{:else}
+									<CheckIcon class="size-4" />
+								{/if}
+								Speichern
+							</InputGroup.Button>
+						</InputGroup.Addon>
+					{:else}
+						<InputGroup.Addon align="inline-end">
+							<InputGroup.Button onclick={() => copyToast(customer.email, 'Email')}>
+								<CopyIcon class="size-4" /> Kopieren
+							</InputGroup.Button>
+						</InputGroup.Addon>
+					{/if}
+				</InputGroup.Root>
+			</form>
+			<form
+				onsubmit={(ev) => {
+					ev.preventDefault();
+					updatePhone.run(phone);
+				}}
+			>
+				<InputGroup.Root>
+					<InputGroup.Addon align="inline-start">
+						<PhoneIcon class="size-4" />
+					</InputGroup.Addon>
+					<InputGroup.Input bind:value={phone} type="tel" placeholder="Telefon" />
+					{#if phone !== customer.phone}
+						<InputGroup.Addon align="inline-end">
+							<InputGroup.Button variant="default" type="submit">
+								{#if updatePhone.isLoading}
+									<Spinner />
+								{:else}
+									<CheckIcon class="size-4" />
+								{/if}
+								Speichern
+							</InputGroup.Button>
+						</InputGroup.Addon>
+					{:else}
+						<InputGroup.Addon align="inline-end">
+							<InputGroup.Button onclick={() => copyToast(customer.phone, 'Telefon')}>
+								<CopyIcon class="size-4" /> Kopieren
+							</InputGroup.Button>
+						</InputGroup.Addon>
+					{/if}
+				</InputGroup.Root>
+			</form>
+		</CardContent>
+	</Card>
+
+	<Card>
+		<CardHeader>
+			<CardTitle>Adresse</CardTitle>
+		</CardHeader>
+		<CardContent>
+			<Address address={fromCustomer(customer)} />
+		</CardContent>
+		<CardFooter>
+			<AddressModal
+				address={fromCustomer(customer)}
+				onSave={async (address) => {
+					await client.mutation(api.customers.updateAddress, {
+						id: customer._id,
+						...address,
+					});
+				}}
+			/>
+		</CardFooter>
+	</Card>
+
+	<Card>
+		<CardHeader>
+			<CardTitle class="flex items-center gap-3">
+				Notizen
+				<span class="text-xs text-gray-500"> Nur für Sie sichtbar. </span>
+			</CardTitle>
+		</CardHeader>
+		<CardContent>
+			<form
+				onsubmit={(ev) => {
+					ev.preventDefault();
+					updateNotes.run(notes);
+				}}
+			>
+				<textarea
+					class="field-sizing-content min-h-32 w-full border-none outline-none"
+					bind:value={notes}
+					placeholder="Notizen zum Kunden..."
+				></textarea>
+				{#if notes !== customer.notes}
+					<Button variant="default" type="submit" size="sm">
+						{#if updateNotes.isLoading}
+							<Spinner />
+						{:else}
+							<CheckIcon class="size-4" />
+						{/if}
+						Speichern
+					</Button>
+				{/if}
+			</form>
+		</CardContent>
+	</Card>
+</div>
+
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+	<Card>
+		<CardHeader>
+			<CardTitle>Rechnungen</CardTitle>
+		</CardHeader>
+		<CardContent>
+			{#if invoices.length === 0}
+				<p class="py-8 text-center text-gray-500">Keine Rechnungen vorhanden</p>
+			{:else}
+				<Table>
+					<TableBody>
+						{#each invoices as invoice}
+							<a href="/app/customers/{customer._id}/invoices/{invoice._id}" class="contents">
+								<TableRow>
+									<TableCell>
+										#{invoice.number}
+									</TableCell>
+									<TableCell>
+										Fällig in {daysUntilDue(invoice.date, invoice.dueInDays)} Tagen
+									</TableCell>
+									<TableCell>
+										<span
+											class="rounded-full px-2 py-0.5 text-xs text-white {InvoiceStateDetail[
+												invoice.state
+											].bgColor} text-{InvoiceStateDetail[invoice.state].textColor}"
+											>{InvoiceStateDetail[invoice.state].name}</span
+										>
+									</TableCell>
+									<TableCell>
+										<DropDownMenu.Root>
+											<DropDownMenu.Trigger
+												class={buttonVariants({ variant: 'ghost', size: 'icon' })}
+											>
+												<EllipsisVerticalIcon class="size-4" />
+											</DropDownMenu.Trigger>
+
+											<DropDownMenu.Content>
+												<DropDownMenu.Item
+													onSelect={() =>
+														goto(`/app/customers/${customer._id}/invoices/${invoice._id}`)}
+												>
+													<EyeIcon class="size-4" /> Anzeigen
+												</DropDownMenu.Item>
+												<DropDownMenu.Separator />
+												{@const deleteInvoice = action(async () => {
+													if (
+														!(await ask(
+															'Löschen',
+															'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?',
+														))
+													)
+														return;
+													const invoiceNumber = invoice.number;
+													await client.mutation(api.invoices.deleteInvoice, {
+														id: invoice._id,
+													});
+													toast.success(`Rechnung #${invoiceNumber} gelöscht`);
+												}, 'Fehler beim Löschen der Rechnung')}
+												<DropDownMenu.Item onclick={deleteInvoice.run}>
+													<TrashIcon class="size-4" />
+													Löschen
+												</DropDownMenu.Item>
+											</DropDownMenu.Content>
+										</DropDownMenu.Root>
+									</TableCell>
+								</TableRow>
+							</a>
+						{/each}
+					</TableBody>
+				</Table>
+			{/if}
+		</CardContent>
+	</Card>
+</div>
