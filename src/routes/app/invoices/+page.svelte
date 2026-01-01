@@ -48,7 +48,7 @@
 	{#if invoices.length > 0}
 		<h2 class="text-2xl">{title}</h2>
 		{#each invoices as invoice}
-			<div class="grid lg:grid-cols-4 grid-cols-2 items-center rounded-lg border px-8 py-4 gap-y-4">
+			<div class="grid lg:grid-cols-4 grid-cols-2 items-center rounded-lg border px-8 py-4 gap-4">
 				<a
 					class="flex flex-col lg:gap-2"
 					href={`/app/customers/${invoice.customerId}/invoices/${invoice._id}`}
