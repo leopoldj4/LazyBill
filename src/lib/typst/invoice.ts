@@ -52,8 +52,8 @@ ${Template}
 
     recipient: (
         name: customer.name,
-        address: customer.invoiceStreet,
-        city: customer.invoiceZip + " " + customer.invoiceCity
+        address: customer.street,
+        city: customer.zip + " " + customer.city
     ),
 
     invoice-nr: nr,

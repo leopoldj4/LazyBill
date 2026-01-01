@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api';
 	import type { Doc, Id } from '$convex/_generated/dataModel';
+	import { action } from '$lib/action.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
@@ -10,19 +13,13 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { parseDate } from '$lib/date';
+	import { formatDate, parseDate } from '$lib/date';
+	import { createPDF } from '$lib/typst/export';
 	import { invoiceTemplate } from '$lib/typst/invoice';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useConvexClient } from 'convex-svelte';
-	import { api } from '$convex/_generated/api';
-	import { formatDate } from '$lib/date';
-	import { alert } from '$lib/prompt.svelte';
-	import { action } from '$lib/action.svelte';
-	import { Spinner } from '$lib/components/ui/spinner';
 	import { toast } from 'svelte-sonner';
-	import { createPDF } from '$lib/typst/export';
-	import { goto } from '$app/navigation';
 
 	const client = useConvexClient();
 	let {
@@ -35,31 +32,15 @@
 		company: Doc<'companies'>;
 	} = $props();
 
-	let due = $state<number | null>(30);
-	let articles = $state([{ name: '', price: 0 }]);
-	let notes = $state<string>('');
+	let due = $derived<number | null>(invoice.dueInDays);
+	let articles = $derived(invoice.articles);
+	let notes = $derived(invoice.notes);
 
 	let invoiceDate = $derived(parseDate(invoice.date));
 
 	let typstDocument = $derived(() =>
 		invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
 	);
-
-	const save = action(async () => {
-		if (!due) {
-			await alert('Fehlendes Feld', 'Bitte geben Sie eine Fälligkeit ein');
-			return;
-		}
-		await client.mutation(api.invoices.updateInvoice, {
-			id: invoice._id,
-			articles,
-			notes,
-			dueInDays: due,
-			date: formatDate(invoiceDate),
-		});
-
-		toast.success('Rechnung erfolgreich gespeichert');
-	}, 'Fehler beim Speichern der Rechnung');
 
 	const done = action(async () => {
 		const uploadUrl = await client.mutation(api.invoices.generateUploadUrl, {});
@@ -186,11 +167,7 @@
 		</div>
 
 		<div class="flex flex-row gap-2">
-			<Button onclick={save.run} variant="outline" disabled={save.isLoading}>Speichern</Button>
-
-			<Button variant="default" onclick={done.run} disabled={done.isLoading}
-				>Fertig</Button
-			>
+			<Button variant="default" onclick={done.run} disabled={done.isLoading}>Fertig</Button>
 		</div>
 	</div>
 

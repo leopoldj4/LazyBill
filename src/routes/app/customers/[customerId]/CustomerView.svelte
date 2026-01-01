@@ -3,7 +3,6 @@
 	import { api } from '$convex/_generated/api.js';
 	import type { Doc } from '$convex/_generated/dataModel';
 	import { action } from '$lib/action.svelte';
-	import { fromCustomer } from '$lib/address';
 	import Address from '$lib/components/Address.svelte';
 	import AddressModal from '$lib/components/AddressModal.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
@@ -20,7 +19,9 @@
 	import TableRow from '$lib/components/ui/table/table-row.svelte';
 	import Table from '$lib/components/ui/table/table.svelte';
 	import { daysUntilDue } from '$lib/date';
+	import { isEmpty as isAddressEmpty } from '$lib/address';
 	import { InvoiceStateDetail } from '$lib/invoiceState';
+	import { alert } from '$lib/prompt.svelte';
 	import { prompt } from '$lib/prompt.svelte.js';
 	import { CheckIcon } from '@lucide/svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
@@ -35,14 +36,30 @@
 	import { useConvexClient } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
 
+	function isCompanyEmpty(company: Doc<'companies'>) {
+		return (
+			company.street.trim() === '' ||
+			company.zip.trim() === '' ||
+			company.city.trim() === '' ||
+			company.state.trim() === '' ||
+			company.country.trim() === '' ||
+			company.bankIban.trim() === '' ||
+			company.bankBic.trim() === '' ||
+			company.bankName.trim() === '' ||
+			company.taxNumber.trim() === '' ||
+			company.representative.trim() === ''
+		);
+	}
+
 	const client = useConvexClient();
 
 	type Props = {
 		customer: Doc<'customers'>;
 		invoices: Doc<'invoices'>[];
+		company: Doc<'companies'>;
 	};
 
-	let { customer, invoices }: Props = $props();
+	let { customer, invoices, company }: Props = $props();
 
 	async function updateValue(key: string, value: string) {
 		await client.mutation(api.customers.update, {
@@ -77,17 +94,28 @@
 	}
 
 	let remove = action(async () => {
-		if (!(await prompt('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?'))) return;
+		if (!(await prompt('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?')))
+			return;
 		await client.mutation(api.customers.remove, { id: customer._id });
 		await goto('/app/customers');
 		toast.success('Kunde erfolgreich gelöscht');
 	}, 'Fehler beim Löschen des Kunden');
 
 	let newInvoice = action(async () => {
+		if (isCompanyEmpty(company)) {
+			await alert('Firma nicht komplett. Bitte setzen Sie die Adresse in den Einstellungen.');
+			return;
+		}
+
+		if (isAddressEmpty(customer)) {
+			await alert('Adresse nicht komplett. Bitte setzen Sie die Adresse im Kundenprofil.');
+			return;
+		}
+
 		const invoiceId = await client.mutation(api.invoices.createInvoice, {
 			customerId: customer._id,
 		});
-		await goto(`/app/customers/${customer._id}/invoices/${invoiceId}`);
+		await goto(`/app/customers/${customer._id}/invoices/${invoiceId}/edit`);
 	}, 'Fehler beim Erstellen der Rechnung');
 
 	let archive = action(async () => {
@@ -249,11 +277,11 @@
 			<CardTitle>Adresse</CardTitle>
 		</CardHeader>
 		<CardContent>
-			<Address address={fromCustomer(customer)} />
+			<Address address={customer} />
 		</CardContent>
 		<CardFooter>
 			<AddressModal
-				address={fromCustomer(customer)}
+				address={customer}
 				onSave={async (address) => {
 					await client.mutation(api.customers.updateAddress, {
 						id: customer._id,

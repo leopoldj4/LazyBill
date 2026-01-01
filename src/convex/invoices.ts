@@ -1,11 +1,10 @@
+import { today } from "$lib/date";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
-import { today } from "$lib/date";
-import type { Id } from "./_generated/dataModel";
 import { invoiceState } from "./invoiceState";
-import { getUserId } from "./auth";
 
 async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
 	const company = await getCompanySafe(ctx);
@@ -80,7 +79,7 @@ export const createInvoice = mutation({
 		const invoice = await ctx.db.insert('invoices', {
 			customerId: customer._id,
 			companyId: company._id,
-			number: (customer.invoiceNumberCounter + 1).toString(),
+			number: `${customer.number}-${(customer.invoiceNumberCounter + 1).toString()}`,
 			date: today(),
 			dueInDays: 30,
 			articles: [{ name: '', price: 0 }],

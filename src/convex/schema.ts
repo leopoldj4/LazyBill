@@ -15,11 +15,11 @@ const customers = defineTable({
 	isArchived: v.boolean(),
 
 	invoiceNumberCounter: v.number(),
-	invoiceCountry: v.string(),
-	invoiceState: v.string(),
-	invoiceCity: v.string(),
-	invoiceZip: v.string(),
-	invoiceStreet: v.string(),
+	country: v.string(),
+	state: v.string(),
+	city: v.string(),
+	zip: v.string(),
+	street: v.string(),
 }).index('by_userId', ['userId']);
 
 const invoices = defineTable({

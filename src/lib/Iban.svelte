@@ -42,8 +42,8 @@
 <input
 	type="text"
 	bind:value={iban}
-	on:input={handleInput}
-	on:paste={handlePaste}
+	oninput={handleInput}
+	onpaste={handlePaste}
     maxlength={44}
 	placeholder="DE12 3456 7890 1234 5678 90"
 	{...restProps}

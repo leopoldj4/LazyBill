@@ -16,16 +16,6 @@ export function isEmpty(address: Address) {
         && address.country.trim() === '';
 }
 
-export function fromCustomer(customer: Doc<'customers'>) {
-    return {
-        street: customer.invoiceStreet,
-        zip: customer.invoiceZip,
-        city: customer.invoiceCity,
-        state: customer.invoiceState,
-        country: customer.invoiceCountry,
-    };
-}
-
 export function fromCompany(company: Doc<'companies'>) {
     return {
         street: company.street,

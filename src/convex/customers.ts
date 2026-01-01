@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 import { mutation, query, type QueryCtx } from './_generated/server';
 import { getUserId } from './auth';
 import type { Id } from './_generated/dataModel';
-import { getCompany } from './companies';
+import { getCompany, getCompanySafe } from './companies';
 
 export async function getCustomer(ctx: QueryCtx, id: Id<'customers'>) {
 	const customer = await getCustomerSafe(ctx, id);
@@ -49,17 +49,23 @@ export const getFull = query({
 		id: v.id('customers'),
 	},
 	handler: async (ctx, args) => {
-		const customer = await getCustomerSafe(ctx, args.id);
+		const [customer, company, invoices] = await Promise.all([
+			getCustomerSafe(ctx, args.id),
+			getCompany(ctx),
+			ctx.db
+				.query('invoices')
+				.filter((q) => q.eq(q.field('customerId'), args.id))
+				.collect()
+		]);
+
 		if (!customer) {
 			return null;
 		}
 
 		return {
 			customer,
-			invoices: await ctx.db
-				.query('invoices')
-				.filter((q) => q.eq(q.field('customerId'), args.id))
-				.collect(),
+			company,
+			invoices,
 		};
 	},
 });
@@ -80,15 +86,15 @@ export const create = mutation({
 			notes: '',
 			isArchived: false,
 			invoiceNumberCounter: 0,
-			invoiceCountry: '',
-			invoiceState: '',
-			invoiceCity: '',
-			invoiceZip: '',
-			invoiceStreet: '',
+			country: '',
+			state: '',
+			city: '',
+			zip: '',
+			street: '',
 			userId: userId,
 			number: company.customerNumberCounter + 1,
 		});
-		
+
 		await ctx.db.patch('companies', company._id, {
 			customerNumberCounter: company.customerNumberCounter + 1,
 		});
@@ -147,11 +153,11 @@ export const updateAddress = mutation({
 	handler: async (ctx, args) => {
 		const customer = await getCustomer(ctx, args.id);
 		await ctx.db.patch('customers', customer._id, {
-			invoiceCountry: args.country,
-			invoiceState: args.state,
-			invoiceCity: args.city,
-			invoiceZip: args.zip,
-			invoiceStreet: args.street,
+			country: args.country,
+			state: args.state,
+			city: args.city,
+			zip: args.zip,
+			street: args.street,
 		});
 	},
 });

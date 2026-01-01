@@ -2,8 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import type { Id } from '$convex/_generated/dataModel.js';
+	import type { InvoiceState } from '$convex/invoiceState';
 	import { action } from '$lib/action.svelte';
-	import Preview from '$lib/components/Preview.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
@@ -15,17 +15,16 @@
 	import { Spinner } from '$lib/components/ui/spinner';
 	import * as Table from '$lib/components/ui/table';
 	import { parseDate } from '$lib/date';
+	import { download } from '$lib/download';
+	import { InvoiceStateDetail } from '$lib/invoiceState';
 	import FileDownIcon from '@lucide/svelte/icons/file-down';
 	import MailIcon from '@lucide/svelte/icons/mail';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import SendIcon from '@lucide/svelte/icons/send';
 	import UserStarIcon from '@lucide/svelte/icons/user-star';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { InvoiceStateDetail } from '$lib/invoiceState';
-	import type { InvoiceState } from '$convex/invoiceState';
-	import { download } from '$lib/download';
-	import PencilIcon from '@lucide/svelte/icons/pencil';
-	import { prompt } from '$lib/prompt.svelte';
 	let { data } = $props();
+	import { prompt } from '$lib/prompt.svelte';
 
 	const query = useQuery(api.invoices.getFull, () => ({
 		id: data.invoiceId as Id<'invoices'>,
@@ -33,7 +32,10 @@
 
 	$effect(() => {
 		if (query.data && query.data.customer._id !== data.customerId) {
-			goto(`/app/customers/${query.data.customer._id}/invoices/${data.invoiceId}/overview`);
+			goto(`/app/customers/${query.data.customer._id}/invoices/${data.invoiceId}`);
+		}
+		if (!query.data?.file) {
+			goto(`/app/customers/${data.customerId}/invoices/${data.invoiceId}/edit`);
 		}
 	});
 
@@ -58,9 +60,11 @@
 	}, 'Fehler beim Aktualisieren des Status');
 
 	async function edit() {
-		if (!query.data) return;
-		if ((query.data.invoice.file || query.data.invoice.state !== 'new') && !(await prompt('Bearbeiten', 'Sind Sie sicher, dass Sie diese Rechnung bearbeiten möchten? Das wird das aktuelle PDF überschreiben.'))) return;
-		await goto(`/app/customers/${query.data.customer._id}/invoices/${query.data.invoice._id}/edit`);
+		if (
+			await prompt('Bearbeiten', 'Sind Sie sicher, dass Sie diese Rechnung bearbeiten möchten?')
+		) {
+			await goto(`/app/customers/${data.customerId}/invoices/${data.invoiceId}/edit`);
+		}
 	}
 </script>
 
@@ -92,7 +96,7 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoice.number}</span></SiteHeader
 					>
 
-					<div class="flex flex-row gap-2 flex-wrap">
+					<div class="flex flex-row flex-wrap gap-2">
 						<Select.Root
 							type="single"
 							bind:value={data.invoice.state as InvoiceState}
@@ -117,19 +121,13 @@
 								{/each}
 							</Select.Content>
 						</Select.Root>
-						{#if data.file}
-							<Button variant="outline" onclick={downloadPdf}>
-								<FileDownIcon class="size-4" />
-
-								PDF
-							</Button>
-						{/if}
-						<Button
-							variant="outline"
-							onclick={edit}
-						>
+						<Button variant="outline" onclick={edit}>
 							<PencilIcon class="size-4" />
 							Bearbeiten
+						</Button>
+						<Button variant="outline" onclick={downloadPdf}>
+							<FileDownIcon class="size-4" />
+							PDF
 						</Button>
 					</div>
 
@@ -224,13 +222,8 @@
 						</Popover.Root>
 					</div>
 				</div>
-				{#if data.file}
-					<iframe src={data.file} class="aspect-[1/1.5] h-full w-full" />
-				{:else}
-					<div class="flex aspect-[1/1.5] h-full w-full items-center justify-center">
-						<p>Noch nicht bearbeitet</p>
-					</div>
-				{/if}
+
+				<iframe src={data.file} class="aspect-[1/1.5] h-full w-full" title="Rechnung"></iframe>
 			</div>
 		{/if}
 	{/snippet}

@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import { action } from '$lib/action.svelte';
-	import { fromCustomer } from '$lib/address';
 	import Address from '$lib/components/Address.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
@@ -17,7 +16,6 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 
-	let search = $state('');
 
 	const client = useConvexClient();
 
@@ -44,10 +42,6 @@
 		archived: showArchived,
 	}));
 
-	function resetFilters() {
-		search = '';
-		showArchived = false;
-	}
 </script>
 
 <Breadcrumb.Root>
@@ -69,12 +63,11 @@
 	</Button>
 </div>
 
-<Suspense {query} class="h-[60vh]">
+<Suspense {query} class="h-[30vh]">
 	{#snippet children(customers)}
 		{#if customers.length === 0}
 			<div class="flex min-h-[30vh] flex-col items-center justify-center gap-4">
 				<p>Keine Kunden gefunden</p>
-				<Button onclick={resetFilters}>Filter zurücksetzen</Button>
 			</div>
 		{:else}
 			<div class="flex flex-col gap-2 lg:hidden">
@@ -106,7 +99,7 @@
 								<Table.TableCell>{customer.email}</Table.TableCell>
 								<Table.TableCell>
 									<div class="text-sm">
-										<Address address={fromCustomer(customer)} />
+										<Address address={customer} />
 									</div>
 								</Table.TableCell>
 							</Table.TableRow>

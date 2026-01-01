@@ -19,8 +19,8 @@
 				<p>Kunde nicht gefunden</p>
 			</div>
 		{:else}
-			{@const { customer, invoices } = data}
-			<CustomerView {customer} {invoices} />
+			{@const { customer, invoices, company } = data}
+			<CustomerView {customer} {invoices} {company} />
 		{/if}
 	{/snippet}
 </Suspense>
