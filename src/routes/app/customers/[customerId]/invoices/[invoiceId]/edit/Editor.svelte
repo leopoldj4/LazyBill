@@ -32,11 +32,11 @@
 		company: Doc<'companies'>;
 	} = $props();
 
-	let due = $derived<number | null>(invoice.dueInDays);
-	let articles = $derived(invoice.articles);
-	let notes = $derived(invoice.notes);
+	let due = $state<number | null>(invoice.dueInDays);
+	let articles = $state(invoice.articles);
+	let notes = $state(invoice.notes);
 
-	let invoiceDate = $derived(parseDate(invoice.date));
+	let invoiceDate = $state(parseDate(invoice.date));
 
 	let typstDocument = $derived(() =>
 		invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
