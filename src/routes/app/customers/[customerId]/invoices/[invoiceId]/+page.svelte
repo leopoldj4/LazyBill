@@ -34,7 +34,7 @@
 		if (query.data && query.data.customer._id !== data.customerId) {
 			goto(`/app/customers/${query.data.customer._id}/invoices/${data.invoiceId}`);
 		}
-		if (!query.data?.file) {
+		if (query.data && !query.data?.file) {
 			goto(`/app/customers/${data.customerId}/invoices/${data.invoiceId}/edit`);
 		}
 	});

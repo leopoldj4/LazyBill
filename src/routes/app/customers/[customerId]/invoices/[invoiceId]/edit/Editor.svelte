@@ -14,12 +14,14 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { formatDate, parseDate } from '$lib/date';
+	import { sleep } from '$lib';
 	import { createPDF } from '$lib/typst/export';
 	import { invoiceTemplate } from '$lib/typst/invoice';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useConvexClient } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	const client = useConvexClient();
 	let {
@@ -62,6 +64,8 @@
 		});
 
 		toast.success('Rechnung erfolgreich gespeichert');
+
+		await sleep(500);
 
 		await goto(`/app/customers/${customer._id}/invoices/${invoice._id}`);
 	}, 'Fehler beim Finalisieren der Rechnung');
@@ -167,7 +171,13 @@
 		</div>
 
 		<div class="flex flex-row gap-2">
-			<Button variant="default" onclick={done.run} disabled={done.isLoading}>Fertig</Button>
+			<Button variant="default" onclick={done.run} disabled={done.isLoading}>
+				{#if done.isLoading}
+					<Spinner class="size-4" />
+				{/if}
+
+				Fertig
+			</Button>
 		</div>
 	</div>
 
