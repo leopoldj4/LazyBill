@@ -61,3 +61,14 @@ export const addBetaUser = action({
         }
     }
 });
+
+export const listBetaUsers = query({
+    handler: async (ctx) => {
+        const auth = await authComponent.getAuthUser(ctx);
+        if (auth.email != "mail@leoj.de") {
+            throw new Error("You are not authorized to list beta users");
+        }
+
+        return await ctx.db.query('betaUsers').collect();
+    }
+});
