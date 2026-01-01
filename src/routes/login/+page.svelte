@@ -3,6 +3,14 @@
 	import GoogleIcon from "$lib/assets/google.svg";
 	import { authClient } from '$lib/auth-client';
 	import BetaBadge from '$lib/components/BetaBadge.svelte';
+	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
+	import { goto } from '$app/navigation';
+
+	const auth = useAuth();
+
+	if (auth.isAuthenticated) {
+		goto('/app');
+	}
 </script>
 
 <h1 class="font-display text-5xl flex flex-row items-center gap-2">LazyBill <BetaBadge /></h1>
