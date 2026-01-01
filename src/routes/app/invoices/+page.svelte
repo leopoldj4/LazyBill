@@ -48,7 +48,7 @@
 	{#if invoices.length > 0}
 		<h2 class="text-2xl">{title}</h2>
 		{#each invoices as invoice}
-			<div class="grid lg:grid-cols-4 grid-cols-2 items-center rounded-lg border px-8 py-4 gap-4">
+			<div class="grid grid-cols-2 items-center gap-4 rounded-lg border px-8 py-4 lg:grid-cols-4">
 				<a
 					class="flex flex-col lg:gap-2"
 					href={`/app/customers/${invoice.customerId}/invoices/${invoice._id}`}
@@ -68,6 +68,11 @@
 
 <Suspense {query}>
 	{#snippet children(invoices)}
+		{#if invoices.length == 0}
+			<div class="flex min-h-[30vh] flex-col items-center justify-center gap-4">
+				<p>Keine Rechnungen gefunden</p>
+			</div>
+		{/if}
 		{@render Invoices('Überfällig', filterOverdue(filterState(invoices, ['new', 'sent'])))}
 		{@render Invoices('Offen', filterNotOverdue(filterState(invoices, ['new', 'sent'])))}
 		{@render Invoices('Archiviert', filterState(invoices, ['paid', 'cancelled']))}
