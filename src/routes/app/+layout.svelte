@@ -100,7 +100,7 @@
 
 <div class="h-full min-h-screen">
 	<div
-		class="fixed top-0 z-30 flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 bg-white px-8"
+		class="fixed top-0 z-30 flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 bg-white px-8 border-b"
 	>
 		<header class="flex shrink-0 items-center gap-2">
 			<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">

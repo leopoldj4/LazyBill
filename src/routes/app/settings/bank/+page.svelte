@@ -2,7 +2,7 @@
 	import { api } from '$convex/_generated/api';
 	import { action } from '$lib/action.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import Suspense from '$lib/components/Suspense.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import LinkIcon from '@lucide/svelte/icons/link';
@@ -10,7 +10,6 @@
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import BankAccount from './BankAccount.svelte';
-	import Suspense from '$lib/components/Suspense.svelte';
 
 	const client = useConvexClient();
 
@@ -65,16 +64,6 @@
 		};
 	});
 </script>
-
-<Breadcrumb.Root>
-	<Breadcrumb.List>
-		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/app/settings">Einstellungen</Breadcrumb.Link>
-		</Breadcrumb.Item>
-		<Breadcrumb.Separator />
-		<Breadcrumb.Item>Bank</Breadcrumb.Item>
-	</Breadcrumb.List>
-</Breadcrumb.Root>
 
 <SiteHeader>Bank</SiteHeader>
 

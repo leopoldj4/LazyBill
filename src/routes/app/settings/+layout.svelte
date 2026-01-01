@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { api } from '$convex/_generated/api.js';
-	import type { Icon } from '@lucide/svelte';
+	import * as Sidebar from '$lib/components/ui/sidebar';
 	import BanknoteIcon from '@lucide/svelte/icons/banknote';
 	import BellIcon from '@lucide/svelte/icons/bell';
 	import BuildingIcon from '@lucide/svelte/icons/building';
@@ -13,34 +12,53 @@
 	const currentUser = useQuery(api.auth.getCurrentUser, {});
 
 	let { children } = $props();
+
+	const settingsNavLinks = [
+		{ href: '/app/settings/company', icon: BuildingIcon, label: 'Meine Firma' },
+		{ href: '/app/settings/bank', icon: BanknoteIcon, label: 'Bank' },
+		{ href: '/app/settings/notifications', icon: BellIcon, label: 'Benachrichtigungen' },
+		{ href: '/app/settings/invoices', icon: ReceiptIcon, label: 'Rechnungen' },
+		{ href: '/app/settings/account', icon: UserIcon, label: 'Account' },
+	];
 </script>
 
-{#snippet navLink(href: string, IconValue: typeof Icon, label: string)}
-	<a
-		{href}
-		class={[
-			'flex flex-row items-center gap-2 rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100',
-			href === page.url.pathname ? 'text-black' : 'text-gray-500',
-		]}
-	>
-		<IconValue class="size-4"></IconValue>
-		{label}
-	</a>
-{/snippet}
+<Sidebar.Provider>
+	<Sidebar.Root class="top-[52px]">
+		<Sidebar.Content>
+			<Sidebar.Group>
+				<Sidebar.GroupLabel>Einstellungen</Sidebar.GroupLabel>
+				<Sidebar.GroupContent>
+					{#each settingsNavLinks as link}
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href={link.href} {...props}>
+										<link.icon class="size-4" />
+										{link.label}
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/each}
+					{#if currentUser?.data?.email == 'mail@leoj.de'}
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton>
+								{#snippet child({ props })}
+									<a href="/app/settings/beta" {...props}>
+										<RocketIcon class="size-4" />
+										Beta
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/if}
+				</Sidebar.GroupContent>
+			</Sidebar.Group>
+		</Sidebar.Content>
+	</Sidebar.Root>
 
-<div class="flex flex-col gap-12 lg:grid lg:grid-cols-[16rem_1fr] min-h-[90vh]">
-	<div class="flex flex-col pr-4 lg:border-r">
-		<h2 class="mb-4 text-xl max-lg:hidden">Einstellungen</h2>
-		{@render navLink('/app/settings/company', BuildingIcon, 'Meine Firma')}
-		{@render navLink('/app/settings/bank', BanknoteIcon, 'Bank')}
-		{@render navLink('/app/settings/notifications', BellIcon, 'Benachrichtigungen')}
-		{@render navLink('/app/settings/invoices', ReceiptIcon, 'Rechnungen')}
-		{@render navLink('/app/settings/account', UserIcon, 'Account')}
-		{#if currentUser?.data?.email == 'mail@leoj.de'}
-			{@render navLink('/app/settings/beta', RocketIcon, 'Beta')}
-		{/if}
-	</div>
-	<div class="flex flex-col gap-8">
+	<div class="flex w-full flex-col gap-8">
+		<Sidebar.Trigger />
 		{@render children?.()}
 	</div>
-</div>
+</Sidebar.Provider>
