@@ -222,3 +222,14 @@ export const getTransactions = query({
             .collect();
     }
 });
+
+export const getAllTransactions = query({
+    handler: async (ctx) => {
+        const userId = await getUserId(ctx);
+        return await ctx.db
+            .query('transactions')
+            .withIndex('by_userId', (q) => q.eq('userId', userId))
+            .order('desc')
+            .collect();
+    }
+});

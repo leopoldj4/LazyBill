@@ -4,12 +4,14 @@
 	import SiteHeader from '$lib/components/site-header.svelte';
 	import Suspense from '$lib/components/Suspense.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
-	import { daysUntilDue } from '$lib/date';
+	import * as Table from '$lib/components/ui/table';
+	import { daysUntilDue, parseDate } from '$lib/date';
 	import { useQuery } from 'convex-svelte';
 	import type { Doc } from '$convex/_generated/dataModel';
 	import type { InvoiceState } from '$convex/invoiceState';
 
 	const query = useQuery(api.invoices.list, {});
+	const transactionsQuery = useQuery(api.plaid.getAllTransactions, {});
 
 	type Invoice = Doc<'invoices'> & {
 		customer: Doc<'customers'> | null;
@@ -43,6 +45,32 @@
 </Breadcrumb.Root>
 
 <SiteHeader>Rechnungen</SiteHeader>
+
+{#if transactionsQuery.data && transactionsQuery.data.length > 0}
+	<div class="mb-8">
+		<h2 class="mb-4 text-2xl">Transaktionen</h2>
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Datum</Table.Head>
+					<Table.Head>Name</Table.Head>
+					<Table.Head>Betrag</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each transactionsQuery.data as transaction}
+					<Table.Row>
+						<Table.Cell>{parseDate(transaction.date)}</Table.Cell>
+						<Table.Cell>{transaction.merchantName || transaction.name}</Table.Cell>
+						<Table.Cell class={transaction.amount < 0 ? 'text-green-600' : 'text-red-600'}>
+							{transaction.amount < 0 ? '+' : '-'}{Math.abs(transaction.amount).toFixed(2)} €
+						</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+{/if}
 
 {#snippet Invoices(title: string, invoices: Invoice[])}
 	{#if invoices.length > 0}
