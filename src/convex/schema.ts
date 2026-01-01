@@ -69,4 +69,29 @@ const betaUsers = defineTable({
 	email: v.string(),
 });
 
-export default defineSchema({ customers, invoices, companies, betaUsers });
+const bankAccounts = defineTable({
+	userId: v.string(),
+	accessToken: v.string(),
+	itemId: v.string(),
+	institutionId: v.optional(v.string()),
+	institutionName: v.optional(v.string()),
+	accountId: v.string(),
+	accountName: v.optional(v.string()),
+	accountMask: v.optional(v.string()),
+	accountType: v.optional(v.string()),
+	accountSubtype: v.optional(v.string()),
+}).index('by_userId', ['userId']);
+
+const transactions = defineTable({
+	userId: v.string(),
+	bankAccountId: v.id('bankAccounts'),
+	transactionId: v.string(),
+	amount: v.number(),
+	date: v.string(),
+	name: v.string(),
+	merchantName: v.optional(v.string()),
+	category: v.optional(v.array(v.string())),
+	pending: v.boolean(),
+}).index('by_userId', ['userId']).index('by_bankAccountId', ['bankAccountId']);
+
+export default defineSchema({ customers, invoices, companies, betaUsers, bankAccounts, transactions });
