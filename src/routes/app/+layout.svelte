@@ -159,7 +159,7 @@
 			</a>
 		</div>
 	</div>
-	<div class="mt-[52px] flex flex-col gap-6 p-8">
+	<div class="mt-[52px] flex flex-col gap-6 p-8 max-lg:pb-32">
 		{@render children?.()}
 	</div>
 
