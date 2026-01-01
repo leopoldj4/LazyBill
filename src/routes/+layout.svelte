@@ -12,7 +12,6 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<title>LazyBill</title>
-	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
 {@render children?.()}
