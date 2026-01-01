@@ -6,9 +6,9 @@
     "display": "minimal-ui",
     "icons": [
         {
-            "src": "/icon.jpg",
+            "src": "/icon.webp",
             "sizes": "512x512",
-            "type": "image/jpg"
+            "type": "image/webp"
         }
     ]
 }
