@@ -40,7 +40,7 @@ const invoices = defineTable({
 	notes: v.string(),
 
 	file: v.optional(v.id('_storage')),
-});
+}).index('by_companyId', ['companyId']);
 
 const companies = defineTable({
 	userId: v.string(),

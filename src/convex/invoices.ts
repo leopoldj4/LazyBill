@@ -5,6 +5,7 @@ import { getCustomer, getCustomerSafe } from "./customers";
 import { today } from "$lib/date";
 import type { Id } from "./_generated/dataModel";
 import { invoiceState } from "./invoiceState";
+import { getUserId } from "./auth";
 
 async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
 	const company = await getCompanySafe(ctx);
@@ -50,6 +51,22 @@ export const getFull = query({
 			file,
 		};
 	},
+})
+
+export const list = query({
+	args: {},
+	handler: async (ctx, args) => {
+		const company = await getCompany(ctx);
+		const invoices = await ctx.db.query('invoices').withIndex('by_companyId', (q) => q.eq('companyId', company._id)).collect();
+		
+		return await Promise.all(invoices.map(async (invoice) => {
+			const customer = await ctx.db.get(invoice.customerId);
+			return {
+				...invoice,
+				customer,
+			};
+		}));
+	}
 })
 
 export const createInvoice = mutation({

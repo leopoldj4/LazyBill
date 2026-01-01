@@ -9,7 +9,9 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Kbd from '$lib/components/ui/kbd';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
+	import type { Icon } from '@lucide/svelte';
 	import BuildingIcon from '@lucide/svelte/icons/building';
+	import ReceiptIcon from '@lucide/svelte/icons/receipt';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import UsersIcon from '@lucide/svelte/icons/users';
@@ -18,7 +20,7 @@
 	import type { ConnectionState } from 'convex/browser';
 	import { onMount } from 'svelte';
 
-	createSvelteAuthClient({ authClient, options: {expectAuth: true} });
+	createSvelteAuthClient({ authClient, options: { expectAuth: true } });
 
 	const { children } = $props();
 	const auth = useAuth();
@@ -54,6 +56,17 @@
 	const query = useQuery(api.customers.list, () =>
 		auth.isAuthenticated ? { archived: false } : 'skip',
 	);
+
+	type Page = {
+		href: string;
+		icon: typeof Icon;
+		label: string;
+	};
+	const pages: Page[] = [
+		{ href: '/app/customers', icon: UsersIcon, label: 'Kunden' },
+		{ href: '/app/invoices', icon: ReceiptIcon, label: 'Rechnungen' },
+		{ href: '/app/settings', icon: BuildingIcon, label: 'Einstellungen' },
+	];
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
@@ -63,8 +76,9 @@
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Seiten">
-			<Command.LinkItem href="/app/customers"><UsersIcon /> Kunden</Command.LinkItem>
-			<Command.LinkItem href="/app/settings"><BuildingIcon /> Einstellungen</Command.LinkItem>
+			{#each pages as page}
+				<Command.LinkItem href={page.href}><page.icon /> {page.label}</Command.LinkItem>
+			{/each}
 		</Command.Group>
 		<Command.Separator />
 		{#if query.data}
@@ -92,23 +106,28 @@
 				<div class="font-display text-xl max-lg:hidden">LazyBill</div>
 				<BetaBadge />
 			</a>
-		</header>
-		<button
-			onclick={() => (commandOpen = true)}
-			class="flex h-9 w-[90%] cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 px-4 text-sm text-gray-600 lg:w-full lg:max-w-lg lg:min-w-[15vw]"
-		>
-			<div class="w-[57px] max-lg:hidden"></div>
+			<button
+				onclick={() => (commandOpen = true)}
+				class="flex h-9 w-[90%] shrink-0 cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 px-4 text-sm text-gray-600 lg:w-full lg:max-w-sm lg:min-w-[15vw]"
+			>
+				<div class="w-[57px] max-lg:hidden"></div>
 
-			<div class="flex items-center gap-2">
-				<SearchIcon class="size-4" />
-				Schnellsuche
+				<div class="flex items-center gap-2">
+					<SearchIcon class="size-4" />
+					Schnellsuche
+				</div>
+
+				<Kbd.Group class="max-lg:hidden">
+					<Kbd.Root class="border">⌘</Kbd.Root>+
+					<Kbd.Root class="border">K</Kbd.Root>
+				</Kbd.Group>
+			</button>
+			<div class="flex flex-row max-lg:hidden">
+				<a href="/app/customers" class={buttonVariants({ variant: 'ghost' })}> Kunden </a>
+				<a href="/app/invoices" class={buttonVariants({ variant: 'ghost' })}> Rechnungen </a>
 			</div>
+		</header>
 
-			<Kbd.Group class="max-lg:hidden">
-				<Kbd.Root class="border">⌘</Kbd.Root>+
-				<Kbd.Root class="border">K</Kbd.Root>
-			</Kbd.Group>
-		</button>
 		<div class="flex shrink-0 items-center justify-between">
 			<div class="hidden lg:block">
 				{#if status.isWebSocketConnected}
