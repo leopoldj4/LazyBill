@@ -92,7 +92,7 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoice.number}</span></SiteHeader
 					>
 
-					<div class="flex flex-row gap-2">
+					<div class="flex flex-row gap-2 flex-wrap">
 						<Select.Root
 							type="single"
 							bind:value={data.invoice.state as InvoiceState}
