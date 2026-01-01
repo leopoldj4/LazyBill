@@ -2,7 +2,7 @@
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { api } from '$convex/_generated/api.js';
-	import Logo from '$lib/assets/logo.png';
+	import Logo from '$lib/assets/logo.svg';
 	import { authClient } from '$lib/auth-client';
 	import BetaBadge from '$lib/components/BetaBadge.svelte';
 	import Prompt from '$lib/components/Prompt.svelte';
@@ -104,7 +104,7 @@
 	>
 		<header class="flex shrink-0 items-center gap-2">
 			<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
-				<img src={Logo} alt="LazyBill Logo" class="-mt-3 size-8" />
+				<img src={Logo} alt="LazyBill Logo" class="size-8" />
 				<div class="font-display text-xl max-lg:hidden">LazyBill</div>
 				<BetaBadge />
 			</a>
