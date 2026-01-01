@@ -1,21 +1,18 @@
 <script lang="ts">
-	import type { Doc } from '$convex/_generated/dataModel';
 	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
-	import type { Id } from '$convex/_generated/dataModel.js';
-	import { debounce } from '$lib';
+	import type { Doc } from '$convex/_generated/dataModel';
 	import { action } from '$lib/action.svelte';
 	import { fromCustomer } from '$lib/address';
-	import { ask } from '$lib/ask.svelte.js';
 	import Address from '$lib/components/Address.svelte';
 	import AddressModal from '$lib/components/AddressModal.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
-	import Suspense from '$lib/components/Suspense.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import * as DropDownMenu from '$lib/components/ui/dropdown-menu';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import TableBody from '$lib/components/ui/table/table-body.svelte';
@@ -23,21 +20,20 @@
 	import TableRow from '$lib/components/ui/table/table-row.svelte';
 	import Table from '$lib/components/ui/table/table.svelte';
 	import { daysUntilDue } from '$lib/date';
-	import { InvoiceStateDetail } from '$lib/invoiceStatus';
-	import ClockIcon from '@lucide/svelte/icons/clock';
-	import EyeIcon from '@lucide/svelte/icons/eye';
+	import { InvoiceStateDetail } from '$lib/invoiceState';
+	import { prompt } from '$lib/prompt.svelte.js';
+	import { CheckIcon } from '@lucide/svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import ClockIcon from '@lucide/svelte/icons/clock';
 	import CopyIcon from '@lucide/svelte/icons/copy';
+	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
+	import EyeIcon from '@lucide/svelte/icons/eye';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PhoneIcon from '@lucide/svelte/icons/phone';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
-	import { useConvexClient, useQuery } from 'convex-svelte';
+	import { useConvexClient } from 'convex-svelte';
 	import { toast } from 'svelte-sonner';
-	import * as DropDownMenu from '$lib/components/ui/dropdown-menu';
-	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
-	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import { CheckIcon } from '@lucide/svelte';
 
 	const client = useConvexClient();
 
@@ -81,7 +77,7 @@
 	}
 
 	let remove = action(async () => {
-		if (!(await ask('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?'))) return;
+		if (!(await prompt('Löschen', 'Sind Sie sicher, dass Sie diesen Kunden löschen möchten?'))) return;
 		await client.mutation(api.customers.remove, { id: customer._id });
 		await goto('/app/customers');
 		toast.success('Kunde erfolgreich gelöscht');
@@ -95,10 +91,9 @@
 	}, 'Fehler beim Erstellen der Rechnung');
 
 	let archive = action(async () => {
-		if (!customer.isArchived) return;
 		if (
 			invoices.some((invoice) => invoice.state != 'paid' && invoice.state != 'cancelled') &&
-			!(await ask(
+			!(await prompt(
 				'Archivieren',
 				'Kunde hat offene Rechnungen. Sind Sie sicher, dass Sie ihn archivieren möchten?',
 			))
@@ -349,7 +344,7 @@
 												<DropDownMenu.Separator />
 												{@const deleteInvoice = action(async () => {
 													if (
-														!(await ask(
+														!(await prompt(
 															'Löschen',
 															'Sind Sie sicher, dass Sie diese Rechnung löschen möchten?',
 														))

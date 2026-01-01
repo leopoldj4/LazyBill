@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Doc } from '$convex/_generated/dataModel';
+	import type { Doc, Id } from '$convex/_generated/dataModel';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import SiteHeader from '$lib/components/site-header.svelte';
@@ -14,7 +14,17 @@
 	import { invoiceTemplate } from '$lib/typst/invoice';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { useConvexClient } from 'convex-svelte';
+	import { api } from '$convex/_generated/api';
+	import { formatDate } from '$lib/date';
+	import { alert } from '$lib/prompt.svelte';
+	import { action } from '$lib/action.svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
+	import { toast } from 'svelte-sonner';
+	import { createPDF } from '$lib/typst/export';
+	import { goto } from '$app/navigation';
 
+	const client = useConvexClient();
 	let {
 		customer,
 		invoice,
@@ -30,9 +40,50 @@
 	let notes = $state<string>('');
 
 	let invoiceDate = $derived(parseDate(invoice.date));
-    
 
-	let typstDocument = $derived(() => invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes));
+	let typstDocument = $derived(() =>
+		invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
+	);
+
+	const save = action(async () => {
+		if (!due) {
+			await alert('Fehlendes Feld', 'Bitte geben Sie eine Fälligkeit ein');
+			return;
+		}
+		await client.mutation(api.invoices.updateInvoice, {
+			id: invoice._id,
+			articles,
+			notes,
+			dueInDays: due,
+			date: formatDate(invoiceDate),
+		});
+
+		toast.success('Rechnung erfolgreich gespeichert');
+	}, 'Fehler beim Speichern der Rechnung');
+
+	const done = action(async () => {
+		const uploadUrl = await client.mutation(api.invoices.generateUploadUrl, {});
+
+		const document = await createPDF(typstDocument());
+		const { storageId } = await fetch(uploadUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/pdf' },
+			body: new Blob([document.slice()], { type: 'application/pdf' }),
+		}).then((res) => res.json());
+
+		await client.mutation(api.invoices.updateInvoice, {
+			id: invoice._id,
+			articles,
+			notes,
+			dueInDays: due || 0,
+			date: formatDate(invoiceDate),
+			file: storageId as Id<'_storage'>,
+		});
+
+		toast.success('Rechnung erfolgreich gespeichert');
+
+		await goto(`/app/customers/${customer._id}/invoices/${invoice._id}`);
+	}, 'Fehler beim Finalisieren der Rechnung');
 </script>
 
 <div class="grid gap-12 lg:grid-cols-2">
@@ -58,7 +109,14 @@
 			<div class="flex flex-col gap-3">
 				<Label>Fällig in</Label>
 				<InputGroup.Root>
-					<InputGroup.Input class="text-right" bind:value={due} type="number" min="1" max="600"
+					<InputGroup.Input
+						required
+						aria-invalid={due == null || due < 0}
+						class="text-right"
+						bind:value={due}
+						type="number"
+						min="1"
+						max="600"
 					></InputGroup.Input>
 					<InputGroup.Addon align="inline-end">
 						<InputGroup.Text>Tagen</InputGroup.Text>
@@ -74,7 +132,7 @@
 				<div class="grid grid-cols-[min-content_1fr] gap-4 lg:grid-cols-[min-content_1fr_100px]">
 					<Button
 						variant="ghost"
-                        disabled={articles.length === 1}
+						disabled={articles.length === 1}
 						onclick={() => {
 							articles.splice(articles.indexOf(article), 1);
 						}}
@@ -86,9 +144,16 @@
 						bind:value={article.name}
 						placeholder="Artikelbeschreibung"
 						class="max-lg:hidden"
+						required
+						aria-invalid={article.name == '' || article.name == null}
 					/>
 					<InputGroup.Root>
-						<InputGroup.Input type="number" bind:value={article.price} />
+						<InputGroup.Input
+							type="number"
+							bind:value={article.price}
+							min="0"
+							aria-invalid={article.price <= 0 || article.price == null}
+						/>
 						<InputGroup.Addon align="inline-end">
 							<InputGroup.Text>€</InputGroup.Text>
 						</InputGroup.Addon>
@@ -118,6 +183,14 @@
 		<div class="flex flex-col gap-3">
 			<h2 class="text-xl">Anmerkungen</h2>
 			<Textarea bind:value={notes} placeholder="Notizen zur Rechnung" />
+		</div>
+
+		<div class="flex flex-row gap-2">
+			<Button onclick={save.run} variant="outline" disabled={save.isLoading}>Speichern</Button>
+
+			<Button variant="default" onclick={done.run} disabled={done.isLoading}
+				>Fertig</Button
+			>
 		</div>
 	</div>
 

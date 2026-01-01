@@ -1,5 +1,6 @@
 import type { CalendarDate } from '@internationalized/date';
 import type { Doc } from '$convex/_generated/dataModel';
+import Template from './template.typ?raw';
 
 type Article = {
     name: string;
@@ -21,7 +22,7 @@ export function invoiceTemplate(
 ) {
 
     const result = `
-#import "@preview/invoice-pro:0.1.0": *
+${Template}
 
 #let articles = ${encode(articles)}
 #let company = ${encode(company)}

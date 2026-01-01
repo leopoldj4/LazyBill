@@ -13,6 +13,7 @@ import type * as beta from "../beta.js";
 import type * as companies from "../companies.js";
 import type * as customers from "../customers.js";
 import type * as http from "../http.js";
+import type * as invoiceState from "../invoiceState.js";
 import type * as invoices from "../invoices.js";
 import type * as migrations from "../migrations.js";
 
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   companies: typeof companies;
   customers: typeof customers;
   http: typeof http;
+  invoiceState: typeof invoiceState;
   invoices: typeof invoices;
   migrations: typeof migrations;
 }>;

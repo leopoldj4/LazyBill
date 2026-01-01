@@ -2,42 +2,30 @@ import MailIcon from "@lucide/svelte/icons/mail";
 import CheckIcon from "@lucide/svelte/icons/check";
 import TrashIcon from "@lucide/svelte/icons/trash";
 import PencilIcon from "@lucide/svelte/icons/pencil";
-import FileCheckIcon from "@lucide/svelte/icons/file-check";
+import type { InvoiceState } from "$convex/invoiceState";
 
-export enum InvoiceState {
-    DRAFT = 'draft',
-    FINALIZED = 'finalized',
-    SENT = 'sent',
-    PAID = 'paid',
-    CANCELLED = 'cancelled',
-}
+type Detail = { name: string, icon: typeof PencilIcon, bgColor: string, textColor: string };
 
-export const InvoiceStateDetail = {
-    [InvoiceState.DRAFT]: {
-        name: 'Entwurf',
+export const InvoiceStateDetail: Record<InvoiceState, Detail> = {
+    new: {
+        name: 'Neu',
         icon: PencilIcon,
         bgColor: 'bg-yellow-500',
         textColor: 'text-yellow-500',
     },
-    [InvoiceState.FINALIZED]: {
-        name: 'Finalisiert',
-        icon: FileCheckIcon,
-        bgColor: 'bg-green-500',
-        textColor: 'text-green-500',
-    },
-    [InvoiceState.SENT]: {
+    sent: {
         name: 'Gesendet',
         icon: MailIcon,
         bgColor: 'bg-blue-500',
         textColor: 'text-blue-500',
     },
-    [InvoiceState.PAID]: {
+    paid: {
         name: 'Bezahlt',
         icon: CheckIcon,
         bgColor: 'bg-green-500',
         textColor: 'text-green-500',
     },
-    [InvoiceState.CANCELLED]: {
+    cancelled: {
         name: 'Storniert',
         icon: TrashIcon,
         bgColor: 'bg-gray-500',

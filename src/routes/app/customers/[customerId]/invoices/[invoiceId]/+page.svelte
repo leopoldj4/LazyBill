@@ -15,16 +15,16 @@
 	import { Spinner } from '$lib/components/ui/spinner';
 	import * as Table from '$lib/components/ui/table';
 	import { parseDate } from '$lib/date';
-	import { exportPDF } from '$lib/typst/export';
-	import { invoiceTemplate } from '$lib/typst/invoice.js';
-	import LeftArrowIcon from '@lucide/svelte/icons/arrow-left';
-	import RightArrowIcon from '@lucide/svelte/icons/arrow-right';
 	import FileDownIcon from '@lucide/svelte/icons/file-down';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import SendIcon from '@lucide/svelte/icons/send';
 	import UserStarIcon from '@lucide/svelte/icons/user-star';
 	import { useConvexClient, useQuery } from 'convex-svelte';
-	import { InvoiceState, InvoiceStateDetail } from '$lib/invoiceStatus';
+	import { InvoiceStateDetail } from '$lib/invoiceState';
+	import type { InvoiceState } from '$convex/invoiceState';
+	import { download } from '$lib/download';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
+	import { prompt } from '$lib/prompt.svelte';
 	let { data } = $props();
 
 	const query = useQuery(api.invoices.getFull, () => ({
@@ -37,21 +37,13 @@
 		}
 	});
 
-	const downloadPdf = action(async () => {
-		if (!query.data) return;
-		const pdf = await exportPDF(
-			invoiceTemplate(
-				query.data.company,
-				query.data.customer,
-				query.data.invoice.articles,
-				parseDate(query.data.invoice.date),
-				query.data.invoice.number,
-				query.data.invoice.dueInDays,
-				query.data.invoice.notes,
-			),
+	function downloadPdf() {
+		if (!query.data?.file) return;
+		download(
+			query.data.file,
 			`${query.data.customer.name} - Rechnung ${query.data.invoice.number}.pdf`,
 		);
-	}, 'Fehler beim Herunterladen der Rechnung');
+	}
 
 	let enteredEmail = $derived(query.data?.customer.email || '');
 
@@ -64,6 +56,12 @@
 			state,
 		});
 	}, 'Fehler beim Aktualisieren des Status');
+
+	async function edit() {
+		if (!query.data) return;
+		if ((query.data.invoice.file || query.data.invoice.state !== 'new') && !(await prompt('Bearbeiten', 'Sind Sie sicher, dass Sie diese Rechnung bearbeiten möchten? Das wird das aktuelle PDF überschreiben.'))) return;
+		await goto(`/app/customers/${query.data.customer._id}/invoices/${query.data.invoice._id}/edit`);
+	}
 </script>
 
 <Suspense {query} class="h-[60vh]">
@@ -94,30 +92,46 @@
 					<SiteHeader>Rechnung <span class="text-gray-500">#{data.invoice.number}</span></SiteHeader
 					>
 
-					<Select.Root
-						type="single"
-						bind:value={data.invoice.state as InvoiceState}
-						onValueChange={(value) => updateInvoiceState.run(value as InvoiceState)}
-					>
-						<Select.Trigger>
-							{#if updateInvoiceState.isLoading}
-								<Spinner class="size-4" />
-							{:else}
-								{@const Icon = InvoiceStateDetail[data.invoice.state].icon}
-								<Icon class="size-4 {InvoiceStateDetail[data.invoice.state].textColor}" />
-							{/if}
-							{InvoiceStateDetail[data.invoice.state].name}
-						</Select.Trigger>
-						<Select.Content align="start">
-							{#each Object.values(InvoiceState) as state}
-								<Select.Item value={state}>
-									{@const Icon = InvoiceStateDetail[state].icon}
-									<Icon class="size-4 {InvoiceStateDetail[state].textColor}" />
-									{InvoiceStateDetail[state].name}
-								</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<div class="flex flex-row gap-2">
+						<Select.Root
+							type="single"
+							bind:value={data.invoice.state as InvoiceState}
+							onValueChange={(value) => updateInvoiceState.run(value as InvoiceState)}
+						>
+							<Select.Trigger>
+								{#if updateInvoiceState.isLoading}
+									<Spinner class="size-4" />
+								{:else}
+									{@const Icon = InvoiceStateDetail[data.invoice.state].icon}
+									<Icon class="size-4 {InvoiceStateDetail[data.invoice.state].textColor}" />
+								{/if}
+								{InvoiceStateDetail[data.invoice.state].name}
+							</Select.Trigger>
+							<Select.Content align="start">
+								{#each Object.entries(InvoiceStateDetail) as [name, state]}
+									<Select.Item value={name}>
+										{@const Icon = state.icon}
+										<Icon class="size-4 {state.textColor}" />
+										{InvoiceStateDetail[name as InvoiceState].name}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+						{#if data.file}
+							<Button variant="outline" onclick={downloadPdf}>
+								<FileDownIcon class="size-4" />
+
+								PDF
+							</Button>
+						{/if}
+						<Button
+							variant="outline"
+							onclick={edit}
+						>
+							<PencilIcon class="size-4" />
+							Bearbeiten
+						</Button>
+					</div>
 
 					<h3 class="text-xl">Zusammenfassung</h3>
 					<Table.Root>
@@ -168,18 +182,9 @@
 						</Table.Body>
 					</Table.Root>
 
-					<h3 class="text-xl">Senden</h3>
 					<div class="flex flex-row flex-wrap gap-2">
-						<Button variant="outline" onclick={downloadPdf.run}>
-							{#if downloadPdf.isLoading}
-								<Spinner class="size-4" />
-							{:else}
-								<FileDownIcon class="size-4" />
-							{/if}
-							PDF
-						</Button>
 						<Popover.Root>
-							<Popover.Trigger class={buttonVariants({ variant: 'default' })}>
+							<Popover.Trigger class="{buttonVariants({ variant: 'default' })} hidden">
 								<MailIcon class="size-4" />
 								E-Mail Senden
 							</Popover.Trigger>
@@ -219,17 +224,13 @@
 						</Popover.Root>
 					</div>
 				</div>
-				<Preview
-					typstDocument={invoiceTemplate(
-						data.company,
-						data.customer,
-						data.invoice.articles,
-						parseDate(data.invoice.date),
-						data.invoice.number,
-						data.invoice.dueInDays,
-						data.invoice.notes,
-					)}
-				/>
+				{#if data.file}
+					<iframe src={data.file} class="aspect-[1/1.5] h-full w-full" />
+				{:else}
+					<div class="flex aspect-[1/1.5] h-full w-full items-center justify-center">
+						<p>Noch nicht bearbeitet</p>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	{/snippet}

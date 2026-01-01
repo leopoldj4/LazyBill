@@ -14,6 +14,7 @@
 				value: string;
 				placeholder: string;
 				checkbox?: boolean;
+				iban?: boolean;
 		  }
 		| {
 				label: string;
@@ -22,36 +23,36 @@
 				checkbox: true;
 		  };
 
-	let props: Props = $props();
+	let { label, key, value = $bindable(), checkbox, ...restProps }: Props = $props();
 
 	const client = useConvexClient();
 
 	const update = action(async (value: string | boolean) => {
 		await client.mutation(api.companies.updateField, {
-			field: props.key,
+			field: key,
 			value: value,
 		});
-	}, `Fehler beim Aktualisieren von ${props.label}`);
+	}, `Fehler beim Aktualisieren von ${label}`);
 </script>
 
-{#if props.checkbox}
+{#if checkbox}
 	<div class="flex items-center gap-2">
 		<Checkbox
-			id={props.key}
-			checked={props.value as boolean}
+			id={key}
+			checked={value as boolean}
 			onCheckedChange={(checked) => update.run(checked)}
 		/>
-		<Label for={props.key} class="lg:justify-self-end">{props.label}</Label>
+		<Label for={key} class="lg:justify-self-end">{label}</Label>
 		{#if update.isLoading}
 			<Spinner />
 		{/if}
 	</div>
 {:else}
 	<InlineInput
-		id={props.key}
-		label={props.label}
-		bind:value={props.value as string}
+		id={key}
+		{label}
+		{...restProps}
+		bind:value={value as string}
 		{update}
-		placeholder={props.placeholder}
 	/>
 {/if}

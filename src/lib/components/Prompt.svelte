@@ -1,10 +1,15 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
-	import { queue } from '$lib/ask.svelte';
+	import { queue } from '$lib/prompt.svelte';
 
 	function resolve(value: boolean) {
-		queue[queue.length - 1].resolve(value);
+		const item = queue[queue.length - 1];
+		if (item.type === 'prompt') {
+			item.resolve(value);
+		} else {
+			item.resolve();
+		}
 		queue.pop();
 	}
 </script>
@@ -27,8 +32,12 @@
 				>
 			</Dialog.Header>
 			<Dialog.Footer>
-				<Button variant="outline" onclick={() => resolve(false)}>Abbrechen</Button>
-				<Button onclick={() => resolve(true)}>Ja</Button>
+				{#if queue.length > 0 && queue[queue.length - 1].type === 'prompt'}
+					<Button variant="outline" onclick={() => resolve(false)}>Abbrechen</Button>
+					<Button onclick={() => resolve(true)}>Ja</Button>
+				{:else}
+					<Button variant="outline" onclick={() => resolve(true)}>Ok</Button>
+				{/if}
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Portal>

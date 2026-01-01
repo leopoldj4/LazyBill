@@ -4,6 +4,7 @@ import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
 import { today } from "$lib/date";
 import type { Id } from "./_generated/dataModel";
+import { invoiceState } from "./invoiceState";
 
 async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
 	const company = await getCompanySafe(ctx);
@@ -31,8 +32,12 @@ export const getFull = query({
 		if (!invoice) {
 			return null;
 		}
-		const customer = await getCustomerSafe(ctx, invoice.customerId);
-		const company = await getCompanySafe(ctx);
+
+		const [customer, company, file] = await Promise.all([
+			getCustomerSafe(ctx, invoice.customerId),
+			getCompanySafe(ctx),
+			invoice.file ? ctx.storage.getUrl(invoice.file) : Promise.resolve(null),
+		]);
 
 		if (!customer || !company) {
 			return null;
@@ -42,6 +47,7 @@ export const getFull = query({
 			invoice,
 			customer,
 			company,
+			file,
 		};
 	},
 })
@@ -62,7 +68,7 @@ export const createInvoice = mutation({
 			dueInDays: 30,
 			articles: [{ name: '', price: 0 }],
 			notes: '',
-			state: 'draft',
+			state: 'new',
 		});
 
 		await ctx.db.patch('customers', customer._id, {
@@ -86,7 +92,7 @@ export const deleteInvoice = mutation({
 export const updateInvoiceState = mutation({
 	args: {
 		id: v.id('invoices'),
-		state: v.union(v.literal('draft'), v.literal('finalized'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
+		state: invoiceState,
 	},
 	handler: async (ctx, args) => {
 		const invoice = await getInvoice(ctx, args.id);
@@ -94,4 +100,34 @@ export const updateInvoiceState = mutation({
 			state: args.state,
 		});
 	}
+})
+
+export const updateInvoice = mutation({
+	args: {
+		id: v.id('invoices'),
+		articles: v.array(v.object({ name: v.string(), price: v.number() })),
+		notes: v.string(),
+		dueInDays: v.number(),
+		date: v.string(),
+		state: v.optional(invoiceState),
+		file: v.optional(v.id('_storage')),
+	},
+	handler: async (ctx, args) => {
+		const invoice = await getInvoice(ctx, args.id);
+		await ctx.db.patch('invoices', invoice._id, {
+			articles: args.articles,
+			notes: args.notes,
+			dueInDays: args.dueInDays,
+			date: args.date,
+			state: args.state || invoice.state,
+			file: args.file,
+		});
+	}
+})
+
+export const generateUploadUrl = mutation({
+	args: {},
+	handler: async (ctx) => {
+		return await ctx.storage.generateUploadUrl();
+	},
 })

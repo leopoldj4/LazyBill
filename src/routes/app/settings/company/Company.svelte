@@ -54,7 +54,8 @@
 			label="IBAN"
 			key="bankIban"
 			value={company.bankIban}
-			placeholder="DE12345678901234567890"
+			placeholder="DE12 3456 7890 1234 5678 90"
+			iban
 		/>
 
 		<Row label="BIC" key="bankBic" value={company.bankBic} placeholder="DEUTDEDB123" />

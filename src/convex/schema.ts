@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
+import { invoiceState } from './invoiceState';
 
 const customers = defineTable({
 	userId: v.string(),
@@ -25,7 +26,7 @@ const invoices = defineTable({
 	customerId: v.id('customers'),
 	companyId: v.id('companies'),
 
-	state: v.union(v.literal('draft'), v.literal('finalized'), v.literal('sent'), v.literal('paid'), v.literal('cancelled')),
+	state: invoiceState,
 
 	number: v.string(),
 	date: v.string(), // yr-mon-day
