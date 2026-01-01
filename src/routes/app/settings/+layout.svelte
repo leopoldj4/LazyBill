@@ -25,7 +25,7 @@
 	</a>
 {/snippet}
 
-<div class="grid grid-cols-1 gap-12 lg:grid-cols-[16rem_1fr] min-h-[90vh]">
+<div class="flex flex-col gap-12 lg:grid lg:grid-cols-[16rem_1fr] min-h-[90vh]">
 	<div class="flex flex-col pr-4 lg:border-r">
 		<h2 class="mb-4 text-xl max-lg:hidden">Einstellungen</h2>
 		{@render navLink('/app/settings/company', BuildingIcon, 'Meine Firma')}
