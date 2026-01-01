@@ -3,8 +3,11 @@
 	import { api } from '$convex/_generated/api.js';
 	import type { Icon } from '@lucide/svelte';
 	import BanknoteIcon from '@lucide/svelte/icons/banknote';
+	import BellIcon from '@lucide/svelte/icons/bell';
 	import BuildingIcon from '@lucide/svelte/icons/building';
+	import ReceiptIcon from '@lucide/svelte/icons/receipt';
 	import RocketIcon from '@lucide/svelte/icons/rocket';
+	import UserIcon from '@lucide/svelte/icons/user';
 	import { useQuery } from 'convex-svelte';
 
 	const currentUser = useQuery(api.auth.getCurrentUser, {});
@@ -30,6 +33,9 @@
 		<h2 class="mb-4 text-xl max-lg:hidden">Einstellungen</h2>
 		{@render navLink('/app/settings/company', BuildingIcon, 'Meine Firma')}
 		{@render navLink('/app/settings/bank', BanknoteIcon, 'Bank')}
+		{@render navLink('/app/settings/notifications', BellIcon, 'Benachrichtigungen')}
+		{@render navLink('/app/settings/invoices', ReceiptIcon, 'Rechnungen')}
+		{@render navLink('/app/settings/account', UserIcon, 'Account')}
 		{#if currentUser?.data?.email == 'mail@leoj.de'}
 			{@render navLink('/app/settings/beta', RocketIcon, 'Beta')}
 		{/if}

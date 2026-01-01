@@ -1,7 +1,7 @@
 {
-    "name": "LazyBill - Dead simple invoices",
+    "name": "LazyBill",
     "short_name": "LazyBill",
-    "description": "Manage your business with ease",
+    "description": "Dead simple invoices. Manage your business with ease.",
     "start_url": "/app",
     "display": "minimal-ui",
     "icons": [
