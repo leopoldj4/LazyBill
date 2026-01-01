@@ -223,7 +223,7 @@
 					</div>
 				</div>
 
-				<iframe src={data.file} class="aspect-[1/1.5] h-full w-full" title="Rechnung"></iframe>
+				<iframe src="{data.file}{window.innerWidth < 1024 ? "#zoom=50" : ""}" class="aspect-[1/1.5] h-full w-full" title="Rechnung"></iframe>
 			</div>
 		{/if}
 	{/snippet}
