@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { beforeNavigate, goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { api } from '$convex/_generated/api.js';
 	import Logo from '$lib/assets/logo.png';
 	import { authClient } from '$lib/auth-client';
@@ -18,6 +19,7 @@
 	import { createSvelteAuthClient, useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 	import type { ConnectionState } from 'convex/browser';
+
 	import { onMount } from 'svelte';
 
 	createSvelteAuthClient({ authClient, options: { expectAuth: true } });
@@ -108,7 +110,7 @@
 			</a>
 			<button
 				onclick={() => (commandOpen = true)}
-				class="flex h-9 w-[90%] shrink-0 cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 px-4 text-sm text-gray-600 lg:w-full lg:max-w-sm lg:min-w-[15vw]"
+				class="hidden h-9 w-[90%] shrink-0 cursor-text items-center justify-between gap-2 rounded-md bg-gray-100 px-4 text-sm text-gray-600 lg:flex lg:w-full lg:max-w-sm lg:min-w-[15vw]"
 			>
 				<div class="w-[57px] max-lg:hidden"></div>
 
@@ -151,7 +153,7 @@
 					</div>
 				{/if}
 			</div>
-			<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>
+			<a href="/app/settings" class="max-lg:hidden {buttonVariants({ variant: 'ghost' })}">
 				<SettingsIcon class="size-4" />
 				<span class="hidden lg:block">Einstellungen</span>
 			</a>
@@ -159,6 +161,24 @@
 	</div>
 	<div class="mt-[52px] flex flex-col gap-6 p-8">
 		{@render children?.()}
+	</div>
+
+	<div
+		class="fixed right-0 bottom-0 left-0 grid grid-cols-3 justify-between gap-2 border-t bg-white p-4 px-4 lg:hidden"
+	>
+		{#each pages as item}
+			<a
+				href={item.href}
+				class="flex flex-col items-center justify-center gap-2 {page.url.pathname.startsWith(
+					item.href,
+				)
+					? 'text-primary'
+					: 'text-gray-400'}"
+			>
+				<item.icon class="size-4"></item.icon>
+				{item.label}
+			</a>
+		{/each}
 	</div>
 </div>
 
