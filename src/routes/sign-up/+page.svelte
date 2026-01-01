@@ -5,6 +5,10 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { goto } from '$app/navigation';
+	import { sleep } from '$lib';
+	import { action } from '$lib/action.svelte';
+	import { Spinner } from '$lib/components/ui/spinner';
 
 	let name = $state('');
 	let email = $state('');
@@ -12,7 +16,7 @@
 
 	let error = $state('');
 
-	async function signUp(e: Event) {
+	const signUp = action(async (e: Event) => {
 		e.preventDefault();
 
 		const { error: signUpError } = await authClient.signUp.email({
@@ -25,7 +29,10 @@
 		if (signUpError) {
 			error = signUpError.message || 'An unknown error occurred';
 		}
-	}
+
+		await sleep(500);
+		await goto('/app');
+	}, 'An unknown error occurred');
 </script>
 
 <div class="flex h-screen w-full items-center justify-center px-4">
@@ -35,7 +42,7 @@
 			<Card.Description>Enter your email below to sign up for an account</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form onsubmit={signUp}>
+			<form onsubmit={signUp.run}>
 				<div class="grid gap-4">
 					<div class="grid gap-2">
 						<Label for="name">Name</Label>
@@ -58,7 +65,13 @@
 					{#if error}
 						<p class="text-red-500">{error}</p>
 					{/if}
-					<Button type="submit" class="w-full">Sign Up</Button>
+					<Button type="submit" class="w-full" disabled={signUp.isLoading}>
+						{#if signUp.isLoading}
+							<Spinner class="size-4" />
+						{:else}
+							Sign Up
+						{/if}
+					</Button>
 				</div>
 
 				<div class="mt-4 text-center text-sm">
