@@ -175,7 +175,7 @@
 					? 'text-primary'
 					: 'text-gray-400'}"
 			>
-				<item.icon class="size-4"></item.icon>
+				<item.icon></item.icon>
 				{item.label}
 			</a>
 		{/each}
