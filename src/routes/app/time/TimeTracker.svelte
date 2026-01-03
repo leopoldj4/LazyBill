@@ -189,7 +189,7 @@
 	<!-- New entry form -->
 	<div class="rounded-lg border bg-card p-4">
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Neuer Timer</h3>
+			<h3 class="text-lg">Neuer Timer</h3>
 
 			<div class="flex flex-col gap-3 lg:flex-row lg:items-end">
 				<div class="flex-1">

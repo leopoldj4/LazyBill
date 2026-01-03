@@ -92,8 +92,8 @@
 			<span class="text-lg font-medium">{entry.description || 'Kein Titel'}</span>
 			<div class="flex items-center gap-2 text-sm text-muted-foreground">
 				<ClockIcon class="size-4" />
-				<span>{formatDateTimeRange(entry.startDateTime, entry.endDateTime)}</span>
-				<span class="text-xs">({calculateDuration(entry.startDateTime, entry.endDateTime)})</span>
+				<span>{formatDateTimeRange(entry.startDateTime, entry.endDateTime!)}</span>
+				<span class="text-xs">({calculateDuration(entry.startDateTime, entry.endDateTime!)})</span>
 			</div>
 		</div>
 		<div class="flex flex-wrap gap-2">
