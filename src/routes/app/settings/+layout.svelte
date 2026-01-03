@@ -2,7 +2,6 @@
 	import { beforeNavigate } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import BanknoteIcon from '@lucide/svelte/icons/banknote';
 	import BellIcon from '@lucide/svelte/icons/bell';
 	import BuildingIcon from '@lucide/svelte/icons/building';
@@ -15,10 +14,10 @@
 
 	let { children } = $props();
 
-	const sidebar = useSidebar();
+	let sidebarOpen = $state(false);
 
 	beforeNavigate(() => {
-		sidebar.setOpenMobile(false);
+		sidebarOpen = false;
 	});
 
 	const settingsNavLinks = [
@@ -30,7 +29,7 @@
 	];
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider bind:open={sidebarOpen}>
 	<Sidebar.Root class="top-[52px]">
 		<Sidebar.Content>
 			<Sidebar.Group>
