@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getCompany, getCompanySafe } from "./companies";
+import { getCustomer } from "./customers";
 
 export async function getTaskSafe(ctx: QueryCtx, id: Id<'tasks'>) {
     const company = await getCompanySafe(ctx);
@@ -27,7 +28,6 @@ export const create = mutation({
     args: {
         customerId: v.id('customers'),
         description: v.string(),
-        dueDate: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const company = await getCompany(ctx);
@@ -35,7 +35,6 @@ export const create = mutation({
             companyId: company._id,
             customerId: args.customerId,
             description: args.description,
-            dueDate: args.dueDate,
             completed: false,
         });
     }
@@ -59,5 +58,38 @@ export const setCompleted = mutation({
     handler: async (ctx, args) => {
         const task = await getTask(ctx, args.id);
         return await ctx.db.patch('tasks', task._id, { completed: args.completed });
+    }
+});
+
+export const remove = mutation({
+    args: {
+        id: v.id('tasks'),
+    },
+    handler: async (ctx, args) => {
+        const task = await getTask(ctx, args.id);
+        return await ctx.db.delete('tasks', task._id);
+    }
+});
+
+export const updateCustomer = mutation({
+    args: {
+        id: v.id('tasks'),
+        customerId: v.optional(v.id('customers')),
+    },
+    handler: async (ctx, args) => {
+        const task = await getTask(ctx, args.id);
+        const customer = args.customerId ? await getCustomer(ctx, args.customerId) : null;
+        return await ctx.db.patch('tasks', task._id, { customerId: customer?._id ?? undefined });
+    }
+});
+
+export const updateDescription = mutation({
+    args: {
+        id: v.id('tasks'),
+        description: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const task = await getTask(ctx, args.id);
+        return await ctx.db.patch('tasks', task._id, { description: args.description });
     }
 });
