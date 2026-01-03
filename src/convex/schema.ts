@@ -65,15 +65,6 @@ const companies = defineTable({
 	customerNumberCounter: v.number(),
 }).index('by_userId', ['userId']);
 
-const timeEntries = defineTable({
-	companyId: v.id('companies'),
-	customerId: v.optional(v.id('customers')),
-	invoiceId: v.optional(v.id('invoices')),
-	
-	description: v.string(),
-	completed: v.boolean(),
-}).index('by_companyId', ['companyId']);
-
 const tasks = defineTable({
 	companyId: v.id('companies'),
 	customerId: v.optional(v.id('customers')),
