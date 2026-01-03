@@ -10,6 +10,7 @@
 	import { useQuery } from 'convex-svelte';
 	import TimeEntryRow from './TimeEntryRow.svelte';
 	import TimeEntryDialog from './TimeEntryDialog.svelte';
+	import TimeTracker from './TimeTracker.svelte';
 
 	const customersQuery = useQuery(api.customers.list, {});
 	const invoicesQuery = useQuery(api.invoices.list, {});
@@ -22,9 +23,11 @@
 	type TimeEntry = Doc<'timeEntries'>;
 
 	function filterEntries(entries: TimeEntry[], searchTerm: string): TimeEntry[] {
-		if (!searchTerm) return entries;
+		// Filter out running entries (those without endDateTime) - they're shown in TimeTracker
+		let filtered = entries.filter((entry) => entry.endDateTime);
+		if (!searchTerm) return filtered;
 		const term = searchTerm.toLowerCase();
-		return entries.filter((entry) => entry.description.toLowerCase().includes(term));
+		return filtered.filter((entry) => entry.description.toLowerCase().includes(term));
 	}
 
 	function sortEntries(entries: TimeEntry[]): TimeEntry[] {
@@ -46,6 +49,7 @@
 	{#snippet children(customers)}
 		<Suspense query={invoicesQuery}>
 			{#snippet children(invoices)}
+				<TimeTracker {customers} />
 				<div class="flex justify-between gap-2">
 					<div class="flex flex-1 gap-2">
 						<Input

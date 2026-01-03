@@ -81,7 +81,7 @@ const timeEntries = defineTable({
 
 	description: v.string(),
 	startDateTime: v.string(), // ISO datetime string (YYYY-MM-DDTHH:mm)
-	endDateTime: v.string(), // ISO datetime string (YYYY-MM-DDTHH:mm)
+	endDateTime: v.optional(v.string()), // ISO datetime string (YYYY-MM-DDTHH:mm)
 }).index('by_companyId', ['companyId']);
 
 const betaUsers = defineTable({

@@ -139,3 +139,59 @@ export const remove = mutation({
         return await ctx.db.delete(timeEntry._id);
     }
 });
+
+export const getRunning = query({
+    args: {},
+    handler: async (ctx) => {
+        const company = await getCompanySafe(ctx);
+        if (!company) return [];
+
+        const entries = await ctx.db
+            .query('timeEntries')
+            .withIndex('by_companyId', (q) => q.eq('companyId', company._id))
+            .collect();
+
+        // Running entries have no endDateTime
+        return entries.filter((e) => !e.endDateTime);
+    }
+});
+
+export const start = mutation({
+    args: {
+        customerId: v.optional(v.id('customers')),
+        description: v.string(),
+        startDateTime: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const company = await getCompany(ctx);
+
+        if (args.customerId) {
+            await getCustomer(ctx, args.customerId);
+        }
+
+        return await ctx.db.insert('timeEntries', {
+            companyId: company._id,
+            customerId: args.customerId,
+            description: args.description,
+            startDateTime: args.startDateTime,
+        });
+    }
+});
+
+export const stop = mutation({
+    args: {
+        id: v.id('timeEntries'),
+        endDateTime: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const timeEntry = await getTimeEntry(ctx, args.id);
+
+        if (timeEntry.endDateTime) {
+            throw new Error('Time entry is already stopped');
+        }
+
+        return await ctx.db.patch(timeEntry._id, {
+            endDateTime: args.endDateTime,
+        });
+    }
+});
