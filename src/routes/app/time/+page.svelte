@@ -1,19 +1,37 @@
 <script lang="ts">
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import { api } from '$convex/_generated/api';
+	import type { Doc, Id } from '$convex/_generated/dataModel';
 	import SiteHeader from '$lib/components/site-header.svelte';
-    import * as Select from '$lib/components/ui/select';
-    import { useQuery } from 'convex-svelte';
-    import { api } from '$convex/_generated/api';
-    import type { Doc, Id } from '$convex/_generated/dataModel';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import Suspense from '$lib/components/Suspense.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import { Input } from '$lib/components/ui/input';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { useQuery } from 'convex-svelte';
+	import TimeEntryRow from './TimeEntryRow.svelte';
+	import TimeEntryDialog from './TimeEntryDialog.svelte';
 
-    const customersQuery = useQuery(api.customers.list, {});
+	const customersQuery = useQuery(api.customers.list, {});
+	const invoicesQuery = useQuery(api.invoices.list, {});
+	const timeEntriesQuery = useQuery(api.timeEntries.list, {});
 
-    let customerId = $state<Id<'customers'> | undefined>(undefined);
+	let timeEntryDialog: ReturnType<typeof TimeEntryDialog>;
 
-    type Customer = Doc<'customers'>;
+	let search = $state('');
 
-    let customers: Customer[] = $derived(customersQuery.data ?? []);
+	type TimeEntry = Doc<'timeEntries'>;
+
+	function filterEntries(entries: TimeEntry[], searchTerm: string): TimeEntry[] {
+		if (!searchTerm) return entries;
+		const term = searchTerm.toLowerCase();
+		return entries.filter((entry) => entry.description.toLowerCase().includes(term));
+	}
+
+	function sortEntries(entries: TimeEntry[]): TimeEntry[] {
+		return entries.toSorted((a, b) => {
+			return new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime();
+		});
+	}
 </script>
 
 <Breadcrumb.Root>
@@ -24,17 +42,48 @@
 
 <SiteHeader>Zeiterfassung</SiteHeader>
 
-<Select.Root type="single" bind:value={customerId}>
-    <Select.Trigger class="w-full">
-        {customerId
-            ? customers.find((customer) => customer._id === customerId)?.name
-            : 'Kein Kunde ausgewählt'}
-    </Select.Trigger>
-    <Select.Content>
-        <Select.Item value="">Kein Kunde</Select.Item>
-        <Select.Separator />
-        {#each customers as customer}
-            <Select.Item value={customer._id}>{customer.name}</Select.Item>
-        {/each}
-    </Select.Content>
-</Select.Root>
+<Suspense query={customersQuery}>
+	{#snippet children(customers)}
+		<Suspense query={invoicesQuery}>
+			{#snippet children(invoices)}
+				<div class="flex justify-between gap-2">
+					<div class="flex flex-1 gap-2">
+						<Input
+							type="text"
+							placeholder="Suchen ..."
+							bind:value={search}
+							class="h-8 w-[150px] lg:w-[250px]"
+						/>
+					</div>
+					<Button onclick={() => timeEntryDialog.create()}>
+						<PlusIcon />
+						Neu
+					</Button>
+				</div>
+
+				<Suspense query={timeEntriesQuery}>
+					{#snippet children(timeEntries)}
+						{#if timeEntries.length === 0}
+							<div class="flex min-h-[30vh] flex-col items-center justify-center gap-4">
+								<p>Keine Zeiteinträge gefunden</p>
+							</div>
+						{:else}
+							<div class="grid gap-2">
+								{#each sortEntries(filterEntries(timeEntries, search)) as entry (entry._id)}
+									<TimeEntryRow
+										{entry}
+										customer={customers.find((c) => c._id === entry.customerId)}
+										invoice={invoices.find((i) => i._id === entry.invoiceId)}
+										{timeEntryDialog}
+									/>
+								{/each}
+							</div>
+						{/if}
+					{/snippet}
+				</Suspense>
+
+				<TimeEntryDialog bind:this={timeEntryDialog} {customers} {invoices} />
+			{/snippet}
+		</Suspense>
+	{/snippet}
+</Suspense>

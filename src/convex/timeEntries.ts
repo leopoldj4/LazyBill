@@ -1,0 +1,141 @@
+import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+import { mutation, query, type QueryCtx } from "./_generated/server";
+import { getCompany, getCompanySafe } from "./companies";
+import { getCustomer } from "./customers";
+import { getInvoice } from "./invoices";
+
+export async function getTimeEntrySafe(ctx: QueryCtx, id: Id<'timeEntries'>) {
+    const company = await getCompanySafe(ctx);
+    if (!company) {
+        return null;
+    }
+    const timeEntry = await ctx.db.get(id);
+    if (!timeEntry || timeEntry.companyId !== company._id) {
+        return null;
+    }
+    return timeEntry;
+}
+
+export async function getTimeEntry(ctx: QueryCtx, id: Id<'timeEntries'>) {
+    const timeEntry = await getTimeEntrySafe(ctx, id);
+    if (!timeEntry) {
+        throw new Error('Time entry not found');
+    }
+    return timeEntry;
+}
+
+export const create = mutation({
+    args: {
+        customerId: v.optional(v.id('customers')),
+        invoiceId: v.optional(v.id('invoices')),
+        description: v.string(),
+        startDateTime: v.string(),
+        endDateTime: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const company = await getCompany(ctx);
+
+        if (args.customerId) {
+            await getCustomer(ctx, args.customerId);
+        }
+        if (args.invoiceId) {
+            await getInvoice(ctx, args.invoiceId);
+        }
+
+        return await ctx.db.insert('timeEntries', {
+            companyId: company._id,
+            customerId: args.customerId,
+            invoiceId: args.invoiceId,
+            description: args.description,
+            startDateTime: args.startDateTime,
+            endDateTime: args.endDateTime,
+        });
+    }
+});
+
+export const list = query({
+    args: {},
+    handler: async (ctx) => {
+        const company = await getCompany(ctx);
+        return await ctx.db
+            .query('timeEntries')
+            .withIndex('by_companyId', (q) => q.eq('companyId', company._id))
+            .collect();
+    }
+});
+
+export const update = mutation({
+    args: {
+        id: v.id('timeEntries'),
+        customerId: v.optional(v.id('customers')),
+        invoiceId: v.optional(v.id('invoices')),
+        description: v.optional(v.string()),
+        startDateTime: v.optional(v.string()),
+        endDateTime: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const timeEntry = await getTimeEntry(ctx, args.id);
+
+        if (args.customerId) {
+            await getCustomer(ctx, args.customerId);
+        }
+        if (args.invoiceId) {
+            await getInvoice(ctx, args.invoiceId);
+        }
+
+        const updates: Partial<{
+            customerId: Id<'customers'> | undefined;
+            invoiceId: Id<'invoices'> | undefined;
+            description: string;
+            startDateTime: string;
+            endDateTime: string;
+        }> = {};
+
+        if (args.customerId !== undefined) updates.customerId = args.customerId || undefined;
+        if (args.invoiceId !== undefined) updates.invoiceId = args.invoiceId || undefined;
+        if (args.description !== undefined) updates.description = args.description;
+        if (args.startDateTime !== undefined) updates.startDateTime = args.startDateTime;
+        if (args.endDateTime !== undefined) updates.endDateTime = args.endDateTime;
+
+        return await ctx.db.patch(timeEntry._id, updates);
+    }
+});
+
+export const updateCustomer = mutation({
+    args: {
+        id: v.id('timeEntries'),
+        customerId: v.optional(v.id('customers')),
+    },
+    handler: async (ctx, args) => {
+        const timeEntry = await getTimeEntry(ctx, args.id);
+        if (args.customerId) {
+            await getCustomer(ctx, args.customerId);
+        }
+        return await ctx.db.patch(timeEntry._id, { customerId: args.customerId ?? undefined });
+    }
+});
+
+export const updateInvoice = mutation({
+    args: {
+        id: v.id('timeEntries'),
+        invoiceId: v.optional(v.id('invoices')),
+    },
+    handler: async (ctx, args) => {
+        const timeEntry = await getTimeEntry(ctx, args.id);
+        if (args.invoiceId) {
+            await getInvoice(ctx, args.invoiceId);
+        }
+        return await ctx.db.patch(timeEntry._id, { invoiceId: args.invoiceId ?? undefined });
+    }
+});
+
+export const remove = mutation({
+    args: {
+        id: v.id('timeEntries'),
+    },
+    handler: async (ctx, args) => {
+        const timeEntry = await getTimeEntry(ctx, args.id);
+        return await ctx.db.delete(timeEntry._id);
+    }
+});

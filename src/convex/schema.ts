@@ -69,13 +69,23 @@ const tasks = defineTable({
 	companyId: v.id('companies'),
 	customerId: v.optional(v.id('customers')),
 	invoiceId: v.optional(v.id('invoices')),
-	
+
 	description: v.string(),
 	completed: v.boolean(),
+}).index('by_companyId', ['companyId']);
+
+const timeEntries = defineTable({
+	companyId: v.id('companies'),
+	customerId: v.optional(v.id('customers')),
+	invoiceId: v.optional(v.id('invoices')),
+
+	description: v.string(),
+	startDateTime: v.string(), // ISO datetime string (YYYY-MM-DDTHH:mm)
+	endDateTime: v.string(), // ISO datetime string (YYYY-MM-DDTHH:mm)
 }).index('by_companyId', ['companyId']);
 
 const betaUsers = defineTable({
 	email: v.string(),
 });
 
-export default defineSchema({ customers, invoices, companies, betaUsers, tasks });
+export default defineSchema({ customers, invoices, companies, betaUsers, tasks, timeEntries });

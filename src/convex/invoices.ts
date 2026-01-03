@@ -6,7 +6,7 @@ import { getCompany, getCompanySafe } from "./companies";
 import { getCustomer, getCustomerSafe } from "./customers";
 import { invoiceState } from "./invoiceState";
 
-async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
+export async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
 	const company = await getCompanySafe(ctx);
 	const invoice = await ctx.db.get(id);
 	if (!invoice || invoice.companyId !== company?._id) {
@@ -15,7 +15,7 @@ async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
 	return invoice;
 }
 
-async function getInvoice(ctx: QueryCtx, id: Id<'invoices'>) {
+export async function getInvoice(ctx: QueryCtx, id: Id<'invoices'>) {
 	const invoice = await getInvoiceSafe(ctx, id);
 	if (!invoice) {
 		throw new Error('Invoice not found');
