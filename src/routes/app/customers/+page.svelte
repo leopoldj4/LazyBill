@@ -16,7 +16,6 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { useConvexClient, useQuery } from 'convex-svelte';
 
-
 	const client = useConvexClient();
 
 	let newCustomerOpen = $state(false);
@@ -41,7 +40,6 @@
 	const query = useQuery(api.customers.list, () => ({
 		archived: showArchived,
 	}));
-
 </script>
 
 <Breadcrumb.Root>
@@ -81,32 +79,28 @@
 					</a>
 				{/each}
 			</div>
-			<Table.Root class="max-lg:hidden">
-				<Table.TableHeader>
-					<Table.Row>
-						<Table.Head>Name</Table.Head>
-						<Table.Head>Email</Table.Head>
-						<Table.Head>Invoice Address</Table.Head>
-					</Table.Row>
-				</Table.TableHeader>
-				<Table.TableBody>
-					{#each customers as customer}
-						<a href={`/app/customers/${customer._id}`} class="contents">
-							<Table.TableRow>
-								<Table.TableCell>
-									{customer.name}
-								</Table.TableCell>
-								<Table.TableCell>{customer.email}</Table.TableCell>
-								<Table.TableCell>
-									<div class="text-sm">
-										<Address address={customer} />
-									</div>
-								</Table.TableCell>
-							</Table.TableRow>
-						</a>
-					{/each}
-				</Table.TableBody>
-			</Table.Root>
+			<div class="overflow-hidden rounded-md border">
+				<Table.Root class="max-lg:hidden">
+					<Table.TableHeader>
+						<Table.Row>
+							<Table.Head>Name</Table.Head>
+							<Table.Head>Email</Table.Head>
+						</Table.Row>
+					</Table.TableHeader>
+					<Table.TableBody>
+						{#each customers as customer}
+							<a href={`/app/customers/${customer._id}`} class="contents">
+								<Table.TableRow>
+									<Table.TableCell>
+										{customer.name}
+									</Table.TableCell>
+									<Table.TableCell>{customer.email}</Table.TableCell>
+								</Table.TableRow>
+							</a>
+						{/each}
+					</Table.TableBody>
+				</Table.Root>
+			</div>
 		{/if}
 	{/snippet}
 </Suspense>

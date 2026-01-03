@@ -13,7 +13,7 @@
 	import type { Icon } from '@lucide/svelte';
 	import BuildingIcon from '@lucide/svelte/icons/building';
 	import ReceiptIcon from '@lucide/svelte/icons/receipt';
-	import TaskIcon from '@lucide/svelte/icons/list-todo';
+	import ClockIcon from '@lucide/svelte/icons/clock';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import UsersIcon from '@lucide/svelte/icons/users';
@@ -68,7 +68,7 @@
 	const pages: Page[] = [
 		{ href: '/app/customers', icon: UsersIcon, label: 'Kunden' },
 		{ href: '/app/invoices', icon: ReceiptIcon, label: 'Rechnungen' },
-		{ href: '/app/tasks', icon: TaskIcon, label: 'Aufgaben' },
+		{ href: '/app/time', icon: ClockIcon, label: 'Zeiterfassung' },
 		{ href: '/app/settings', icon: BuildingIcon, label: 'Einstellungen' },
 	];
 </script>
@@ -129,7 +129,7 @@
 			<div class="flex flex-row max-lg:hidden">
 				<a href="/app/customers" class={buttonVariants({ variant: 'ghost' })}> Kunden </a>
 				<a href="/app/invoices" class={buttonVariants({ variant: 'ghost' })}> Rechnungen </a>
-				<a href="/app/tasks" class={buttonVariants({ variant: 'ghost' })}> Aufgaben </a>
+				<a href="/app/time" class={buttonVariants({ variant: 'ghost' })}> Zeiterfassung </a>
 			</div>
 		</header>
 
