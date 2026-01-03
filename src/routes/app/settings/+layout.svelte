@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { beforeNavigate } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
+	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import BanknoteIcon from '@lucide/svelte/icons/banknote';
 	import BellIcon from '@lucide/svelte/icons/bell';
 	import BuildingIcon from '@lucide/svelte/icons/building';
@@ -12,6 +14,12 @@
 	const currentUser = useQuery(api.auth.getCurrentUser, {});
 
 	let { children } = $props();
+
+	const sidebar = useSidebar();
+
+	beforeNavigate(() => {
+		sidebar.setOpenMobile(false);
+	});
 
 	const settingsNavLinks = [
 		{ href: '/app/settings/company', icon: BuildingIcon, label: 'Meine Firma' },
