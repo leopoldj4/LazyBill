@@ -153,7 +153,7 @@
 					</div>
 				{/if}
 			</div>
-			<a href="/app/settings" class="{buttonVariants({ variant: 'ghost' })}">
+			<a href="/app/settings" class={buttonVariants({ variant: 'ghost' })}>
 				<SettingsIcon class="size-4" />
 				<span class="hidden lg:block">Einstellungen</span>
 			</a>
@@ -164,7 +164,7 @@
 	</div>
 
 	<div
-		class="fixed right-0 bottom-0 left-0 grid grid-cols-2 justify-between gap-2 border-t bg-white p-4 px-4 lg:hidden"
+		class="fixed right-0 bottom-0 left-0 grid grid-cols-3 justify-between gap-2 border-t bg-white p-4 px-4 lg:hidden"
 	>
 		{#each pages as item}
 			<a
@@ -179,6 +179,10 @@
 				{item.label}
 			</a>
 		{/each}
+		<button class="flex flex-col items-center justify-center gap-2 text-gray-400" onclick={() => (commandOpen = true)}>
+			<SearchIcon></SearchIcon>
+			Suche
+		</button>
 	</div>
 </div>
 
