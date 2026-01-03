@@ -27,13 +27,12 @@ export const list = query({
 	},
 	handler: async (ctx, args) => {
 		const userId = await getUserId(ctx);
-
-		let query = ctx.db.query('customers').withIndex('by_userId', (q) => q.eq('userId', userId));
-		if (args.archived !== undefined) {
-			query = query.filter((q) => q.eq(q.field('isArchived'), args.archived));
-		}
-
-		return await query.collect();
+		const archived = args.archived ?? false;
+		return await ctx.db
+			.query('customers')
+			.withIndex('by_userId', (q) => q.eq('userId', userId))
+			.filter((q) => q.eq(q.field('isArchived'), archived))
+			.collect();
 	},
 });
 

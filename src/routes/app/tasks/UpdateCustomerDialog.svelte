@@ -9,9 +9,7 @@
 	import Suspense from '$lib/components/Suspense.svelte';
 	import { Spinner } from '$lib/components/ui/spinner';
 
-	const query = useQuery(api.customers.list, () => ({
-		archived: false,
-	}));
+	const query = useQuery(api.customers.list, {});
 
 	const client = useConvexClient();
 

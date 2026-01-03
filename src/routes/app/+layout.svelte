@@ -57,7 +57,7 @@
 	});
 
 	const query = useQuery(api.customers.list, () =>
-		auth.isAuthenticated ? { archived: false } : 'skip',
+		auth.isAuthenticated ? { } : 'skip',
 	);
 
 	type Page = {

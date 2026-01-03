@@ -19,9 +19,7 @@
 
 	let updateCustomerDialog: ReturnType<typeof UpdateCustomerDialog>;
 
-	const customersQuery = useQuery(api.customers.list, () => ({
-		archived: false,
-	}));
+	const customersQuery = useQuery(api.customers.list, {});
 
 	let showCompleted = $state(false);
 	let search = $state<string | undefined>(undefined);

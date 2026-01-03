@@ -37,9 +37,7 @@
 
 	let showArchived = $state(false);
 
-	const query = useQuery(api.customers.list, () => ({
-		archived: showArchived,
-	}));
+	const query = useQuery(api.customers.list, () => (showArchived ? { archived: true } : {}));
 </script>
 
 <Breadcrumb.Root>
