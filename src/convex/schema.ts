@@ -65,33 +65,18 @@ const companies = defineTable({
 	customerNumberCounter: v.number(),
 }).index('by_userId', ['userId']);
 
+const tasks = defineTable({
+	companyId: v.id('companies'),
+	customerId: v.id('customers'),
+	invoiceId: v.optional(v.id('invoices')),
+	
+	description: v.string(),
+	dueDate: v.optional(v.string()),
+	completed: v.boolean(),
+}).index('by_companyId', ['companyId']);
+
 const betaUsers = defineTable({
 	email: v.string(),
 });
 
-const bankAccounts = defineTable({
-	userId: v.string(),
-	accessToken: v.string(),
-	itemId: v.string(),
-	institutionId: v.optional(v.string()),
-	institutionName: v.optional(v.string()),
-	accountId: v.string(),
-	accountName: v.optional(v.string()),
-	accountMask: v.optional(v.string()),
-	accountType: v.optional(v.string()),
-	accountSubtype: v.optional(v.string()),
-}).index('by_userId', ['userId']);
-
-const transactions = defineTable({
-	userId: v.string(),
-	bankAccountId: v.id('bankAccounts'),
-	transactionId: v.string(),
-	amount: v.number(),
-	date: v.string(),
-	name: v.string(),
-	merchantName: v.optional(v.string()),
-	category: v.optional(v.array(v.string())),
-	pending: v.boolean(),
-}).index('by_userId', ['userId']).index('by_bankAccountId', ['bankAccountId']);
-
-export default defineSchema({ customers, invoices, companies, betaUsers, bankAccounts, transactions });
+export default defineSchema({ customers, invoices, companies, betaUsers, tasks });

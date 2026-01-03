@@ -16,7 +16,7 @@ import type * as http from "../http.js";
 import type * as invoiceState from "../invoiceState.js";
 import type * as invoices from "../invoices.js";
 import type * as migrations from "../migrations.js";
-import type * as plaid from "../plaid.js";
+import type * as tasks from "../tasks.js";
 
 import type {
   ApiFromModules,
@@ -33,7 +33,7 @@ declare const fullApi: ApiFromModules<{
   invoiceState: typeof invoiceState;
   invoices: typeof invoices;
   migrations: typeof migrations;
-  plaid: typeof plaid;
+  tasks: typeof tasks;
 }>;
 
 /**
