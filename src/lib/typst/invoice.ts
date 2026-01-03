@@ -73,7 +73,7 @@ ${Template}
     bank: company.bankName,
     iban: company.bankIban,
     bic: company.bankBic,
-    reference: "Rechnung #" + nr,
+    reference: "Rechnung " + nr,
 )
 
 #notes
