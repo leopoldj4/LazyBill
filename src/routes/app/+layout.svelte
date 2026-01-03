@@ -56,9 +56,7 @@
 		return unsubscribe;
 	});
 
-	const query = useQuery(api.customers.list, () =>
-		auth.isAuthenticated ? { } : 'skip',
-	);
+	const query = useQuery(api.customers.list, () => (auth.isAuthenticated ? {} : 'skip'));
 
 	type Page = {
 		href: string;
@@ -68,8 +66,7 @@
 	const pages: Page[] = [
 		{ href: '/app/customers', icon: UsersIcon, label: 'Kunden' },
 		{ href: '/app/invoices', icon: ReceiptIcon, label: 'Rechnungen' },
-		{ href: '/app/time', icon: ClockIcon, label: 'Zeiterfassung' },
-		{ href: '/app/settings', icon: BuildingIcon, label: 'Einstellungen' },
+		//{ href: '/app/time', icon: ClockIcon, label: 'Zeiterfassung' },
 	];
 </script>
 
@@ -102,7 +99,7 @@
 
 <div class="h-full min-h-screen">
 	<div
-		class="fixed top-0 z-30 flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 bg-white px-8 border-b"
+		class="fixed top-0 z-30 flex h-[52px] w-full max-w-screen flex-row items-center justify-between gap-4 border-b bg-white px-8"
 	>
 		<header class="flex shrink-0 items-center gap-2">
 			<a class="mr-4 flex shrink-0 items-center gap-1" href="/app">
@@ -127,9 +124,9 @@
 				</Kbd.Group>
 			</button>
 			<div class="flex flex-row max-lg:hidden">
-				<a href="/app/customers" class={buttonVariants({ variant: 'ghost' })}> Kunden </a>
-				<a href="/app/invoices" class={buttonVariants({ variant: 'ghost' })}> Rechnungen </a>
-				<a href="/app/time" class={buttonVariants({ variant: 'ghost' })}> Zeiterfassung </a>
+				{#each pages as page (page.href)}
+					<a href={page.href} class={buttonVariants({ variant: 'ghost' })}> {page.label} </a>
+				{/each}
 			</div>
 		</header>
 
@@ -156,7 +153,7 @@
 					</div>
 				{/if}
 			</div>
-			<a href="/app/settings" class="max-lg:hidden {buttonVariants({ variant: 'ghost' })}">
+			<a href="/app/settings" class="{buttonVariants({ variant: 'ghost' })}">
 				<SettingsIcon class="size-4" />
 				<span class="hidden lg:block">Einstellungen</span>
 			</a>
