@@ -11,10 +11,13 @@
 	import TimeEntryRow from './TimeEntryRow.svelte';
 	import TimeEntryDialog from './TimeEntryDialog.svelte';
 	import TimeTracker from './TimeTracker.svelte';
+	import CustomerPicker from '$lib/components/CustomerPicker.svelte';
 
 	const customersQuery = useQuery(api.customers.list, {});
 	const invoicesQuery = useQuery(api.invoices.list, {});
 	const timeEntriesQuery = useQuery(api.timeEntries.list, {});
+
+	let customerId = $state<Id<'customers'> | undefined>(undefined);
 
 	let timeEntryDialog: ReturnType<typeof TimeEntryDialog>;
 
@@ -58,8 +61,9 @@
 							bind:value={search}
 							class="h-8 w-[150px] lg:w-[250px]"
 						/>
+						<CustomerPicker bind:customerId class="w-[180px]" />
 					</div>
-					<Button onclick={() => timeEntryDialog.create()}>
+					<Button onclick={() => timeEntryDialog.create()} size="sm">
 						<PlusIcon />
 						Neu
 					</Button>
