@@ -164,7 +164,7 @@
 	</div>
 
 	<div
-		class="fixed right-0 bottom-0 left-0 grid grid-cols-4 justify-between gap-2 border-t bg-white p-4 px-4 lg:hidden"
+		class="fixed right-0 bottom-0 left-0 grid grid-cols-2 justify-between gap-2 border-t bg-white p-4 px-4 lg:hidden"
 	>
 		{#each pages as item}
 			<a
