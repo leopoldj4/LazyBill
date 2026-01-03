@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { beforeNavigate } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import BanknoteIcon from '@lucide/svelte/icons/banknote';
@@ -9,16 +8,11 @@
 	import RocketIcon from '@lucide/svelte/icons/rocket';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import { useQuery } from 'convex-svelte';
+	import SettingsNavHandler from './SettingsNavHandler.svelte';
 
 	const currentUser = useQuery(api.auth.getCurrentUser, {});
 
 	let { children } = $props();
-
-	let sidebarOpen = $state(false);
-
-	beforeNavigate(() => {
-		sidebarOpen = false;
-	});
 
 	const settingsNavLinks = [
 		{ href: '/app/settings/company', icon: BuildingIcon, label: 'Meine Firma' },
@@ -29,7 +23,8 @@
 	];
 </script>
 
-<Sidebar.Provider bind:open={sidebarOpen}>
+<Sidebar.Provider>
+	<SettingsNavHandler />
 	<Sidebar.Root class="top-[52px]">
 		<Sidebar.Content>
 			<Sidebar.Group>
