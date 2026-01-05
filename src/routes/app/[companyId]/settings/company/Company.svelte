@@ -1,18 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { api } from '$convex/_generated/api.js';
 	import type { Doc } from '$convex/_generated/dataModel';
-	import { createDebouncedStore } from '$lib/debounce.svelte';
-	import { authClient } from '$lib/auth-client';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import LogOutIcon from '@lucide/svelte/icons/log-out';
+	import { fromCompany } from '$lib/address';
+	import Address from '$lib/components/Address.svelte';
+	import AddressModal from '$lib/components/AddressModal.svelte';
 	import { useConvexClient } from 'convex-svelte';
 	import Row from './Row.svelte';
 	import Section from './Section.svelte';
-	import { extractCompanyData, type CompanyData } from './company';
-	import AddressModal from '$lib/components/AddressModal.svelte';
-	import { fromCompany } from '$lib/address';
-	import Address from '$lib/components/Address.svelte';
 	const client = useConvexClient();
 
 	type Props = {
@@ -66,14 +60,3 @@
 		<Row label="Kleinunternehmer" key="smallBusiness" value={company.smallBusiness} checkbox />
 	</Section>
 </div>
-
-<Button
-	variant="link"
-	class="mt-12"
-	onclick={async () => {
-		authClient.signOut();
-	}}
->
-	<LogOutIcon class="size-4" />
-	Abmelden
-</Button>

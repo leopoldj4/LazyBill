@@ -1,0 +1,1 @@
+export const load = async ({ params }) => ({ companyId: params.companyId });

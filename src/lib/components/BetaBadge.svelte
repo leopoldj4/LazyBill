@@ -1,1 +1,1 @@
-<div class="rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-primary-foreground ml-2">Beta</div>
+<div class="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground ml-2">Beta</div>

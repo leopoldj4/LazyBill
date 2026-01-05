@@ -158,7 +158,7 @@
 
 <SiteHeader>
 	{customer.name}
-	<div class="text-gray-500">#{customer.number}</div>
+	<div class="text-muted-foreground">#{customer.number}</div>
 	<DropDownMenu.Root>
 		<DropDownMenu.Trigger>
 			{#snippet child({ props })}
