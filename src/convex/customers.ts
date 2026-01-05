@@ -131,7 +131,7 @@ export const update = mutation({
 	handler: async (ctx, args) => {
 		const customer = await getCustomer(ctx, args.id);
 
-		if (!['email', 'phone', 'notes'].includes(args.key)) {
+		if (!['email', 'phone', 'notes', 'name'].includes(args.key)) {
 			throw new Error('Invalid key');
 		}
 		await ctx.db.patch('customers', customer._id, {

@@ -23,7 +23,7 @@
 	import { InvoiceStateDetail } from '$lib/invoiceState';
 	import { alert } from '$lib/prompt.svelte';
 	import { prompt } from '$lib/prompt.svelte.js';
-	import { CheckIcon } from '@lucide/svelte';
+	import { CheckIcon, PencilIcon } from '@lucide/svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ClockIcon from '@lucide/svelte/icons/clock';
 	import CopyIcon from '@lucide/svelte/icons/copy';
@@ -101,6 +101,17 @@
 		toast.success('Kunde erfolgreich gelöscht');
 	}, 'Fehler beim Löschen des Kunden');
 
+	let rename = action(async () => {
+		const newName = window.prompt('Umbenennen', customer.name);
+		if (newName) {
+			await client.mutation(api.customers.update, {
+				id: customer._id,
+				key: 'name',
+				value: newName,
+			});
+		}
+	}, 'Fehler beim Umbenennen des Kunden');
+
 	let newInvoice = action(async () => {
 		if (isCompanyEmpty(company)) {
 			await alert('Firma nicht komplett. Bitte setzen Sie die Adresse in den Einstellungen.');
@@ -148,6 +159,22 @@
 <SiteHeader>
 	{customer.name}
 	<div class="text-gray-500">#{customer.number}</div>
+	<DropDownMenu.Root>
+		<DropDownMenu.Trigger>
+			{#snippet child({ props })}
+				<Button {...props} variant="outline">
+					<EllipsisVerticalIcon></EllipsisVerticalIcon>
+					<div class="lg:hidden">Aktionen</div>
+				</Button>
+			{/snippet}
+		</DropDownMenu.Trigger>
+		<DropDownMenu.Content class="w-48">
+			<DropDownMenu.Item onclick={rename.run}><PencilIcon />Umbenennen</DropDownMenu.Item>
+			<DropDownMenu.Separator />
+			<DropDownMenu.Item onclick={archive.run}><ArchiveIcon />Archivieren</DropDownMenu.Item>
+			<DropDownMenu.Item onclick={remove.run}><TrashIcon />Löschen</DropDownMenu.Item>
+		</DropDownMenu.Content>
+	</DropDownMenu.Root>
 </SiteHeader>
 
 <div class="flex gap-2">
@@ -165,40 +192,16 @@
 	{/if}
 </div>
 
-<ButtonGroup.Root class="flex-wrap">
-	<ButtonGroup.Root>
-		<Button variant="outline" onclick={newInvoice.run}>
-			{#if newInvoice.isLoading}
-				<Spinner />
-			{:else}
-				<PlusIcon class="size-4" />
-			{/if}
-			Rechnung erstellen
-		</Button>
-	</ButtonGroup.Root>
-	<ButtonGroup.Root>
-		<Button variant="outline" onclick={archive.run}>
-			{#if archive.isLoading}
-				<Spinner />
-			{:else}
-				<ArchiveIcon class="size-4" />
-			{/if}
-			{#if customer.isArchived}
-				Archiv entfernen
-			{:else}
-				Archivieren
-			{/if}
-		</Button>
-		<Button variant="outline" onclick={remove.run}>
-			{#if remove.isLoading}
-				<Spinner />
-			{:else}
-				<TrashIcon class="size-4 text-destructive" />
-			{/if}
-			Löschen
-		</Button>
-	</ButtonGroup.Root>
-</ButtonGroup.Root>
+<div class="flex flex-wrap gap-2">
+	<Button onclick={newInvoice.run}>
+		{#if newInvoice.isLoading}
+			<Spinner />
+		{:else}
+			<PlusIcon class="size-4" />
+		{/if}
+		Rechnung erstellen
+	</Button>
+</div>
 
 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 	<Card>
