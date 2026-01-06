@@ -2,11 +2,8 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { invoiceState } from './invoiceState';
 
-// TRANSITIONAL SCHEMA - supports both old (userId) and new (companyId) during migration
-// After migration completes: remove userId, make companyId required, remove by_userId index
 const customers = defineTable({
-	companyId: v.optional(v.id('companies')), // Will be required after migration
-	userId: v.optional(v.string()), // Will be removed after migration
+	companyId: v.id('companies'),
 
 	number: v.number(),
 
@@ -23,9 +20,7 @@ const customers = defineTable({
 	city: v.string(),
 	zip: v.string(),
 	street: v.string(),
-})
-	.index('by_companyId', ['companyId'])
-	.index('by_userId', ['userId']); // Will be removed after migration
+}).index('by_companyId', ['companyId']);
 
 const invoices = defineTable({
 	customerId: v.id('customers'),
