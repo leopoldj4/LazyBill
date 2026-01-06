@@ -44,10 +44,12 @@
 
 	let commandOpen = $state(false);
 
+
 	beforeNavigate(() => (commandOpen = false));
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === '/') {
+		if (!(e.metaKey || e.ctrlKey)) return;
+		if (e.key === 'k') {
 			e.preventDefault();
 			commandOpen = !commandOpen;
 		}
@@ -390,7 +392,7 @@
 <ModeWatcher />
 
 <Command.Dialog bind:open={commandOpen}>
-	<Command.Input placeholder="Type a command or search..." />
+	<Command.Input placeholder="Suche..." />
 	<Command.List>
 		<Command.Empty>Keine Ergebnisse gefunden.</Command.Empty>
 		<Command.Group heading="Firmen">

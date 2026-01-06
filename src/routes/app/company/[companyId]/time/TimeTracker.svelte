@@ -16,13 +16,15 @@
 
 	let {
 		customers,
+		companyId,
 	}: {
 		customers: Doc<'customers'>[];
+		companyId: Id<'companies'>;
 	} = $props();
 
 	const client = useConvexClient();
 
-	const runningEntriesQuery = useQuery(api.timeEntries.getRunning, {});
+	const runningEntriesQuery = useQuery(api.timeEntries.getRunning, () => ({ companyId }));
 
 	let runningEntries = $derived((runningEntriesQuery.data as Doc<'timeEntries'>[] | undefined) ?? []);
 
@@ -86,6 +88,7 @@
 
 	const startAction = action(async () => {
 		await client.mutation(api.timeEntries.start, {
+			companyId,
 			description: description || 'Zeiteintrag',
 			customerId: customerId || undefined,
 			startDateTime: nowDateTimeString(),

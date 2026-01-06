@@ -56,7 +56,7 @@
 	{#snippet children(customers)}
 		<Suspense query={invoicesQuery}>
 			{#snippet children(invoices)}
-				<TimeTracker {customers} />
+				<TimeTracker {customers} companyId={data.companyId as Id<'companies'>} />
 				<div class="flex justify-between gap-2">
 					<div class="flex flex-1 gap-2">
 						<Input
@@ -94,7 +94,7 @@
 					{/snippet}
 				</Suspense>
 
-				<TimeEntryDialog bind:this={timeEntryDialog} {customers} {invoices} />
+				<TimeEntryDialog bind:this={timeEntryDialog} {customers} {invoices} companyId={data.companyId as Id<'companies'>} />
 			{/snippet}
 		</Suspense>
 	{/snippet}

@@ -16,9 +16,11 @@
 	let {
 		customers,
 		invoices,
+		companyId,
 	}: {
 		customers: Doc<'customers'>[];
 		invoices: (Doc<'invoices'> & { customer: Doc<'customers'> | null })[];
+		companyId: Id<'companies'>;
 	} = $props();
 
 	const client = useConvexClient();
@@ -37,6 +39,7 @@
 		if (!startDateTime || !endDateTime) return;
 
 		await client.mutation(api.timeEntries.create, {
+			companyId,
 			description,
 			customerId: customerId || undefined,
 			invoiceId: invoiceId || undefined,
@@ -82,7 +85,7 @@
 		customerId = entry.customerId;
 		invoiceId = entry.invoiceId;
 		startDateTime = parseDateTime(entry.startDateTime);
-		endDateTime = parseDateTime(entry.endDateTime);
+		endDateTime = parseDateTime(entry.endDateTime!);
 		mode = 'edit';
 		open = true;
 	}
