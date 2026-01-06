@@ -168,6 +168,9 @@
 </SiteHeader>
 
 <div class="flex gap-2">
+	<Badge variant="outline">
+		Kunde #{customer.number}
+	</Badge>
 	{#if customer.isArchived}
 		<Badge variant="outline">
 			<ArchiveIcon class="size-4" />
