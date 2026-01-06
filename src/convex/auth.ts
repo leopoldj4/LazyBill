@@ -6,6 +6,7 @@ import type { DataModel } from './_generated/dataModel';
 import { internalMutation, query } from './_generated/server';
 import { betterAuth } from 'better-auth/minimal';
 import authConfig from './auth.config';
+import { notifyNewUserSignup } from './telegram';
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -69,6 +70,13 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 								userId: user.id,
 							});
 						}
+
+						// Send Telegram notification for new signup
+						await notifyNewUserSignup({
+							name: user.name,
+							email: user.email,
+							id: user.id,
+						});
 					},
 				},
 			},
