@@ -6,12 +6,19 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
+	import { action } from '$lib/action.svelte';
 
 	const client = useConvexClient();
 
 	let open = $state(false);
 
 	let message = $state('');
+
+	let addFeedback = action(async () => {
+		await client.action(api.beta.addFeedback, { message });
+		open = false;
+        message = '';
+	}, 'Fehler beim Senden des Feedbacks');
 </script>
 
 <Dialog.Root {open} onOpenChange={(value) => (open = value)}>
@@ -29,12 +36,13 @@
 		</Dialog.Header>
 		<Textarea placeholder="Feedback" bind:value={message} />
 		<Dialog.Footer>
-			<Button
-				onclick={() => {
-					client.mutation(api.beta.addFeedback, { message });
-					open = false;
-				}}>Senden</Button
-			>
+			<Button onclick={addFeedback.run}>
+				{#if addFeedback.isLoading}
+					Sendet ...
+				{:else}
+					Senden
+				{/if}
+			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

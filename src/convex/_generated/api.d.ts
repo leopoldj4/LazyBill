@@ -18,6 +18,7 @@ import type * as invoiceState from "../invoiceState.js";
 import type * as invoices from "../invoices.js";
 import type * as migrations from "../migrations.js";
 import type * as tasks from "../tasks.js";
+import type * as telegram from "../telegram.js";
 import type * as timeEntries from "../timeEntries.js";
 
 import type {
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   invoices: typeof invoices;
   migrations: typeof migrations;
   tasks: typeof tasks;
+  telegram: typeof telegram;
   timeEntries: typeof timeEntries;
 }>;
 

@@ -332,7 +332,7 @@
 				</div>
 
 				<Kbd.Group class="max-lg:hidden">
-					<Kbd.Root class="border">/</Kbd.Root>
+					<Kbd.Root class="border">⌘K</Kbd.Root>
 				</Kbd.Group>
 			</button>
 

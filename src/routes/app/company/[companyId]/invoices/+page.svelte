@@ -55,7 +55,7 @@
 					href="/app/company/{data.companyId}/customers/{invoice.customerId}/invoices/{invoice._id}"
 				>
 					<h3 class="text-lg">#{invoice.number}</h3>
-					<p class="text-sm text-gray-500">{invoice.customer?.name ?? 'Unbekannt'}</p>
+					<p class="text-sm text-muted-foreground">{invoice.customer?.name ?? 'Unbekannt'}</p>
 				</a>
 				<div>Fällig in {daysUntilDue(invoice.date, invoice.dueInDays)} Tagen</div>
 				<InvoiceStateSelect value={invoice.state} invoiceId={invoice._id} />

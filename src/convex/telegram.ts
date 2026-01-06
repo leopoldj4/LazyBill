@@ -62,6 +62,15 @@ export async function notifyNewUserSignup(user: { name: string; email: string; i
 	await sendTelegramMessage(message, 'HTML');
 }
 
+export async function notifyFeedback(feedback: { userId: string; message: string }): Promise<void> {
+	const message = `💬 <b>New Feedback!</b>\n\n` +
+		`🆔 <b>User ID:</b> <code>${feedback.userId}</code>\n` +
+		`📝 <b>Message:</b> ${escapeHtml(feedback.message)}\n` +
+		`⏰ <b>Time:</b> ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}`;
+
+	await sendTelegramMessage(message, 'HTML');
+}
+
 /**
  * Escape HTML special characters for Telegram HTML parse mode
  */

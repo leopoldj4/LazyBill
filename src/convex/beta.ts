@@ -1,8 +1,9 @@
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
-import { authComponent, getUserId } from "./auth";
+import { authComponent } from "./auth";
 import { Resend } from "resend";
+import { notifyFeedback } from "./telegram";
 
 
 export const isBetaUser = query({
@@ -73,12 +74,26 @@ export const listBetaUsers = query({
     }
 });
 
-export const addFeedback = mutation({
+// Internal mutation to insert feedback into database
+export const insertFeedback = internalMutation({
+    args: {
+        userId: v.string(),
+        message: v.string(),
+    },
+    handler: async (ctx, { userId, message }) => {
+        await ctx.db.insert('feedback', { userId, message });
+    }
+});
+
+export const addFeedback = action({
     args: {
         message: v.string(),
     },
     handler: async (ctx, { message }) => {
-        const userId = await getUserId(ctx);
-        await ctx.db.insert('feedback', { userId, message });
+        const user = await authComponent.getAuthUser(ctx);
+        const userId = user._id;
+
+        await ctx.runMutation(internal.beta.insertFeedback, { userId, message });
+        await notifyFeedback({ userId, message });
     }
 });

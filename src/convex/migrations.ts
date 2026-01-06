@@ -11,3 +11,4 @@ export const convertNumbersToStrings = migrations.define({
         number: invoice.number.toString(),
     }),
 })
+

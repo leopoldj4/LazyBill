@@ -334,7 +334,10 @@
 				<Table>
 					<TableBody>
 						{#each invoices as invoice}
-							<a href="/app/company/{company._id}/customers/{customer._id}/invoices/{invoice._id}" class="contents">
+							<a
+								href="/app/company/{company._id}/customers/{customer._id}/invoices/{invoice._id}"
+								class="contents"
+							>
 								<TableRow>
 									<TableCell>
 										#{invoice.number}
@@ -361,7 +364,9 @@
 											<DropDownMenu.Content>
 												<DropDownMenu.Item
 													onSelect={() =>
-														goto(`/app/company/${company._id}/customers/${customer._id}/invoices/${invoice._id}/edit`)}
+														goto(
+															`/app/company/${company._id}/customers/${customer._id}/invoices/${invoice._id}/edit`,
+														)}
 												>
 													Bearbeiten
 												</DropDownMenu.Item>
@@ -393,6 +398,15 @@
 					</TableBody>
 				</Table>
 			{/if}
+		</CardContent>
+	</Card>
+
+	<Card>
+		<CardHeader>
+			<CardTitle>Zeiterfassung</CardTitle>
+		</CardHeader>
+		<CardContent>
+			
 		</CardContent>
 	</Card>
 </div>
