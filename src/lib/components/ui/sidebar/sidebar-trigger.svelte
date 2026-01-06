@@ -21,8 +21,7 @@
 	data-sidebar="trigger"
 	data-slot="sidebar-trigger"
 	variant="ghost"
-	size="icon"
-	class={cn("size-7", className)}
+	class={cn("lg:size-7", className)}
 	type="button"
 	onclick={(e) => {
 		onclick?.(e);
@@ -31,5 +30,6 @@
 	{...restProps}
 >
 	<PanelLeftIcon />
+	<span class="lg:hidden">Menu</span>
 	<span class="sr-only">Toggle Sidebar</span>
 </Button>

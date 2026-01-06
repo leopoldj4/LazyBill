@@ -263,12 +263,12 @@
 	</Sidebar.Root>
 	<div class="h-full min-h-screen w-full">
 		<div
-			class="z-30 grid h-[52px] w-full grid-cols-3 items-center justify-between gap-4 border-b bg-background px-4"
+			class="z-30 flex flex-row items-center lg:grid h-[52px] w-full lg:grid-cols-3 justify-between gap-4 border-b bg-background px-4"
 		>
 			<header class="flex shrink-0 items-center gap-4">
 				<Sidebar.Trigger />
 
-				<Breadcrumb.Root class="shrink-0">
+				<Breadcrumb.Root class="shrink-0 hidden lg:flex">
 					<Breadcrumb.List>
 						{@const path = getPath()}
 						{#if path.length > 3}
@@ -324,7 +324,7 @@
 
 			<button
 				onclick={() => (commandOpen = true)}
-				class="flex h-9 w-full shrink-0 cursor-text items-center justify-between gap-2 rounded-md bg-muted px-4 text-sm text-muted-foreground lg:min-w-[15vw]"
+				class="flex h-9 w-full lg:shrink-0 cursor-text items-center justify-between gap-2 rounded-md bg-muted px-4 text-sm text-muted-foreground lg:min-w-[15vw]"
 			>
 				<div class="w-[20px] max-lg:hidden"></div>
 
@@ -358,31 +358,6 @@
 		</div>
 		<div class="flex w-full flex-col gap-6 p-8 max-lg:pb-32">
 			{@render children?.()}
-		</div>
-
-		<div
-			class="fixed right-0 bottom-0 left-0 grid grid-cols-3 justify-between gap-2 border-t bg-background p-4 px-4 lg:hidden"
-		>
-			{#each pages as item}
-				<a
-					href={item.href}
-					class="flex flex-col items-center justify-center gap-2 {page.url.pathname.startsWith(
-						item.href,
-					)
-						? 'text-primary'
-						: 'text-muted-foreground'}"
-				>
-					<item.icon></item.icon>
-					{item.label}
-				</a>
-			{/each}
-			<button
-				class="flex flex-col items-center justify-center gap-2 text-muted-foreground"
-				onclick={() => (commandOpen = true)}
-			>
-				<SearchIcon></SearchIcon>
-				Suche
-			</button>
 		</div>
 	</div>
 </Sidebar.Provider>
