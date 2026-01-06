@@ -13,9 +13,13 @@ export async function getCustomer(ctx: QueryCtx, id: Id<'customers'>) {
 }
 
 export async function getCustomerSafe(ctx: QueryCtx, id: Id<'customers'>) {
-	const userId = await getUserId(ctx);
-	const customer = await ctx.db.get(id);
-	if (!customer || customer.userId !== userId) {
+
+	const customer = await ctx.db.get("customers", id);
+	if (!customer) {
+		return null;
+	}
+	const company = await getCompanySafe(ctx, customer.companyId);
+	if (!company) {
 		return null;
 	}
 	return customer;
@@ -23,14 +27,15 @@ export async function getCustomerSafe(ctx: QueryCtx, id: Id<'customers'>) {
 
 export const list = query({
 	args: {
+		companyId: v.id('companies'),
 		archived: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		const userId = await getUserId(ctx);
+		const company = await getCompany(ctx, args.companyId);
 		const archived = args.archived ?? false;
 		return await ctx.db
 			.query('customers')
-			.withIndex('by_userId', (q) => q.eq('userId', userId))
+			.withIndex('by_companyId', (q) => q.eq('companyId', company._id))
 			.filter((q) => q.eq(q.field('isArchived'), archived))
 			.collect();
 	},
@@ -48,9 +53,9 @@ export const getFull = query({
 		id: v.id('customers'),
 	},
 	handler: async (ctx, args) => {
-		const [customer, company, invoices] = await Promise.all([
+		const [customer, invoices] = await Promise.all([
 			getCustomerSafe(ctx, args.id),
-			getCompany(ctx),
+
 			ctx.db
 				.query('invoices')
 				.filter((q) => q.eq(q.field('customerId'), args.id))
@@ -58,6 +63,11 @@ export const getFull = query({
 		]);
 
 		if (!customer) {
+			return null;
+		}
+
+		const company = await getCompanySafe(ctx, customer.companyId);
+		if (!company) {
 			return null;
 		}
 
@@ -71,12 +81,13 @@ export const getFull = query({
 
 export const create = mutation({
 	args: {
+		companyId: v.id('companies'),
 		name: v.string(),
 	},
 	handler: async (ctx, args) => {
 		const userId = await getUserId(ctx);
 
-		const company = await getCompany(ctx);
+		const company = await getCompany(ctx, args.companyId);
 
 		const _id = await ctx.db.insert('customers', {
 			name: args.name,
@@ -90,7 +101,7 @@ export const create = mutation({
 			city: '',
 			zip: '',
 			street: '',
-			userId: userId,
+			companyId: company._id,
 			number: company.customerNumberCounter + 1,
 		});
 

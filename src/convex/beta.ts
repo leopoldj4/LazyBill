@@ -1,7 +1,7 @@
-import { action, internalMutation, query } from "./_generated/server";
+import { action, internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
-import { authComponent } from "./auth";
+import { authComponent, getUserId } from "./auth";
 import { Resend } from "resend";
 
 
@@ -70,5 +70,15 @@ export const listBetaUsers = query({
         }
 
         return await ctx.db.query('betaUsers').collect();
+    }
+});
+
+export const addFeedback = mutation({
+    args: {
+        message: v.string(),
+    },
+    handler: async (ctx, { message }) => {
+        const userId = await getUserId(ctx);
+        await ctx.db.insert('feedback', { userId, message });
     }
 });

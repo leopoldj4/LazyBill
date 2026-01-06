@@ -6,12 +6,12 @@ import { getCustomer } from "./customers";
 import { getInvoice } from "./invoices";
 
 export async function getTimeEntrySafe(ctx: QueryCtx, id: Id<'timeEntries'>) {
-    const company = await getCompanySafe(ctx);
-    if (!company) {
+    const timeEntry = await ctx.db.get(id);
+    if (!timeEntry) {
         return null;
     }
-    const timeEntry = await ctx.db.get(id);
-    if (!timeEntry || timeEntry.companyId !== company._id) {
+    const company = await getCompanySafe(ctx, timeEntry.companyId);
+    if (!company || timeEntry.companyId !== company._id) {
         return null;
     }
     return timeEntry;
@@ -27,14 +27,15 @@ export async function getTimeEntry(ctx: QueryCtx, id: Id<'timeEntries'>) {
 
 export const create = mutation({
     args: {
-        customerId: v.optional(v.id('customers')),
+        customerId: v.optional(v.id("customers")),
+        companyId: v.id('companies'),
         invoiceId: v.optional(v.id('invoices')),
         description: v.string(),
         startDateTime: v.string(),
         endDateTime: v.string(),
     },
     handler: async (ctx, args) => {
-        const company = await getCompany(ctx);
+        const company = await getCompany(ctx, args.companyId);
 
         if (args.customerId) {
             await getCustomer(ctx, args.customerId);
@@ -55,9 +56,11 @@ export const create = mutation({
 });
 
 export const list = query({
-    args: {},
-    handler: async (ctx) => {
-        const company = await getCompany(ctx);
+    args: {
+        companyId: v.id('companies'),
+    },
+    handler: async (ctx, args) => {
+        const company = await getCompany(ctx, args.companyId);
         return await ctx.db
             .query('timeEntries')
             .withIndex('by_companyId', (q) => q.eq('companyId', company._id))
@@ -141,9 +144,11 @@ export const remove = mutation({
 });
 
 export const getRunning = query({
-    args: {},
-    handler: async (ctx) => {
-        const company = await getCompanySafe(ctx);
+    args: {
+        companyId: v.id('companies'),
+    },
+    handler: async (ctx, args) => {
+        const company = await getCompanySafe(ctx, args.companyId);
         if (!company) return [];
 
         const entries = await ctx.db
@@ -161,9 +166,10 @@ export const start = mutation({
         customerId: v.optional(v.id('customers')),
         description: v.string(),
         startDateTime: v.string(),
+        companyId: v.id('companies'),
     },
     handler: async (ctx, args) => {
-        const company = await getCompany(ctx);
+        const company = await getCompany(ctx, args.companyId);
 
         if (args.customerId) {
             await getCustomer(ctx, args.customerId);

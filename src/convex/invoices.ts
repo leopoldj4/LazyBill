@@ -7,9 +7,12 @@ import { getCustomer, getCustomerSafe } from "./customers";
 import { invoiceState } from "./invoiceState";
 
 export async function getInvoiceSafe(ctx: QueryCtx, id: Id<'invoices'>) {
-	const company = await getCompanySafe(ctx);
-	const invoice = await ctx.db.get(id);
-	if (!invoice || invoice.companyId !== company?._id) {
+	const invoice = await ctx.db.get("invoices", id);
+	if (!invoice) {
+		return null;
+	}
+	const company = await getCompanySafe(ctx, invoice.companyId);
+	if (!company) {
 		return null;
 	}
 	return invoice;
@@ -35,7 +38,7 @@ export const getFull = query({
 
 		const [customer, company, file] = await Promise.all([
 			getCustomerSafe(ctx, invoice.customerId),
-			getCompanySafe(ctx),
+			getCompanySafe(ctx, invoice.companyId),
 			invoice.file ? ctx.storage.getUrl(invoice.file) : Promise.resolve(null),
 		]);
 
@@ -53,11 +56,13 @@ export const getFull = query({
 })
 
 export const list = query({
-	args: {},
+	args: {
+		companyId: v.id('companies'),
+	},
 	handler: async (ctx, args) => {
-		const company = await getCompany(ctx);
+		const company = await getCompany(ctx, args.companyId);
 		const invoices = await ctx.db.query('invoices').withIndex('by_companyId', (q) => q.eq('companyId', company._id)).collect();
-		
+
 		return await Promise.all(invoices.map(async (invoice) => {
 			const customer = await ctx.db.get(invoice.customerId);
 			return {
@@ -74,7 +79,7 @@ export const createInvoice = mutation({
 	},
 	handler: async (ctx, args) => {
 		const customer = await getCustomer(ctx, args.customerId);
-		const company = await getCompany(ctx);
+		const company = await getCompany(ctx, customer.companyId);
 
 		const invoice = await ctx.db.insert('invoices', {
 			customerId: customer._id,

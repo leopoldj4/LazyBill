@@ -27,10 +27,11 @@
 
 	type Props = {
 		address: Address;
+		class?: string;
 		onSave: (address: Address) => Promise<void>;
 	};
 
-	let { address, onSave }: Props = $props();
+	let { address, class: className, onSave }: Props = $props();
 
 	const requestParams = {
 		region: 'DE',
@@ -135,7 +136,7 @@
 </script>
 
 <Dialog.Root {open} onOpenChange={(value) => !updateAuto.isLoading && (open = value)}>
-	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+	<Dialog.Trigger class={buttonVariants({ variant: 'outline', class: className })}>
 		<EditIcon class="h-4 w-4" />
 		Adresse bearbeiten
 	</Dialog.Trigger>

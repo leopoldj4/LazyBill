@@ -1,0 +1,210 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { api } from '$convex/_generated/api.js';
+	import type { Id } from '$convex/_generated/dataModel.js';
+	import type { InvoiceState } from '$convex/invoiceState';
+	import { action } from '$lib/action.svelte';
+	import SiteHeader from '$lib/components/site-header.svelte';
+	import Suspense from '$lib/components/Suspense.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import * as InputGroup from '$lib/components/ui/input-group';
+	import Label from '$lib/components/ui/label/label.svelte';
+	import * as Popover from '$lib/components/ui/popover';
+	import * as Select from '$lib/components/ui/select';
+	import { Spinner } from '$lib/components/ui/spinner';
+	import * as Table from '$lib/components/ui/table';
+	import { parseDate } from '$lib/date';
+	import { download } from '$lib/download';
+	import { InvoiceStateDetail } from '$lib/invoiceState';
+	import FileDownIcon from '@lucide/svelte/icons/file-down';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
+	import SendIcon from '@lucide/svelte/icons/send';
+	import UserStarIcon from '@lucide/svelte/icons/user-star';
+	import { useConvexClient, useQuery } from 'convex-svelte';
+	let { data } = $props();
+	import { prompt } from '$lib/prompt.svelte';
+	import Path from '$lib/components/Path.svelte';
+
+	const query = useQuery(api.invoices.getFull, () => ({
+		id: data.invoiceId as Id<'invoices'>,
+	}));
+
+	function downloadPdf() {
+		if (!query.data?.file) return;
+		download(
+			query.data.file,
+			`${query.data.customer.name} - Rechnung ${query.data.invoice.number}.pdf`,
+		);
+	}
+
+	let enteredEmail = $derived(query.data?.customer.email || '');
+
+	const client = useConvexClient();
+
+	const updateInvoiceState = action(async (state: InvoiceState) => {
+		if (!query.data) return;
+		await client.mutation(api.invoices.updateInvoiceState, {
+			id: data.invoiceId as Id<'invoices'>,
+			state,
+		});
+	}, 'Fehler beim Aktualisieren des Status');
+
+	async function edit() {
+		if (
+			await prompt('Bearbeiten', 'Sind Sie sicher, dass Sie diese Rechnung bearbeiten möchten?')
+		) {
+			await goto(`/app/company/${data.companyId}/customers/${data.customerId}/invoices/${data.invoiceId}/edit`);
+		}
+	}
+</script>
+
+
+<Suspense {query} class="h-[60vh]">
+	{#snippet children(data)}
+		{#if !data}
+			<div class="flex h-full items-center justify-center">
+				<p>Kunde nicht gefunden</p>
+			</div>
+		{:else}
+			<div class="grid gap-12 lg:grid-cols-2">
+				<div class="flex flex-col gap-8">
+					<Path label="Rechnung #{data.invoice.number}" href="/app/company/{data.company._id}/customers/{data.customer._id}/invoices/{data.invoice._id}" />
+
+
+					<SiteHeader>Rechnung <span class="text-muted-foreground">#{data.invoice.number}</span></SiteHeader
+					>
+
+					<div class="flex flex-row flex-wrap gap-2">
+						<Select.Root
+							type="single"
+							bind:value={data.invoice.state as InvoiceState}
+							onValueChange={(value) => updateInvoiceState.run(value as InvoiceState)}
+						>
+							<Select.Trigger>
+								{#if updateInvoiceState.isLoading}
+									<Spinner class="size-4" />
+								{:else}
+									{@const Icon = InvoiceStateDetail[data.invoice.state].icon}
+									<Icon class="size-4 {InvoiceStateDetail[data.invoice.state].textColor}" />
+								{/if}
+								{InvoiceStateDetail[data.invoice.state].name}
+							</Select.Trigger>
+							<Select.Content align="start">
+								{#each Object.entries(InvoiceStateDetail) as [name, state]}
+									<Select.Item value={name}>
+										{@const Icon = state.icon}
+										<Icon class="size-4 {state.textColor}" />
+										{InvoiceStateDetail[name as InvoiceState].name}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+						<Button variant="outline" onclick={edit}>
+							<PencilIcon class="size-4" />
+							Bearbeiten
+						</Button>
+						<Button variant="outline" onclick={downloadPdf}>
+							<FileDownIcon class="size-4" />
+							PDF
+						</Button>
+					</div>
+
+					<h3 class="text-xl">Zusammenfassung</h3>
+					<Table.Root>
+						<Table.Body>
+							<Table.Row>
+								<Table.Cell>Rechnungsnummer</Table.Cell>
+								<Table.Cell>#{data.invoice.number}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Rechnungsdatum</Table.Cell>
+								<Table.Cell>{parseDate(data.invoice.date)}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Fälligkeit</Table.Cell>
+								<Table.Cell>{data.invoice.dueInDays} Tage</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell>Notizen</Table.Cell>
+								<Table.Cell>{data.invoice.notes}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table.Root>
+
+					<h3 class="text-xl">Artikel</h3>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>Artikel</Table.Head>
+								<Table.Head>Preis</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each data.invoice.articles as article}
+								<Table.Row>
+									<Table.Cell>{article.name}</Table.Cell>
+									<Table.Cell>{article.price}</Table.Cell>
+								</Table.Row>
+							{/each}
+							<Table.Row>
+								<Table.Cell class="font-bold">Gesamt</Table.Cell>
+								<Table.Cell
+									>{data.invoice.articles.reduce(
+										(acc, article) => acc + article.price,
+										0,
+									)}</Table.Cell
+								>
+							</Table.Row>
+						</Table.Body>
+					</Table.Root>
+
+					<div class="flex flex-row flex-wrap gap-2">
+						<Popover.Root>
+							<Popover.Trigger class="{buttonVariants({ variant: 'default' })} hidden">
+								<MailIcon class="size-4" />
+								E-Mail Senden
+							</Popover.Trigger>
+							<Popover.Content class="flex flex-col gap-3" align="start">
+								<h2 class="text-lg">E-Mail versenden</h2>
+								<p class="text-sm text-gray-500">
+									LazyBill wird die Rechnung in ihrem Namen an die folgende E-Mail-Adresse senden:
+								</p>
+								<Label for="email">E-Mail-Adresse</Label>
+								<InputGroup.Root>
+									<InputGroup.Input
+										type="email"
+										id="email"
+										placeholder="E-Mail-Adresse"
+										bind:value={enteredEmail}
+									/>
+									{#if enteredEmail !== data.customer.email}
+										<InputGroup.Addon align="inline-end">
+											<InputGroup.Button
+												variant="outline"
+												onclick={() => {
+													enteredEmail = data.customer.email;
+												}}
+											>
+												<UserStarIcon class="size-4" />
+											</InputGroup.Button>
+										</InputGroup.Addon>
+									{/if}
+								</InputGroup.Root>
+								<div class="flex flex-row gap-2">
+									<Button variant="default">
+										<SendIcon class="size-4" />
+										Für mich senden
+									</Button>
+								</div>
+							</Popover.Content>
+						</Popover.Root>
+					</div>
+				</div>
+
+				<iframe src="{data.file}{window.innerWidth < 1024 ? "#zoom=50" : ""}" class="aspect-[1/1.5] h-full w-full" title="Rechnung"></iframe>
+			</div>
+		{/if}
+	{/snippet}
+</Suspense>

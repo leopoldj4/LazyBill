@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 import { invoiceState } from './invoiceState';
 
 const customers = defineTable({
-	userId: v.string(),
+	companyId: v.id('companies'),
 
 	number: v.number(),
 
@@ -20,7 +20,7 @@ const customers = defineTable({
 	city: v.string(),
 	zip: v.string(),
 	street: v.string(),
-}).index('by_userId', ['userId']);
+}).index('by_companyId', ['companyId']);
 
 const invoices = defineTable({
 	customerId: v.id('customers'),
@@ -88,4 +88,9 @@ const betaUsers = defineTable({
 	email: v.string(),
 });
 
-export default defineSchema({ customers, invoices, companies, betaUsers, tasks, timeEntries });
+const feedback = defineTable({
+	userId: v.string(),
+	message: v.string(),
+});
+
+export default defineSchema({ customers, invoices, companies, betaUsers, tasks, timeEntries, feedback });
