@@ -32,7 +32,7 @@
 <Sidebar.Provider class="gap-6 flex-col lg:flex-row">
 	<Sidebar.Root collapsible="none" class="rounded-xl bg-background font-medium max-lg:w-full">
 		<Sidebar.Content>
-			<Sidebar.Group class="py-0">
+			<Sidebar.Group class="p-0">
 				<Sidebar.Menu>
 					{#each pages as pageItem}
 						<Sidebar.MenuItem>

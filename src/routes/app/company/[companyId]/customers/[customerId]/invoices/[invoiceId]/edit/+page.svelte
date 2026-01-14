@@ -11,16 +11,29 @@
 	const query = useQuery(api.invoices.getFull, () => ({
 		id: data.invoiceId as Id<'invoices'>,
 	}));
+
+	const timeEntriesQuery = useQuery(api.timeEntries.list, () => ({
+		companyId: data.companyId as Id<'companies'>,
+	}));
 </script>
 
 <Suspense {query} class="h-[60vh]">
 	{#snippet children(data)}
-		{#if !data}
-			<div class="flex h-full items-center justify-center">
-				<p>Kunde nicht gefunden</p>
-			</div>
-		{:else}
-			<Editor customer={data.customer} invoice={data.invoice} company={data.company} />
-		{/if}
+		<Suspense query={timeEntriesQuery}>
+			{#snippet children(timeEntries)}
+				{#if !data}
+					<div class="flex h-full items-center justify-center">
+						<p>Kunde nicht gefunden</p>
+					</div>
+				{:else}
+					<Editor
+						customer={data.customer}
+						invoice={data.invoice}
+						company={data.company}
+						timeEntries={timeEntries}
+					/>
+				{/if}
+			{/snippet}
+		</Suspense>
 	{/snippet}
 </Suspense>

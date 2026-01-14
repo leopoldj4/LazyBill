@@ -59,3 +59,69 @@ export function formatDateTimeDisplay(dateTime: string): string {
 		minute: '2-digit',
 	});
 }
+
+
+export function formatDateTimeRange(startDateTime: string, endDateTime: string): string {
+	const start = parseDateTime(startDateTime);
+	const end = parseDateTime(endDateTime);
+
+	const startDate = start.toDate(getLocalTimeZone());
+	const endDate = end.toDate(getLocalTimeZone());
+
+	const dateOptions: Intl.DateTimeFormatOptions = {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+	};
+
+	const timeOptions: Intl.DateTimeFormatOptions = {
+		hour: '2-digit',
+		minute: '2-digit',
+	};
+
+	const startDateStr = startDate.toLocaleDateString('de-DE', dateOptions);
+	const endDateStr = endDate.toLocaleDateString('de-DE', dateOptions);
+	const startTimeStr = startDate.toLocaleTimeString('de-DE', timeOptions);
+	const endTimeStr = endDate.toLocaleTimeString('de-DE', timeOptions);
+
+	if (startDateStr === endDateStr) {
+		return `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
+	}
+
+	return `${startDateStr} ${startTimeStr} - ${endDateStr} ${endTimeStr}`;
+}
+
+export function calculateDuration(startDateTime: string, endDateTime: string): string {
+	const start = parseDateTime(startDateTime);
+	const end = parseDateTime(endDateTime);
+
+	const startMs = start.toDate(getLocalTimeZone()).getTime();
+	const endMs = end.toDate(getLocalTimeZone()).getTime();
+	const diffMs = Math.abs(endMs - startMs);
+
+	const hours = Math.floor(diffMs / (1000 * 60 * 60));
+	const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+	if (hours === 0) {
+		return `${minutes} Min.`;
+	}
+
+	if (minutes === 0) {
+		return `${hours} Std.`;
+	}
+
+	return `${hours} Std. ${minutes} Min.`;
+}
+
+export function calculateDurationInHours(startDateTime: string, endDateTime: string, smallestUnit: number): number {
+	const start = parseDateTime(startDateTime);
+	const end = parseDateTime(endDateTime);
+
+	const startMs = start.toDate(getLocalTimeZone()).getTime();
+	const endMs = end.toDate(getLocalTimeZone()).getTime();
+	const diffMinutes = Math.abs(endMs - startMs) / (1000 * 60);
+
+	// Round up to the nearest smallestUnit (in minutes), then convert to hours
+	const roundedMinutes = Math.ceil(diffMinutes / smallestUnit) * smallestUnit;
+	return roundedMinutes / 60;
+}

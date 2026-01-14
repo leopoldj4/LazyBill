@@ -68,6 +68,20 @@ export const list = query({
     }
 });
 
+export const listOpen = query({
+    args: {
+        companyId: v.id('companies'),
+    },
+    handler: async (ctx, args) => {
+        const company = await getCompany(ctx, args.companyId);
+        return await ctx.db
+            .query('timeEntries')
+            .withIndex('by_companyId', (q) => q.eq('companyId', company._id))
+            .filter((q) => q.eq(q.field('invoiceId'), undefined))
+            .collect();
+    }
+});
+
 export const update = mutation({
     args: {
         id: v.id('timeEntries'),

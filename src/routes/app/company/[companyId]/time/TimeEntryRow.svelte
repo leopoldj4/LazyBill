@@ -5,7 +5,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropDownMenu from '$lib/components/ui/dropdown-menu';
-	import { formatDateTimeDisplay, parseDateTime } from '$lib/date';
+	import { formatDateTimeDisplay, parseDateTime, formatDateTimeRange, calculateDuration } from '$lib/date';
 	import { prompt } from '$lib/prompt.svelte';
 	import ClockIcon from '@lucide/svelte/icons/clock';
 	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
@@ -32,58 +32,6 @@
 			await client.mutation(api.timeEntries.remove, params);
 		}
 	}, 'Fehler beim Löschen des Zeiteintrags');
-
-	function formatDateTimeRange(startDateTime: string, endDateTime: string): string {
-		const start = parseDateTime(startDateTime);
-		const end = parseDateTime(endDateTime);
-
-		const startDate = start.toDate(getLocalTimeZone());
-		const endDate = end.toDate(getLocalTimeZone());
-
-		const dateOptions: Intl.DateTimeFormatOptions = {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric',
-		};
-
-		const timeOptions: Intl.DateTimeFormatOptions = {
-			hour: '2-digit',
-			minute: '2-digit',
-		};
-
-		const startDateStr = startDate.toLocaleDateString('de-DE', dateOptions);
-		const endDateStr = endDate.toLocaleDateString('de-DE', dateOptions);
-		const startTimeStr = startDate.toLocaleTimeString('de-DE', timeOptions);
-		const endTimeStr = endDate.toLocaleTimeString('de-DE', timeOptions);
-
-		if (startDateStr === endDateStr) {
-			return `${startDateStr}, ${startTimeStr} - ${endTimeStr}`;
-		}
-
-		return `${startDateStr} ${startTimeStr} - ${endDateStr} ${endTimeStr}`;
-	}
-
-	function calculateDuration(startDateTime: string, endDateTime: string): string {
-		const start = parseDateTime(startDateTime);
-		const end = parseDateTime(endDateTime);
-
-		const startMs = start.toDate(getLocalTimeZone()).getTime();
-		const endMs = end.toDate(getLocalTimeZone()).getTime();
-		const diffMs = Math.abs(endMs - startMs);
-
-		const hours = Math.floor(diffMs / (1000 * 60 * 60));
-		const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-		if (hours === 0) {
-			return `${minutes} Min.`;
-		}
-
-		if (minutes === 0) {
-			return `${hours} Std.`;
-		}
-
-		return `${hours} Std. ${minutes} Min.`;
-	}
 </script>
 
 <div class="flex justify-between gap-4 rounded-md border px-4 py-3">

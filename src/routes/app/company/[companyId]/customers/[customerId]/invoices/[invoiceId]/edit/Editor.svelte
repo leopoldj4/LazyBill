@@ -13,7 +13,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { formatDate, parseDate } from '$lib/date';
+	import { calculateDurationInHours, formatDate, parseDate } from '$lib/date';
 	import { sleep } from '$lib';
 	import { createPDF } from '$lib/typst/export';
 	import { invoiceTemplate } from '$lib/typst/invoice';
@@ -23,27 +23,66 @@
 	import { toast } from 'svelte-sonner';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import Path from '$lib/components/Path.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Card from '$lib/components/ui/card';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import { CheckIcon, Divide } from '@lucide/svelte';
+	import { formatDateTimeRange, calculateDuration } from '$lib/date';
 
 	const client = useConvexClient();
 	let {
 		customer,
 		invoice,
 		company,
+		timeEntries,
 	}: {
 		customer: Doc<'customers'>;
 		invoice: Doc<'invoices'>;
 		company: Doc<'companies'>;
+		timeEntries: Doc<'timeEntries'>[];
 	} = $props();
 
 	let due = $state<number | null>(invoice.dueInDays);
 	let articles = $state(invoice.articles);
 	let notes = $state(invoice.notes);
+	let timeExpanded = $state(false);
+	let selectedTimeEntries = $state<Id<'timeEntries'>[]>([]);
+	let hourlyRate = $state('100');
+	let smallestUnit = $state(1);
+
+	function selectTimeEntry(timeEntryId: Id<'timeEntries'>) {
+		if (selectedTimeEntries.includes(timeEntryId)) {
+			selectedTimeEntries.splice(selectedTimeEntries.indexOf(timeEntryId), 1);
+		} else {
+			selectedTimeEntries.push(timeEntryId);
+		}
+	}
 
 	let invoiceDate = $state(parseDate(invoice.date));
 
-	let typstDocument = $derived(() =>
-		invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
-	);
+	let typstDocument = $derived(() => {
+		const timeEntryArticles = timeEntries
+			.filter((entry) => selectedTimeEntries.includes(entry._id))
+			.map((entry) => ({
+				name: `${entry.description} (${calculateDuration(entry.startDateTime, entry.endDateTime!)})`,
+				price:
+					Math.round(
+						calculateDurationInHours(entry.startDateTime, entry.endDateTime!, smallestUnit) *
+							parseFloat(hourlyRate) *
+							100,
+					) / 100,
+			}));
+
+		return invoiceTemplate(
+			company,
+			customer,
+			[...timeEntryArticles, ...articles],
+			invoiceDate,
+			invoice.number,
+			due || 0,
+			notes,
+		);
+	});
 
 	const done = action(async () => {
 		const uploadUrl = await client.mutation(api.invoices.generateUploadUrl, {});
@@ -72,7 +111,10 @@
 	}, 'Fehler beim Finalisieren der Rechnung');
 </script>
 
-<Path label="Rechnung #{invoice.number}" href="/app/company/{company._id}/customers/{customer._id}/invoices/{invoice._id}" />
+<Path
+	label="Rechnung #{invoice.number}"
+	href="/app/company/{company._id}/customers/{customer._id}/invoices/{invoice._id}"
+/>
 
 <div class="grid gap-12 lg:grid-cols-2">
 	<div class="flex flex-col gap-8">
@@ -99,6 +141,80 @@
 			</div>
 		</div>
 
+		<div class="grid gap-4 border-y py-6">
+			<div class="flex flex-row items-center justify-between gap-2">
+				<Card.Title>Bisher nicht abgerechnete Zeit</Card.Title>
+				<Button variant="ghost" size="icon" onclick={() => (timeExpanded = !timeExpanded)}>
+					<ChevronDownIcon
+						class="transition-transform {timeExpanded ? 'rotate-180' : ''} duration-200"
+					/>
+				</Button>
+			</div>
+
+			<!-- todo: ohnekunden vs mit kunde -->
+			{#if timeExpanded}
+				<div class="flex flex-col divide-y rounded-lg border">
+					{#each timeEntries.filter((timeEntry) => timeEntry.customerId === customer._id) as timeEntry (timeEntry._id)}
+						<div class="flex flex-row items-center gap-6 px-4 py-2">
+							<Button
+								variant={selectedTimeEntries.includes(timeEntry._id) ? 'default' : 'secondary'}
+								size="icon"
+								onclick={() => selectTimeEntry(timeEntry._id)}
+							>
+								{#if selectedTimeEntries.includes(timeEntry._id)}
+									<CheckIcon />
+								{:else}
+									<PlusIcon />
+								{/if}
+							</Button>
+							<div class="grid">
+								<div class="text-lg">{timeEntry.description}</div>
+								<span>
+									{formatDateTimeRange(timeEntry.startDateTime, timeEntry.endDateTime!)}
+									&middot;
+									{calculateDuration(timeEntry.startDateTime, timeEntry.endDateTime!)}
+								</span>
+							</div>
+							<div class="ml-auto flex flex-row gap-2">
+								{Math.round(
+									calculateDurationInHours(
+										timeEntry.startDateTime,
+										timeEntry.endDateTime!,
+										smallestUnit,
+									) *
+										parseFloat(hourlyRate) *
+										100,
+								) / 100} €
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<div class="grid gap-4 lg:grid-cols-2">
+			<InputGroup.Root>
+				<InputGroup.Addon>Stundensatz</InputGroup.Addon>
+				<InputGroup.Input type="number" bind:value={hourlyRate} class="text-right" placeholder="" />
+				<InputGroup.Addon align="inline-end">
+					<InputGroup.Text>€</InputGroup.Text>
+				</InputGroup.Addon>
+			</InputGroup.Root>
+
+			<InputGroup.Root>
+				<InputGroup.Addon>Kleinste Zeiteinheit</InputGroup.Addon>
+				<InputGroup.Input
+					type="number"
+					bind:value={smallestUnit}
+					class="text-right"
+					placeholder=""
+				/>
+				<InputGroup.Addon align="inline-end">
+					<InputGroup.Text>min</InputGroup.Text>
+				</InputGroup.Addon>
+			</InputGroup.Root>
+		</div>
+
 		<h2 class="text-xl">Artikel</h2>
 
 		<div class="flex flex-col gap-4">
@@ -111,7 +227,7 @@
 							articles.splice(articles.indexOf(article), 1);
 						}}
 					>
-						<CircleMinusIcon class="text-muted-foreground"/>
+						<CircleMinusIcon class="text-muted-foreground" />
 					</Button>
 					<Input
 						type="text"
@@ -142,16 +258,36 @@
 				<Separator orientation="horizontal" class="col-span-2 lg:col-span-3" />
 			{/each}
 
-			<Button
-				variant="outline"
-				class="col-span-2 lg:col-span-3"
-				onclick={() => {
-					articles.push({ name: '', price: 0 });
-				}}
-			>
-				<PlusIcon />
-				Neuer Artikel
-			</Button>
+			<div>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						{#snippet child({ props })}
+							<Button variant="outline" size="sm" {...props}>
+								<PlusIcon />
+								Hinzufügen
+							</Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+
+					<DropdownMenu.Content class="w-48" align="start">
+						<DropdownMenu.Item
+							onclick={() => {
+								articles.push({ name: '', price: 0 });
+							}}>Neuer Artikel</DropdownMenu.Item
+						>
+						<DropdownMenu.Separator />
+						{#each timeEntries as timeEntry}
+							<DropdownMenu.Item
+								onclick={() => {
+									articles.push({ name: timeEntry.description, price: 0 });
+								}}
+							>
+								{timeEntry.description}
+							</DropdownMenu.Item>
+						{/each}
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 		</div>
 
 		<div class="flex flex-col gap-3">

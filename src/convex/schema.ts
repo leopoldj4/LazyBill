@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import { invoiceState } from './invoiceState';
 
+
 const customers = defineTable({
 	companyId: v.id('companies'),
 
@@ -22,6 +23,16 @@ const customers = defineTable({
 	street: v.string(),
 }).index('by_companyId', ['companyId']);
 
+const article = v.union(v.object({
+	type: v.union(v.literal("items"), v.literal("hours")),
+	name: v.string(),
+	units: v.string(),
+	price: v.number(),
+}), v.object({
+	name: v.string(),
+	price: v.number(),
+}));
+
 const invoices = defineTable({
 	customerId: v.id('customers'),
 	companyId: v.id('companies'),
@@ -31,12 +42,7 @@ const invoices = defineTable({
 	number: v.string(),
 	date: v.string(), // yr-mon-day
 	dueInDays: v.number(),
-	articles: v.array(
-		v.object({
-			name: v.string(),
-			price: v.number(),
-		}),
-	),
+	articles: v.array(article),
 	notes: v.string(),
 
 	file: v.optional(v.id('_storage')),
@@ -82,7 +88,7 @@ const timeEntries = defineTable({
 	description: v.string(),
 	startDateTime: v.string(), // ISO datetime string (YYYY-MM-DDTHH:mm)
 	endDateTime: v.optional(v.string()), // ISO datetime string (YYYY-MM-DDTHH:mm)
-}).index('by_companyId', ['companyId']);
+}).index('by_companyId', ['companyId']).index('by_invoiceId', ['invoiceId']);
 
 const betaUsers = defineTable({
 	email: v.string(),
