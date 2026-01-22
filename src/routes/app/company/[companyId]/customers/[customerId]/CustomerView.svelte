@@ -69,22 +69,33 @@
 		});
 	}
 
-	const updateEmail = action(
-		async (value: string) => updateValue('email', value),
-		'Fehler beim Aktualisieren der Email',
+	const updateContact = action(
+		async ({ email, phone }: { email: string; phone: string }) => {
+			await client.mutation(api.customers.updateContact, {
+				id: customer._id,
+				email,
+				phone,
+			});
+		},
+		'Fehler beim Aktualisieren der Kontaktdaten',
 	);
 	const updateNotes = action(
 		async (value: string) => updateValue('notes', value),
 		'Fehler beim Aktualisieren der Notizen',
 	);
-	const updatePhone = action(
-		async (value: string) => updateValue('phone', value),
-		'Fehler beim Aktualisieren des Telefons',
-	);
 
-	let email = $derived(customer.email);
+	let email = $state(customer.email);
 	let notes = $derived(customer.notes);
-	let phone = $derived(customer.phone);
+	let phone = $state(customer.phone);
+
+	$effect(() => {
+		email = customer.email;
+	});
+	$effect(() => {
+		phone = customer.phone;
+	});
+
+	let contactChanged = $derived(email !== customer.email || phone !== customer.phone);
 
 	function copyToast(value: string, description: string) {
 		navigator.clipboard.writeText(value);
@@ -206,64 +217,47 @@
 			<form
 				onsubmit={(ev) => {
 					ev.preventDefault();
-					updateEmail.run(email);
+					updateContact.run({ email, phone });
 				}}
 			>
-				<InputGroup.Root>
-					<InputGroup.Addon align="inline-start">
-						<MailIcon class="size-4" />
-					</InputGroup.Addon>
-					<InputGroup.Input bind:value={email} type="email" placeholder="Email" />
-					{#if email !== customer.email}
-						<InputGroup.Addon align="inline-end">
-							<InputGroup.Button variant="default" type="submit">
-								{#if updateEmail.isLoading}
-									<Spinner />
-								{:else}
-									<CheckIcon class="size-4" />
-								{/if}
-								Speichern
-							</InputGroup.Button>
+				<div class="flex flex-col gap-2">
+					<InputGroup.Root>
+						<InputGroup.Addon align="inline-start">
+							<MailIcon class="size-4" />
 						</InputGroup.Addon>
-					{:else}
-						<InputGroup.Addon align="inline-end">
-							<InputGroup.Button onclick={() => copyToast(customer.email, 'Email')}>
-								<CopyIcon class="size-4" /> Kopieren
-							</InputGroup.Button>
+						<InputGroup.Input bind:value={email} type="email" placeholder="Email" />
+						{#if !contactChanged}
+							<InputGroup.Addon align="inline-end">
+								<InputGroup.Button onclick={() => copyToast(customer.email, 'Email')}>
+									<CopyIcon class="size-4" /> Kopieren
+								</InputGroup.Button>
+							</InputGroup.Addon>
+						{/if}
+					</InputGroup.Root>
+					<InputGroup.Root>
+						<InputGroup.Addon align="inline-start">
+							<PhoneIcon class="size-4" />
 						</InputGroup.Addon>
+						<InputGroup.Input bind:value={phone} type="tel" placeholder="Telefon" />
+						{#if !contactChanged}
+							<InputGroup.Addon align="inline-end">
+								<InputGroup.Button onclick={() => copyToast(customer.phone, 'Telefon')}>
+									<CopyIcon class="size-4" /> Kopieren
+								</InputGroup.Button>
+							</InputGroup.Addon>
+						{/if}
+					</InputGroup.Root>
+					{#if contactChanged}
+						<Button variant="default" type="submit" size="sm" class="self-end">
+							{#if updateContact.isLoading}
+								<Spinner />
+							{:else}
+								<CheckIcon class="size-4" />
+							{/if}
+							Speichern
+						</Button>
 					{/if}
-				</InputGroup.Root>
-			</form>
-			<form
-				onsubmit={(ev) => {
-					ev.preventDefault();
-					updatePhone.run(phone);
-				}}
-			>
-				<InputGroup.Root>
-					<InputGroup.Addon align="inline-start">
-						<PhoneIcon class="size-4" />
-					</InputGroup.Addon>
-					<InputGroup.Input bind:value={phone} type="tel" placeholder="Telefon" />
-					{#if phone !== customer.phone}
-						<InputGroup.Addon align="inline-end">
-							<InputGroup.Button variant="default" type="submit">
-								{#if updatePhone.isLoading}
-									<Spinner />
-								{:else}
-									<CheckIcon class="size-4" />
-								{/if}
-								Speichern
-							</InputGroup.Button>
-						</InputGroup.Addon>
-					{:else}
-						<InputGroup.Addon align="inline-end">
-							<InputGroup.Button onclick={() => copyToast(customer.phone, 'Telefon')}>
-								<CopyIcon class="size-4" /> Kopieren
-							</InputGroup.Button>
-						</InputGroup.Addon>
-					{/if}
-				</InputGroup.Root>
+				</div>
 			</form>
 		</CardContent>
 	</Card>

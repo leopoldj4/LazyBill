@@ -184,3 +184,18 @@ export const setArchived = mutation({
 		});
 	},
 });
+
+export const updateContact = mutation({
+	args: {
+		id: v.id('customers'),
+		email: v.string(),
+		phone: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const customer = await getCustomer(ctx, args.id);
+		await ctx.db.patch('customers', customer._id, {
+			email: args.email,
+			phone: args.phone,
+		});
+	},
+});
