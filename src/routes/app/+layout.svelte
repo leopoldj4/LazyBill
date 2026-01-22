@@ -43,7 +43,15 @@
 	let { children } = $props();
 
 	let commandOpen = $state(false);
+	let isMobile = $state(false);
 
+	onMount(() => {
+		const mediaQuery = window.matchMedia('(max-width: 1023px)');
+		isMobile = mediaQuery.matches;
+		const handler = (e: MediaQueryListEvent) => (isMobile = e.matches);
+		mediaQuery.addEventListener('change', handler);
+		return () => mediaQuery.removeEventListener('change', handler);
+	});
 
 	beforeNavigate(() => (commandOpen = false));
 
@@ -208,8 +216,8 @@
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content
 							class="w-(--bits-dropdown-menu-anchor-width) min-w-56 rounded-lg"
-							align="end"
-							side="right"
+							align={isMobile ? 'center' : 'end'}
+							side={isMobile ? 'top' : 'right'}
 							sideOffset={4}
 						>
 							<DropdownMenu.Item>
