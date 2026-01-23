@@ -85,8 +85,6 @@ export const create = mutation({
 		name: v.string(),
 	},
 	handler: async (ctx, args) => {
-		const userId = await getUserId(ctx);
-
 		const company = await getCompany(ctx, args.companyId);
 
 		const _id = await ctx.db.insert('customers', {

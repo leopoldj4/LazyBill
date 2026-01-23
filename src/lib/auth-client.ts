@@ -1,6 +1,12 @@
 import { createAuthClient } from 'better-auth/svelte';
 import { convexClient } from '@convex-dev/better-auth/client/plugins';
+import { stripeClient } from '@better-auth/stripe/client';
 
 export const authClient = createAuthClient({
-	plugins: [convexClient()],
+	plugins: [
+		convexClient(),
+		stripeClient({
+			subscription: true,
+		}),
+	],
 });

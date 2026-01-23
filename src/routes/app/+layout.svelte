@@ -22,12 +22,14 @@
 	import BuildingIcon from '@lucide/svelte/icons/building';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import ClockIcon from '@lucide/svelte/icons/clock';
+	import CreditCardIcon from '@lucide/svelte/icons/credit-card';
 	import DashboardIcon from '@lucide/svelte/icons/gauge';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import ReceiptIcon from '@lucide/svelte/icons/receipt';
 	import RocketIcon from '@lucide/svelte/icons/rocket';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { createSvelteAuthClient, useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
@@ -92,6 +94,22 @@
 	];
 
 	const currentUser = useQuery(api.auth.getCurrentUser, {});
+	const customerCount = useQuery(
+		api.companies.getTotalCustomerCount,
+		() => (auth.isAuthenticated ? {} : 'skip'),
+	);
+	const subscriptionQuery = useQuery(
+		api.subscriptions.getSubscription,
+		() => (auth.isAuthenticated ? {} : 'skip'),
+	);
+
+	const FREE_CUSTOMER_LIMIT = 15;
+
+	const subscription = $derived(subscriptionQuery.data ?? { plan: 'free', status: 'active' });
+	const isPro = $derived(subscription?.plan === 'pro' && subscription?.status === 'active');
+	const isNearLimit = $derived(
+		!isPro && (customerCount.data ?? 0) >= FREE_CUSTOMER_LIMIT - 3,
+	);
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
@@ -238,15 +256,28 @@
 									</a>
 								{/snippet}
 							</DropdownMenu.Item>
-							<DropdownMenu.Item>
-								{#snippet child({ props })}
-									<a href="/app/account/notifications" {...props}>
-										<BellIcon />
-										Benachrichtigungen
-									</a>
-								{/snippet}
-							</DropdownMenu.Item>
-							{#if currentUser.data?.email === 'mail@leoj.de'}
+						<DropdownMenu.Item>
+							{#snippet child({ props })}
+								<a href="/app/account/notifications" {...props}>
+									<BellIcon />
+									Benachrichtigungen
+								</a>
+							{/snippet}
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							{#snippet child({ props })}
+								<a href="/app/account/billing" {...props}>
+									<CreditCardIcon />
+									Abrechnung
+									{#if !isPro}
+										<span class="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+											Free
+										</span>
+									{/if}
+								</a>
+							{/snippet}
+						</DropdownMenu.Item>
+						{#if currentUser.data?.email === 'mail@leoj.de'}
 								<DropdownMenu.Separator />
 								<DropdownMenu.Item>
 									{#snippet child({ props })}
@@ -346,7 +377,16 @@
 				</Kbd.Group>
 			</button>
 
-			<div class="flex shrink-0 items-center justify-end">
+			<div class="flex shrink-0 items-center justify-end gap-2">
+				{#if isNearLimit && !isPro}
+					<a
+						href="/app/account/billing"
+						class="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-all hover:from-amber-600 hover:to-orange-600 hover:shadow-md"
+					>
+						<SparklesIcon class="size-4" />
+						<span class="hidden sm:inline">Upgrade</span>
+					</a>
+				{/if}
 				<div class="hidden lg:block">
 					{#if status.hasEverConnected}
 						<div class="mr-4 flex items-center gap-2 text-sm text-gray-600">

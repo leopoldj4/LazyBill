@@ -13,12 +13,30 @@
 	import * as Table from '$lib/components/ui/table';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import { useConvexClient, useQuery } from 'convex-svelte';
+
+	const FREE_CUSTOMER_LIMIT = 15;
 
 	const { data } = $props();
 	const client = useConvexClient();
 
 	let newCustomerOpen = $state(false);
+	let upgradeDialogOpen = $state(false);
+
+	const subscriptionQuery = useQuery(api.subscriptions.getSubscription, {});
+	const subscription = $derived(subscriptionQuery.data ?? { plan: 'free', status: 'active' });
+	const isPro = $derived(subscription.plan === 'pro' && subscription.status === 'active');
+	const customerCount = useQuery(api.companies.getTotalCustomerCount, {});
+	const isAtLimit = $derived(!isPro && (customerCount.data ?? 0) >= FREE_CUSTOMER_LIMIT);
+
+	function handleAddCustomer() {
+		if (isAtLimit) {
+			upgradeDialogOpen = true;
+		} else {
+			newCustomerOpen = true;
+		}
+	}
 
 	let newCustomer = action(async (event: Event) => {
 		event.preventDefault();
@@ -47,15 +65,15 @@
 
 <SiteHeader>Kunden</SiteHeader>
 
-<div>
-	<Button
-		variant="outline"
-		onclick={() => {
-			newCustomerOpen = true;
-		}}
-	>
+<div class="flex items-center gap-2">
+	<Button variant="outline" onclick={handleAddCustomer}>
 		<PlusIcon /> Kunde hinzufügen
 	</Button>
+	{#if !isPro && customerCount.data !== undefined}
+		<span class="text-sm text-muted-foreground">
+			{customerCount.data} / {FREE_CUSTOMER_LIMIT} Kunden
+		</span>
+	{/if}
 </div>
 
 <Suspense {query} class="h-[30vh]">
@@ -144,6 +162,57 @@
 					</Button>
 				</Dialog.Footer>
 			</form>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
+
+<!-- Upgrade Dialog -->
+<Dialog.Root
+	open={upgradeDialogOpen}
+	onOpenChange={(value) => {
+		upgradeDialogOpen = value;
+	}}
+>
+	<Dialog.Portal>
+		<Dialog.Overlay />
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title class="flex items-center gap-2">
+					<SparklesIcon class="size-5 text-amber-500" />
+					Kundenlimit erreicht
+				</Dialog.Title>
+				<Dialog.Description>
+					Du hast das Limit von {FREE_CUSTOMER_LIMIT} Kunden im kostenlosen Plan erreicht. Upgrade
+					auf Pro für unbegrenzte Kunden.
+				</Dialog.Description>
+			</Dialog.Header>
+			<div class="py-4">
+				<div class="rounded-lg border bg-gradient-to-br from-amber-50/50 to-orange-50/50 p-4 dark:from-amber-950/20 dark:to-orange-950/20">
+					<div class="flex items-baseline gap-1">
+						<span class="text-2xl font-bold">10€</span>
+						<span class="text-muted-foreground">/ Monat</span>
+					</div>
+					<ul class="mt-3 space-y-2 text-sm">
+						<li>✓ Unbegrenzte Kunden</li>
+						<li>✓ Unbegrenzte Rechnungen</li>
+						<li>✓ Prioritäts-Support</li>
+					</ul>
+				</div>
+			</div>
+			<Dialog.Footer>
+				<Button
+					variant="outline"
+					onclick={() => {
+						upgradeDialogOpen = false;
+					}}>Später</Button
+				>
+				<a href="/app/account/billing">
+					<Button class="bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600">
+						<SparklesIcon class="size-4" />
+						Jetzt upgraden
+					</Button>
+				</a>
+			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Portal>
 </Dialog.Root>

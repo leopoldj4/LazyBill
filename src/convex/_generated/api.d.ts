@@ -17,6 +17,7 @@ import type * as http from "../http.js";
 import type * as invoiceState from "../invoiceState.js";
 import type * as invoices from "../invoices.js";
 import type * as migrations from "../migrations.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as tasks from "../tasks.js";
 import type * as telegram from "../telegram.js";
 import type * as timeEntries from "../timeEntries.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   invoiceState: typeof invoiceState;
   invoices: typeof invoices;
   migrations: typeof migrations;
+  subscriptions: typeof subscriptions;
   tasks: typeof tasks;
   telegram: typeof telegram;
   timeEntries: typeof timeEntries;

@@ -93,4 +93,15 @@ const feedback = defineTable({
 	message: v.string(),
 });
 
-export default defineSchema({ customers, invoices, companies, betaUsers, tasks, timeEntries, feedback });
+const subscriptions = defineTable({
+	userId: v.string(),
+	stripeCustomerId: v.string(),
+	stripeSubscriptionId: v.string(),
+	plan: v.string(),
+	status: v.string(),
+	currentPeriodEnd: v.optional(v.number()),
+})
+	.index('by_userId', ['userId'])
+	.index('by_stripeSubscriptionId', ['stripeSubscriptionId']);
+
+export default defineSchema({ customers, invoices, companies, betaUsers, tasks, timeEntries, feedback, subscriptions });

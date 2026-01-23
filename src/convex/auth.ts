@@ -37,7 +37,17 @@ export const createCompanyForUser = internalMutation({
 	},
 });
 
+function getStripePlugin() {
+	return null;
+}
+
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
+	const plugins: any[] = [convex({ authConfig })];
+	const stripePlugin = getStripePlugin();
+	if (stripePlugin) {
+		plugins.push(stripePlugin);
+	}
+
 	return betterAuth({
 		baseURL: siteUrl,
 		database: authComponent.adapter(ctx),
@@ -45,7 +55,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 			enabled: true,
 			requireEmailVerification: false,
 		},
-		plugins: [convex({ authConfig })],
+		plugins,
 		socialProviders: {
 			google: {
 				enabled: true,
@@ -71,7 +81,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 							});
 						}
 
-						// Send Telegram notification for new signup
 						await notifyNewUserSignup({
 							name: user.name,
 							email: user.email,

@@ -110,3 +110,26 @@ export const remove = mutation({
 		await ctx.db.delete('companies', company._id);
 	},
 });
+
+export const getTotalCustomerCount = query({
+	args: {},
+	handler: async (ctx) => {
+		const userId = await getUserId(ctx);
+		const companies = await ctx.db
+			.query('companies')
+			.withIndex('by_userId', (q) => q.eq('userId', userId))
+			.collect();
+
+		let totalCustomers = 0;
+		for (const company of companies) {
+			const customers = await ctx.db
+				.query('customers')
+				.withIndex('by_companyId', (q) => q.eq('companyId', company._id))
+				.filter((q) => q.eq(q.field('isArchived'), false))
+				.collect();
+			totalCustomers += customers.length;
+		}
+
+		return totalCustomers;
+	},
+});
