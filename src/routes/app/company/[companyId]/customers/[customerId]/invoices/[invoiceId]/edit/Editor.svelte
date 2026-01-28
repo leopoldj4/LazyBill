@@ -15,6 +15,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { formatDate, parseDate } from '$lib/date';
 	import { sleep } from '$lib';
+	import { invoicePdfDefinition } from '$lib/pdfmake/invoice';
 	import { createPDF } from '$lib/typst/export';
 	import { invoiceTemplate } from '$lib/typst/invoice';
 	import CircleMinusIcon from '@lucide/svelte/icons/circle-minus';
@@ -43,6 +44,9 @@
 
 	let typstDocument = $derived(() =>
 		invoiceTemplate(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
+	);
+	let pdfDocument = $derived(() =>
+		invoicePdfDefinition(company, customer, articles, invoiceDate, invoice.number, due || 0, notes),
 	);
 
 	const done = action(async () => {
@@ -170,5 +174,5 @@
 		</div>
 	</div>
 
-	<Preview typstDocument={typstDocument()} />
+	<Preview documentDefinition={pdfDocument()} />
 </div>
