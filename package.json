@@ -50,6 +50,7 @@
 		"convex-svelte": "^0.0.12",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
+		"pdfmake": "^0.3.3",
 		"places-autocomplete-svelte": "^2.2.20",
 		"plaid": "^41.0.0",
 		"posthog-js": "^1.310.1",
