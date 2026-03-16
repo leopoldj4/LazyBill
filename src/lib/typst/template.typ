@@ -146,7 +146,7 @@
 
   /// The font family used for the document.
   /// -> str
-  font: "Source Sans Pro",
+  font: "Atkinson Hyperlegible",
   
   /// -> content
   body
