@@ -84,7 +84,7 @@
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
 		if (e.ctrlKey || e.metaKey) {
-			const delta = e.deltaY > 0 ? 0.9 : 1.1;
+			const delta = 1 - e.deltaY * 0.002;
 			const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * delta));
 
 			const rect = container!.getBoundingClientRect();
