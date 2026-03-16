@@ -24,6 +24,16 @@
 	let startX = 0;
 	let startY = 0;
 
+	// SVG natural dimensions (before scaling)
+	let svgNaturalWidth = 0;
+	let svgNaturalHeight = 0;
+
+	// Scrollbar state
+	let isDraggingScrollbarH = false;
+	let isDraggingScrollbarV = false;
+	let scrollbarDragStart = 0;
+	let scrollbarDragTranslateStart = 0;
+
 	// Touch gesture state
 	let lastTouchDist = 0;
 	let lastTouchCenterX = 0;
@@ -44,13 +54,13 @@
 
 		const containerWidth = container.clientWidth;
 		const containerHeight = container.clientHeight;
-		const svgWidth = parseFloat(svgElem.getAttribute('width')!);
-		const svgHeight = parseFloat(svgElem.getAttribute('height')!);
+		svgNaturalWidth = parseFloat(svgElem.getAttribute('width')!);
+		svgNaturalHeight = parseFloat(svgElem.getAttribute('height')!);
 
-		fitScale = Math.min(containerWidth / svgWidth, containerHeight / svgHeight);
+		fitScale = Math.min(containerWidth / svgNaturalWidth, containerHeight / svgNaturalHeight);
 		scale = fitScale;
-		translateX = (containerWidth - svgWidth * fitScale) / 2;
-		translateY = (containerHeight - svgHeight * fitScale) / 2;
+		translateX = (containerWidth - svgNaturalWidth * fitScale) / 2;
+		translateY = (containerHeight - svgNaturalHeight * fitScale) / 2;
 	}
 
 	async function render(doc: string) {
@@ -177,6 +187,88 @@
 		}
 	}
 
+	// Scrollbar calculations
+	const SCROLLBAR_SIZE = 6;
+	const SCROLLBAR_PADDING = 2;
+	const MIN_THUMB = 24;
+
+	let scrollbar = $derived.by(() => {
+		if (!container) return { showH: false, showV: false } as const;
+		const cw = container.clientWidth;
+		const ch = container.clientHeight;
+		const contentW = svgNaturalWidth * scale;
+		const contentH = svgNaturalHeight * scale;
+
+		const showH = contentW > cw + 1;
+		const showV = contentH > ch + 1;
+
+		const trackH = cw - SCROLLBAR_PADDING * 2 - (showV ? SCROLLBAR_SIZE + SCROLLBAR_PADDING : 0);
+		const trackV = ch - SCROLLBAR_PADDING * 2 - (showH ? SCROLLBAR_SIZE + SCROLLBAR_PADDING : 0);
+
+		const hThumbRatio = Math.min(1, cw / contentW);
+		const vThumbRatio = Math.min(1, ch / contentH);
+
+		const hThumbSize = Math.max(MIN_THUMB, hThumbRatio * trackH);
+		const vThumbSize = Math.max(MIN_THUMB, vThumbRatio * trackV);
+
+		const maxScrollX = contentW - cw;
+		const maxScrollY = contentH - ch;
+
+		const hFraction = maxScrollX > 0 ? Math.max(0, Math.min(1, -translateX / maxScrollX)) : 0;
+		const vFraction = maxScrollY > 0 ? Math.max(0, Math.min(1, -translateY / maxScrollY)) : 0;
+
+		const hThumbPos = hFraction * (trackH - hThumbSize);
+		const vThumbPos = vFraction * (trackV - vThumbSize);
+
+		return { showH, showV, trackH, trackV, hThumbSize, vThumbSize, hThumbPos, vThumbPos };
+	});
+
+	function handleScrollbarPointerDown(axis: 'h' | 'v', e: PointerEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (axis === 'h') {
+			isDraggingScrollbarH = true;
+			scrollbarDragStart = e.clientX;
+			scrollbarDragTranslateStart = translateX;
+		} else {
+			isDraggingScrollbarV = true;
+			scrollbarDragStart = e.clientY;
+			scrollbarDragTranslateStart = translateY;
+		}
+		(e.target as HTMLElement).setPointerCapture(e.pointerId);
+	}
+
+	function handleScrollbarPointerMove(axis: 'h' | 'v', e: PointerEvent) {
+		if (axis === 'h' && !isDraggingScrollbarH) return;
+		if (axis === 'v' && !isDraggingScrollbarV) return;
+		if (!container) return;
+
+		const cw = container.clientWidth;
+		const ch = container.clientHeight;
+		const contentW = svgNaturalWidth * scale;
+		const contentH = svgNaturalHeight * scale;
+
+		if (axis === 'h') {
+			const trackH = scrollbar.trackH!;
+			const thumbSize = scrollbar.hThumbSize!;
+			const delta = e.clientX - scrollbarDragStart;
+			const scrollDelta = (delta / (trackH - thumbSize)) * (contentW - cw);
+			translateX = scrollbarDragTranslateStart - scrollDelta;
+		} else {
+			const trackV = scrollbar.trackV!;
+			const thumbSize = scrollbar.vThumbSize!;
+			const delta = e.clientY - scrollbarDragStart;
+			const scrollDelta = (delta / (trackV - thumbSize)) * (contentH - ch);
+			translateY = scrollbarDragTranslateStart - scrollDelta;
+		}
+	}
+
+	function handleScrollbarPointerUp(axis: 'h' | 'v', e: PointerEvent) {
+		if (axis === 'h') isDraggingScrollbarH = false;
+		if (axis === 'v') isDraggingScrollbarV = false;
+		(e.target as HTMLElement).releasePointerCapture(e.pointerId);
+	}
+
 	function resetView() {
 		fitToContainer();
 	}
@@ -214,10 +306,11 @@
 			</button>
 			<button
 				onclick={resetView}
-				class="min-w-[3.5rem] rounded px-2 py-1 text-center text-xs tabular-nums hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+				class="group min-w-[3.5rem] rounded px-2 py-1 text-center text-xs tabular-nums hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
 				title="Reset view"
 			>
-				{Math.round(scale * 100)}%
+				<span class="group-hover:hidden">{Math.round(scale * 100)}%</span>
+				<span class="hidden group-hover:inline">reset</span>
 			</button>
 			<button
 				onclick={zoomIn}
@@ -252,6 +345,50 @@
 					<Spinner />
 				</div>
 			</div>
+
+			<!-- Horizontal scrollbar -->
+			{#if scrollbar.showH}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					class="absolute bottom-0 left-0 z-10"
+					style="height: {SCROLLBAR_SIZE + SCROLLBAR_PADDING * 2}px; width: calc(100% - {scrollbar.showV ? SCROLLBAR_SIZE + SCROLLBAR_PADDING : 0}px);"
+				>
+					<div
+						class="absolute rounded-full bg-black/40 transition-colors hover:bg-black/60 dark:bg-white/40 dark:hover:bg-white/60"
+						style="
+							left: {SCROLLBAR_PADDING + scrollbar.hThumbPos}px;
+							top: {SCROLLBAR_PADDING}px;
+							width: {scrollbar.hThumbSize}px;
+							height: {SCROLLBAR_SIZE}px;
+						"
+						onpointerdown={(e) => handleScrollbarPointerDown('h', e)}
+						onpointermove={(e) => handleScrollbarPointerMove('h', e)}
+						onpointerup={(e) => handleScrollbarPointerUp('h', e)}
+					></div>
+				</div>
+			{/if}
+
+			<!-- Vertical scrollbar -->
+			{#if scrollbar.showV}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					class="absolute top-0 right-0 z-10"
+					style="width: {SCROLLBAR_SIZE + SCROLLBAR_PADDING * 2}px; height: calc(100% - {scrollbar.showH ? SCROLLBAR_SIZE + SCROLLBAR_PADDING : 0}px);"
+				>
+					<div
+						class="absolute rounded-full bg-black/40 transition-colors hover:bg-black/60 dark:bg-white/40 dark:hover:bg-white/60"
+						style="
+							top: {SCROLLBAR_PADDING + scrollbar.vThumbPos}px;
+							left: {SCROLLBAR_PADDING}px;
+							height: {scrollbar.vThumbSize}px;
+							width: {SCROLLBAR_SIZE}px;
+						"
+						onpointerdown={(e) => handleScrollbarPointerDown('v', e)}
+						onpointermove={(e) => handleScrollbarPointerMove('v', e)}
+						onpointerup={(e) => handleScrollbarPointerUp('v', e)}
+					></div>
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}
