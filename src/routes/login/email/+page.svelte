@@ -41,12 +41,12 @@
 
 	<div class="grid gap-2">
 		<Label for="email">Email</Label>
-		<Input id="email" type="email" placeholder="m@example.com" required bind:value={email} />
+		<Input id="email" type="email" placeholder="m@example.com" required bind:value={email} data-1p-ignore={false} />
 	</div>
 
 	<div class="grid gap-2">
 		<Label for="password">Password</Label>
-		<Input id="password" type="password" placeholder="********" required bind:value={password} />
+		<Input id="password" type="password" placeholder="********" required bind:value={password} data-1p-ignore={false} />
 	</div>
 
 	{#if error}

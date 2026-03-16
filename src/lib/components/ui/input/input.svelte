@@ -16,6 +16,7 @@
 		files = $bindable(),
 		class: className,
 		"data-slot": dataSlot = "input",
+		"data-1p-ignore": data1pIgnore = true,
 		...restProps
 	}: Props = $props();
 </script>
@@ -31,6 +32,7 @@
 			className
 		)}
 		type="file"
+		data-1p-ignore={data1pIgnore || undefined}
 		bind:files
 		bind:value
 		{...restProps}
@@ -46,6 +48,7 @@
 			className
 		)}
 		{type}
+		data-1p-ignore={data1pIgnore || undefined}
 		bind:value
 		{...restProps}
 	/>

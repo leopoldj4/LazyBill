@@ -46,7 +46,7 @@
 				<div class="grid gap-4">
 					<div class="grid gap-2">
 						<Label for="name">Name</Label>
-						<Input id="name" type="text" placeholder="John Doe" required bind:value={name} />
+						<Input id="name" type="text" placeholder="John Doe" required bind:value={name} data-1p-ignore={false} />
 					</div>
 					<div class="grid gap-2">
 						<Label for="email">Email</Label>
@@ -56,11 +56,12 @@
 							placeholder="m@example.com"
 							required
 							bind:value={email}
+							data-1p-ignore={false}
 						/>
 					</div>
 					<div class="grid gap-2">
 						<Label for="password">Password</Label>
-						<Input id="password" type="password" required bind:value={password} />
+						<Input id="password" type="password" required bind:value={password} data-1p-ignore={false} />
 					</div>
 					{#if error}
 						<p class="text-red-500">{error}</p>
