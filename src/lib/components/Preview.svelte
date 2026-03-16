@@ -82,8 +82,8 @@
 	}
 
 	function handleWheel(e: WheelEvent) {
+		e.preventDefault();
 		if (e.ctrlKey || e.metaKey) {
-			e.preventDefault();
 			const delta = e.deltaY > 0 ? 0.9 : 1.1;
 			const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * delta));
 
@@ -281,6 +281,13 @@
 		scale = Math.max(MIN_SCALE, scale / 1.25);
 	}
 
+	// Attach wheel listener as non-passive so preventDefault() works
+	$effect(() => {
+		if (!container) return;
+		container.addEventListener('wheel', handleWheel, { passive: false });
+		return () => container!.removeEventListener('wheel', handleWheel);
+	});
+
 	$effect(() => {
 		if (!browser) return;
 		renderDebounced(typstDocument);
@@ -328,7 +335,6 @@
 			class="aspect-[1/1.414] w-full touch-none overflow-hidden bg-gray-100 dark:bg-neutral-900"
 			class:cursor-grabbing={isPanning}
 			class:cursor-default={!isPanning}
-			onwheel={handleWheel}
 			onpointerdown={handlePointerDown}
 			onpointermove={handlePointerMove}
 			onpointerup={handlePointerUp}
