@@ -16,6 +16,7 @@
 	let error: Error | null = $state(null);
 	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
+	let fitScale = 1;
 	let scale = $state(1);
 	let translateX = $state(0);
 	let translateY = $state(0);
@@ -36,10 +37,27 @@
 		rerender = () => render(typstDocument);
 	}
 
+	function fitToContainer() {
+		if (!container || !preview) return;
+		const svgElem = preview.querySelector('svg');
+		if (!svgElem) return;
+
+		const containerWidth = container.clientWidth;
+		const containerHeight = container.clientHeight;
+		const svgWidth = parseFloat(svgElem.getAttribute('width')!);
+		const svgHeight = parseFloat(svgElem.getAttribute('height')!);
+
+		fitScale = Math.min(containerWidth / svgWidth, containerHeight / svgHeight);
+		scale = fitScale;
+		translateX = (containerWidth - svgWidth * fitScale) / 2;
+		translateY = (containerHeight - svgHeight * fitScale) / 2;
+	}
+
 	async function render(doc: string) {
 		try {
 			const svg = await typst.svg({ mainContent: doc });
 			preview!.innerHTML = svg;
+			fitToContainer();
 		} catch (e) {
 			console.log(doc);
 			error = e as Error;
@@ -160,9 +178,7 @@
 	}
 
 	function resetView() {
-		scale = 1;
-		translateX = 0;
-		translateY = 0;
+		fitToContainer();
 	}
 
 	function zoomIn() {
