@@ -8,5 +8,5 @@ export const load = async ({ cookies }) => {
 	if (authState.isAuthenticated) {
 		throw redirect(307, '/app');
 	}
-	throw redirect(307, '/login');
+	return {};
 };
