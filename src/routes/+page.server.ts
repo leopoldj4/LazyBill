@@ -5,8 +5,11 @@ import { createAuth } from '$convex/auth';
 export const load = async ({ cookies }) => {
 	const authState = await getAuthState(createAuth, cookies);
 
+	// Redirect authenticated users to the app dashboard
 	if (authState.isAuthenticated) {
 		throw redirect(307, '/app');
 	}
-	throw redirect(307, '/login');
+
+	// Show landing page for unauthenticated users
+	return {};
 };
